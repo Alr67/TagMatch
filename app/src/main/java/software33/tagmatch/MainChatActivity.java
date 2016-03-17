@@ -1,5 +1,6 @@
 package software33.tagmatch;
 
+import android.content.Intent;
 import android.content.res.Resources;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -89,12 +90,20 @@ public class MainChatActivity extends AppCompatActivity {
     {
         ListChatModel tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
         // SHOW ALERT
-        Toast.makeText(CustomListView,
+        /*Toast.makeText(CustomListView,
                 ""+tempValues.getUserName()
                         +"Image:"+tempValues.getImage()
             +"Producte:"+tempValues.getTitleProduct(),
         Toast.LENGTH_LONG)
         .show();
+        */
+
+        Intent intent = new Intent(this, SingleChatActivity.class);
+        Bundle b = new Bundle();
+        b.putString("UserName", tempValues.getUserName());
+        b.putString("TitleProduct", tempValues.getTitleProduct());
+        intent.putExtras(b);
+        startActivity(intent);
     }
 
 }
