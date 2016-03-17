@@ -5,4 +5,5 @@
     <string name="search_preview">Buscar xat</string>
     <string name="main_chat_activity_title">Xats</string>
     <string name="empty_chat_list">No existeix cap xat encara</string>
+    <string name="send_message">Enviar</string>
 </resources>
