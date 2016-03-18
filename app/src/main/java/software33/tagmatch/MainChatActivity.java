@@ -71,7 +71,7 @@ public class MainChatActivity extends AppCompatActivity {
     public void setListData()
     {
 
-        for (int i = 0; i < 11; i++) {
+        for (int i = 0; i < 10; i++) {
 
             final ListChatModel sched = new ListChatModel();
 
