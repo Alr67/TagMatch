@@ -89,14 +89,6 @@ public class MainChatActivity extends AppCompatActivity {
     public void onItemClick(int mPosition)
     {
         ListChatModel tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
-        // SHOW ALERT
-        /*Toast.makeText(CustomListView,
-                ""+tempValues.getUserName()
-                        +"Image:"+tempValues.getImage()
-            +"Producte:"+tempValues.getTitleProduct(),
-        Toast.LENGTH_LONG)
-        .show();
-        */
 
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
