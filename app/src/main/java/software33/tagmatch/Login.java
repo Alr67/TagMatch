@@ -12,6 +12,16 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+
+import java.io.IOException;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.URL;
+import java.util.ArrayList;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -23,13 +33,44 @@ public class Login extends AppCompatActivity {
     @Bind(R.id.forg) Button forg;
 
     @Bind(R.id.name) EditText username;
-    @Bind(R.id.pass) EditText pass;
+    @Bind(R.id.pass) EditText passw;
+
 
     @OnClick(R.id.log)
-    protected void validate_login() {
+    protected void validate_login() throws IOException {
+        String name = new String();
+        String pass = new String();
+        if(username.getText() != null) {
+            name = username.getText().toString();
+        }
+        if(passw.getText() != null) {
+            pass = passw.getText().toString();
+        }
+        URL URL_connect = new URL("http://192.168.1.1/");
+
+        Authenticator.setDefault(new Authenticator(){
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication("myuser","mypass".toCharArray()); ////Cal modificar aixo
+            }});
+
+        HttpURLConnection urlConnection = (HttpURLConnection) URL_connect.openConnection();
+
+        ArrayList<String> parameters = new ArrayList<>();
+        parameters.add(name);
+        parameters.add(pass);
+
+       // JSONArray jdata = parameters;
+    }
+
+    @OnClick(R.id.reg)
+    protected void intent_reg() {
         Toast.makeText(getApplicationContext(),username.getText().toString(),Toast.LENGTH_SHORT).show();
     }
 
+    @OnClick(R.id.forg)
+    protected void intent_forg() {
+        Toast.makeText(getApplicationContext(),username.getText().toString(),Toast.LENGTH_SHORT).show();
+    }
 
 
     @Override
