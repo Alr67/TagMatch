@@ -19,7 +19,8 @@ public class MainChatActivity extends AppCompatActivity {
     CustomListChatAdapter adapter;
     public MainChatActivity CustomListView = null;
     public ArrayList<ListChatModel> CustomListViewValuesArr = new ArrayList<ListChatModel>();
-
+    public ArrayList<ListChatModel> CustomListViewValuesArrSearch;
+    boolean searching = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +45,7 @@ public class MainChatActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();
-        inflater.inflate(R.menu.menu_main, menu);
+        inflater.inflate(R.menu.menu_option_main_chat, menu);
         inflater.inflate(R.menu.menu_search_chat, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         final SearchView searchView = (SearchView) MenuItemCompat.getActionView(searchItem);
@@ -52,7 +53,7 @@ public class MainChatActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 // perform query here
-
+                //No query to do
                 // workaround to avoid issues with some emulators and keyboard devices firing twice if a keyboard enter is used
                 // see https://code.google.com/p/android/issues/detail?id=24599
                 searchView.clearFocus();
@@ -62,6 +63,21 @@ public class MainChatActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                CustomListViewValuesArrSearch = new ArrayList<ListChatModel>();
+                for (ListChatModel listChatModel : CustomListViewValuesArr){
+                    if (listChatModel.getUserName().toLowerCase().contains(newText.toLowerCase())) {
+                        CustomListViewValuesArrSearch.add(listChatModel);
+                    }
+                }
+                //Set the new list of chats
+                Resources res =getResources();
+                searching = !newText.isEmpty();
+
+                if (searching)adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArrSearch,res );
+                else adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+
+                list.setAdapter( adapter );
+
                 return false;
             }
         });
@@ -76,7 +92,7 @@ public class MainChatActivity extends AppCompatActivity {
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
+        if (id == R.id.action_delete_chat) {
             return true;
         }
 
@@ -104,7 +120,9 @@ public class MainChatActivity extends AppCompatActivity {
 
     public void onItemClick(int mPosition)
     {
-        ListChatModel tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
+        ListChatModel tempValues;
+        if (searching) tempValues = ( ListChatModel ) CustomListViewValuesArrSearch.get(mPosition);
+        else tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
 
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
