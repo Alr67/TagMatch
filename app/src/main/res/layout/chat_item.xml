@@ -8,23 +8,22 @@
     <TableRow>
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
-            android:layout_width="110dp"
+            android:layout_width="60dp"
             android:layout_height="match_parent"
-            android:paddingLeft="10dp"
             android:paddingTop="5dp"
             android:paddingBottom="5dp"
-            >
+            android:layout_gravity="center">
             <ImageView
                 android:layout_height="wrap_content"
                 android:layout_width="wrap_content"
-                android:layout_gravity="left|top"
-                android:scaleType="centerCrop"
+                android:scaleType="fitCenter"
                 android:id="@+id/image"
 
-                />
+                android:src="@drawable/image0"
+                android:layout_gravity="center" />
         </LinearLayout>
         <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="fill_parent"
+            android:layout_width="240dp"
             android:layout_height="wrap_content"
             android:paddingTop="0dip" android:layout_gravity="top"
             >
@@ -57,15 +56,6 @@
             </TableRow>
         </TableLayout>
 
-        <ImageView
-            android:layout_height="30dp"
-            android:layout_width="30dp"
-            android:scaleType="centerCrop"
-            android:background="@android:drawable/ic_menu_delete"
-            android:layout_marginLeft="10dp"
-            android:layout_marginTop="10dp"
-            android:gravity="left"
-            />
     </TableRow>
 
 

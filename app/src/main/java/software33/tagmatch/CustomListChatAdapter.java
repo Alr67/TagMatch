@@ -89,8 +89,7 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
 
         if(data.size()<=0)
         {
-            holder.text.setText(R.string.empty_chat_list);
-
+            vi = inflater.inflate(R.layout.empty_list_chat, null);
         }
         else
         {
@@ -110,7 +109,9 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
             /******** Set Item Click Listner for LayoutInflater for each row *******/
 
             vi.setOnClickListener(new OnItemClickListener( position ));
+            vi.setOnLongClickListener(new OnItemLongClickListener( position ));
         }
+
         return vi;
     }
 
@@ -136,6 +137,28 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
             /****  Call  onItemClick Method inside CustomListViewAndroidExample Class ****/
 
             sct.onItemClick(mPosition);
+        }
+    }
+
+    /********* Called when Item Long click in ListView ************/
+    private class OnItemLongClickListener  implements View.OnLongClickListener {
+        private int mPosition;
+
+        OnItemLongClickListener(int position){
+            mPosition = position;
+        }
+
+        @Override
+        public boolean onLongClick(View arg0) {
+
+
+            MainChatActivity sct = (MainChatActivity)activity;
+
+            /****  Call  onItemClick Method inside CustomListViewAndroidExample Class ****/
+
+            sct.onItemLongClick(mPosition);
+
+            return true;
         }
     }
 }

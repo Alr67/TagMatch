@@ -7,4 +7,8 @@
     <string name="empty_chat_list">No existeix cap xat encara</string>
     <string name="send_message">Enviar</string>
     <string name="action_delete_chat">Esborrar xat</string>
+    <string name="dialog_title_delete_chat">Eliminar xat</string>
+    <string name="dialog_message_delete_chat">Estàs segur de voler eliminar aquest xat?</string>
+    <string name="dialog_confirm_delete_chat">Sí</string>
+    <string name="dialog_cancel_delete_chat">Cancelar</string>
 </resources>
