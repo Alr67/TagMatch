@@ -19,7 +19,11 @@
             </intent-filter>
         </activity>
         <activity android:name=".MainChatActivity" />
-        <activity android:name=".SingleChatActivity"></activity>
+        <activity android:name=".SingleChatActivity" />
+        <activity
+            android:name=".Login"
+            android:label="@string/title_activity_login"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
