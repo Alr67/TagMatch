@@ -16,6 +16,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
+
 import java.util.ArrayList;
 
 public class MainChatActivity extends AppCompatActivity {
@@ -93,6 +95,9 @@ public class MainChatActivity extends AppCompatActivity {
     //Set data in the array
     public void setListData()
     {
+
+        Firebase myFirebaseRef =
+                new Firebase("https://torrid-torch-42.firebaseio.com/#-KDTJDhghptJG7CRDwtv|b141f94cffa90bfba7d0f306e9b11038");
 
         for (int i = 0; i < 10; i++) {
 
