@@ -23,6 +23,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private Button buttonSend;
     private boolean side = false;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
