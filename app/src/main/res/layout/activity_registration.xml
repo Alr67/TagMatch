@@ -91,5 +91,6 @@
         android:layout_height="wrap_content"
         android:text="@string/registration_button"
         android:id="@+id/registrationButton"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="validateUser" />
 </LinearLayout>
