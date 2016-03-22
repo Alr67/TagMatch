@@ -11,4 +11,10 @@
     <string name="dialog_message_delete_chat">Estàs segur de voler eliminar aquest xat?</string>
     <string name="dialog_confirm_delete_chat">Sí</string>
     <string name="dialog_cancel_delete_chat">Cancelar</string>
+    <string name="registration_title">Registre</string>
+    <string name="registration_button">Envia</string>
+    <string name="registration_hint_username">Usuari</string>
+    <string name="registration_hint_mail">Correu Electrònic</string>
+    <string name="registration_hint_password">Contrasenya</string>
+    <string name="registration_hint_password_confirm">Confirmacíó Contrasenya</string>
 </resources>
