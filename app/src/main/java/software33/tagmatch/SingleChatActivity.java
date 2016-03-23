@@ -33,10 +33,10 @@ public class SingleChatActivity extends AppCompatActivity {
     private ListView listView;
     private EditText chatText;
     private Button buttonSend;
-    private boolean mySide = true;
 
     private Firebase myFirebaseRef;
     private Firebase messagesRef;
+    private Firebase usersRef;
     private String userName;
     private String titleProduct;
     private String idChat;
@@ -157,8 +157,8 @@ public class SingleChatActivity extends AppCompatActivity {
     //Set data in the array
     public void setListData(String name, String text)
     {
-        if (name.equals("My User Name")) {
-            chatArrayAdapter.add(new ChatMessage(true, "My User Name", text));
+        if (name.equals("My Id")) {
+            chatArrayAdapter.add(new ChatMessage(true, "My Id", text));
         }
         else {
             chatArrayAdapter.add(new ChatMessage(false, name, text));
@@ -167,26 +167,19 @@ public class SingleChatActivity extends AppCompatActivity {
     }
 
     private boolean sendChatMessage() {
-        //TODO: Get my user name
-        String name;
-        if (mySide)
-            name = "My User Name";
-        else
-            name = userName;
-
-        //chatArrayAdapter.add(new ChatMessage(mySide, name, chatText.getText().toString()));
-
         String text = chatText.getText().toString();
         if (!text.isEmpty()) {
+            //TODO: Get my id
+            String idName = "My Id";
+
             Map<String, Object> values = new HashMap<>();
-            values.put("senderId", name);
+            values.put("senderId", idName);
             values.put("text", text);
 
             messagesRef.push().setValue(values);
 
             chatText.setText("");
         }
-        //mySide = !mySide;
 
         return true;
     }

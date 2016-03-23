@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.firebase.client.AuthData;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -37,7 +38,6 @@ public class MainChatActivity extends AppCompatActivity {
     public ArrayList<ListChatModel> CustomListViewValuesArr = new ArrayList<ListChatModel>();
     public ArrayList<ListChatModel> CustomListViewValuesArrSearch;
     boolean searching = false;
-    boolean first = true;
 
     private Firebase myFirebaseRef;
     private Firebase chatsRef;
@@ -65,7 +65,7 @@ public class MainChatActivity extends AppCompatActivity {
         chatsRef = myFirebaseRef.child("chats");
         usersRef = myFirebaseRef.child("users");
 
-        createChat();
+        createUser("correu1@xd.com", "contra123");
 
         /******** Take some data in Arraylist ( CustomListViewValuesArr ) ***********/
         //Update Data
@@ -185,21 +185,61 @@ public class MainChatActivity extends AppCompatActivity {
         }
     }
 
-    public String createUser(String name) {
-        Firebase id = usersRef.push();
-        Map<String, Object> blockeds = new HashMap<>();
-        //blockeds.put("user","xds");
-        Map<String, Object> chats = new HashMap<>();
-        //chats.put("chat","chat1");
-        User user = new User(name,"",blockeds,chats);
-        id.setValue(user);
-        return id.getKey();
+    String uid1;
+    String uid2;
+
+    boolean first = true;
+    boolean second = false;
+    private void setUID(String s){
+        if (first) {
+            uid1 = s;
+            usersRef.child(uid1).setValue(new User("My User Name","",new HashMap<String, Object>(),new HashMap<String, Object>()));
+            createUser("correu2@xd.com", "contra123");
+            first = false;
+            second = true;
+        }
+        else if (second) {
+            uid2 = s;
+            usersRef.child(uid2).setValue(new User("Usuari0","",new HashMap<String, Object>(),new HashMap<String, Object>()));
+            createChat();
+        }
+    }
+
+    public void createUser(final String email, final String password) {
+        myFirebaseRef.createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
+            @Override
+            public void onSuccess(Map<String, Object> result) {
+                myFirebaseRef.authWithPassword(
+                        email,
+                        password,
+                        new Firebase.AuthResultHandler() {
+                            @Override
+                            public void onAuthenticated(AuthData authData) {
+                                /*usersRef.child(authData.getUid()).setValue
+                                        (new User(name,"",new HashMap<String, Object>(),new HashMap<String, Object>()));*/
+                            }
+
+                            @Override
+                            public void onAuthenticationError(FirebaseError error) {
+                                // Should hopefully not happen as we just created the user.
+                            }
+                        }
+                );
+                setUID(result.get("uid").toString());
+            }
+
+            @Override
+            public void onError(FirebaseError firebaseError) {
+                Toast.makeText(getApplicationContext(),"error Creating",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     public String createChat() {
         Firebase id = chatsRef.push();
-        String id1 = createUser("My User Name");
-        String id2 = createUser("Usuari0");
+
+        String id1 = uid1;
+        String id2 = uid2;
 
         Map<String, Object> users = new HashMap<>();
         users.put(id1, "My User Name");
@@ -207,6 +247,16 @@ public class MainChatActivity extends AppCompatActivity {
 
         ChatInfo chatInfo = new ChatInfo("Anuncio Test", users);
         id.child("info").setValue(chatInfo);
+
+        //Set the chats to each user
+        Map<String, Object> chats1 = new HashMap<>();
+        chats1.put(id.getKey(),"");
+        usersRef.child(id1).child("chats").setValue(chats1);
+
+        Map<String, Object> chats2 = new HashMap<>();
+        chats2.put(id.getKey(),"");
+        usersRef.child(id2).child("chats").setValue(chats2);
+
         return id.getKey();
     }
 
