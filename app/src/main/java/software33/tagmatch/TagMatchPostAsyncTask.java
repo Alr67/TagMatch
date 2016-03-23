@@ -44,15 +44,19 @@ public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, 
             con.getOutputStream().close();
             con.connect();
 
-        /*>=400 errorStream
-        else inputStream*/
+            /*>=400 errorStream
+            else inputStream*/
+
+            JSONObject aux;
+
+            if (con.getResponseCode() >= 400)
+                aux = new JSONObject(iStreamToString(con.getErrorStream()));
+            else
+                aux = new JSONObject(iStreamToString(con.getInputStream()));
 
             con.disconnect();
 
-            if (con.getResponseCode() >= 400)
-                return new JSONObject(iStreamToString(con.getErrorStream()));
-            else
-                return new JSONObject(iStreamToString(con.getInputStream()));
+            return aux;
 
         } catch (IOException | JSONException e) {
             e.printStackTrace();
