@@ -36,9 +36,10 @@ public class SingleChatActivity extends AppCompatActivity {
     private boolean mySide = true;
 
     private Firebase myFirebaseRef;
-    private Firebase chatsRef;
+    private Firebase messagesRef;
     private String userName;
     private String titleProduct;
+    private String idChat;
     private ChildEventListener mListener;
 
     @Override
@@ -48,17 +49,18 @@ public class SingleChatActivity extends AppCompatActivity {
 
         setTitle("");
 
+        Bundle b = getIntent().getExtras();
+        userName = b.getString("UserName");
+        titleProduct = b.getString("TitleProduct");
+        idChat = b.getString("IdChat");
+
         //Get Firebase Reference
         myFirebaseRef =
                 new Firebase("https://torrid-torch-42.firebaseio.com/");
 
-        chatsRef = myFirebaseRef.child("chats");
+        messagesRef = myFirebaseRef.child("chats").child(idChat).child("messages");
 
         /************** Set the action Bar *****************/
-
-        Bundle b = getIntent().getExtras();
-        userName = b.getString("UserName");
-        titleProduct = b.getString("TitleProduct");
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayOptions(actionBar.getDisplayOptions()
@@ -113,29 +115,12 @@ public class SingleChatActivity extends AppCompatActivity {
             }
         });
 
-        //Get Data
-        /*
-        chatsRef.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                if (first) {
-                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                        Chat c = userSnapshot.getValue(Chat.class);
-                        setListData(c.getName(), c.getText());
-                    }
-                }
-                first = false;
-            }
-            @Override public void onCancelled(FirebaseError error) { }
-        });
-        */
-
         //Update Data
-        mListener = this.chatsRef.addChildEventListener(new ChildEventListener() {
+        mListener = this.messagesRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
                 Chat c = dataSnapshot.getValue(Chat.class);
-                setListData(c.getName(), c.getText());
+                setListData(c.getSenderId(), c.getText());
             }
 
             @Override
@@ -156,13 +141,13 @@ public class SingleChatActivity extends AppCompatActivity {
     }
 
     private static class Chat {
+        String senderId;
         String text;
-        String name;
         public Chat() {
             // empty default constructor, necessary for Firebase to be able to deserialize blog posts
         }
-        public String getName() {
-            return name;
+        public String getSenderId() {
+            return senderId;
         }
         public String getText() {
             return text;
@@ -194,10 +179,10 @@ public class SingleChatActivity extends AppCompatActivity {
         String text = chatText.getText().toString();
         if (!text.isEmpty()) {
             Map<String, Object> values = new HashMap<>();
-            values.put("name", name);
+            values.put("senderId", name);
             values.put("text", text);
 
-            chatsRef.push().setValue(values);
+            messagesRef.push().setValue(values);
 
             chatText.setText("");
         }

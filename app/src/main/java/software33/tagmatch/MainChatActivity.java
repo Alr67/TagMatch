@@ -3,11 +3,13 @@ package software33.tagmatch;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -16,9 +18,17 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.Query;
+import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Objects;
 
 public class MainChatActivity extends AppCompatActivity {
     ListView list;
@@ -27,8 +37,16 @@ public class MainChatActivity extends AppCompatActivity {
     public ArrayList<ListChatModel> CustomListViewValuesArr = new ArrayList<ListChatModel>();
     public ArrayList<ListChatModel> CustomListViewValuesArrSearch;
     boolean searching = false;
+    boolean first = true;
 
     private Firebase myFirebaseRef;
+    private Firebase chatsRef;
+    private Firebase usersRef;
+
+    private ChildEventListener mListener;
+
+    //Identified by IdProduct, UserName
+    public Map<Pair<String, String>, String> idChats = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,20 +56,41 @@ public class MainChatActivity extends AppCompatActivity {
         setTitle(R.string.main_chat_activity_title);
 
         CustomListView = this;
+        list= ( ListView )findViewById( R.id.list );
 
         //Get Firebase Reference
         myFirebaseRef =
                 new Firebase("https://torrid-torch-42.firebaseio.com/");
 
+        chatsRef = myFirebaseRef.child("chats");
+        usersRef = myFirebaseRef.child("users");
+
+        createChat();
+
         /******** Take some data in Arraylist ( CustomListViewValuesArr ) ***********/
-        setListData();
+        //Update Data
+        mListener = this.chatsRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                ChatInfo c = dataSnapshot.child("info").getValue(ChatInfo.class);
+                setListData(c.getIdProduct(), c.getUsers(), dataSnapshot.getKey());
+            }
 
-        Resources res =getResources();
-        list= ( ListView )findViewById( R.id.list );
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
 
-        /**************** Create Custom Adapter *********/
-        adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
-        list.setAdapter( adapter );
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {}
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.e("FirebaseListAdapter", "Listen was cancelled, no more updates will occur");
+            }
+
+        });
     }
 
     @Override
@@ -98,40 +137,124 @@ public class MainChatActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    //Set data in the array
-    public void setListData()
-    {
-        for (int i = 0; i < 10; i++) {
+    private static class ChatInfo {
+        String idProduct;
+        Map<String, Object> users = new HashMap<>();
 
-            final ListChatModel sched = new ListChatModel();
-
-            /******* Firstly take data in model object ******/
-            sched.setUserName("Usuari "+i);
-            sched.setImage("image"+0);
-            sched.setTitleProduct("Producte "+i);
-
-            /******** Take Model Object in ArrayList **********/
-            CustomListViewValuesArr.add( sched );
+        public ChatInfo() {
+            // empty default constructor, necessary for Firebase to be able to deserialize blog posts
         }
 
+        public ChatInfo(String idProduct, Map<String, Object> users) {
+            this.idProduct = idProduct;
+            this.users = users;
+        }
+
+        public String getIdProduct() {
+            return idProduct;
+        }
+
+        public Map<String, Object> getUsers(){
+            return users;
+        }
     }
 
-    public void onItemClick(int mPosition)
-    {
+    private static class User {
+        String alias;
+        String img;
+        Map<String, Object> blockeds = new HashMap<>();
+        Map<String, Object> chats = new HashMap<>();
+        public User() {}
+        public User(String alias, String img, Map<String, Object> blockeds, Map<String, Object> chats) {
+            this.alias = alias;
+            this.img = img;
+            this.blockeds = blockeds;
+            this.chats = chats;
+        }
+        public String getAlias() {
+            return alias;
+        }
+        public String getImg() {
+            return img;
+        }
+        public Map<String, Object> getBloqueados(){
+            return blockeds;
+        }
+        public Map<String, Object> getChats(){
+            return chats;
+        }
+    }
+
+    public String createUser(String name) {
+        Firebase id = usersRef.push();
+        Map<String, Object> blockeds = new HashMap<>();
+        //blockeds.put("user","xds");
+        Map<String, Object> chats = new HashMap<>();
+        //chats.put("chat","chat1");
+        User user = new User(name,"",blockeds,chats);
+        id.setValue(user);
+        return id.getKey();
+    }
+
+    public String createChat() {
+        Firebase id = chatsRef.push();
+        String id1 = createUser("My User Name");
+        String id2 = createUser("Usuari0");
+
+        Map<String, Object> users = new HashMap<>();
+        users.put(id1, "My User Name");
+        users.put(id2, "Usuari0");
+
+        ChatInfo chatInfo = new ChatInfo("Anuncio Test", users);
+        id.child("info").setValue(chatInfo);
+        return id.getKey();
+    }
+
+    //Set data in the array
+    public void setListData(String idProduct, Map<String, Object> users, String id) {
+        if (users.containsValue("My User Name")) {
+            String userName = "";
+            for (Object o : users.values()){
+                if (!o.toString().equals("My User Name"))
+                    userName = o.toString();
+            }
+            final ListChatModel sched = new ListChatModel();
+
+            sched.setUserName(userName);
+            //TODO: get image
+            sched.setImage("image" + 0);
+            sched.setTitleProduct(idProduct);
+
+            CustomListViewValuesArr.add(sched);
+
+            //Save the id
+            idChats.put(new Pair<String, String>(idProduct,userName),id);
+
+            /**************** Create Custom Adapter *********/
+            Resources res =getResources();
+            adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+            list.setAdapter( adapter );
+        }
+    }
+
+    public void onItemClick(int mPosition) {
         ListChatModel tempValues;
         if (searching) tempValues = ( ListChatModel ) CustomListViewValuesArrSearch.get(mPosition);
         else tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
+
+        String id = idChats.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
 
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
         b.putString("UserName", tempValues.getUserName());
         b.putString("TitleProduct", tempValues.getTitleProduct());
+        b.putString("IdChat", id);
         intent.putExtras(b);
+
         startActivity(intent);
     }
 
-    public void onItemLongClick(int mPosition)
-    {
+    public void onItemLongClick(int mPosition) {
         ListChatModel tempValues;
         if (searching) tempValues = ( ListChatModel ) CustomListViewValuesArrSearch.get(mPosition);
         else tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
