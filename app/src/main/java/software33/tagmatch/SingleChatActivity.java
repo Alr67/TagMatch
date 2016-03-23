@@ -4,6 +4,7 @@ import android.database.DataSetObserver;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -16,14 +17,29 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
+
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import com.firebase.client.ChildEventListener;
+
 public class SingleChatActivity extends AppCompatActivity {
 
     private ChatArrayAdapter chatArrayAdapter;
     private ListView listView;
     private EditText chatText;
     private Button buttonSend;
-    private boolean side = false;
+    private boolean mySide = true;
 
+    private Firebase myFirebaseRef;
+    private Firebase chatsRef;
+    private String userName;
+    private String titleProduct;
+    private ChildEventListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,11 +48,17 @@ public class SingleChatActivity extends AppCompatActivity {
 
         setTitle("");
 
+        //Get Firebase Reference
+        myFirebaseRef =
+                new Firebase("https://torrid-torch-42.firebaseio.com/");
+
+        chatsRef = myFirebaseRef.child("chats");
+
         /************** Set the action Bar *****************/
 
         Bundle b = getIntent().getExtras();
-        String userName = b.getString("UserName");
-        String titleProduct = b.getString("TitleProduct");
+        userName = b.getString("UserName");
+        titleProduct = b.getString("TitleProduct");
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayOptions(actionBar.getDisplayOptions()
@@ -90,12 +112,97 @@ public class SingleChatActivity extends AppCompatActivity {
                 listView.setSelection(chatArrayAdapter.getCount() - 1);
             }
         });
+
+        //Get Data
+        /*
+        chatsRef.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (first) {
+                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                        Chat c = userSnapshot.getValue(Chat.class);
+                        setListData(c.getName(), c.getText());
+                    }
+                }
+                first = false;
+            }
+            @Override public void onCancelled(FirebaseError error) { }
+        });
+        */
+
+        //Update Data
+        mListener = this.chatsRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                Chat c = dataSnapshot.getValue(Chat.class);
+                setListData(c.getName(), c.getText());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {}
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {}
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.e("FirebaseListAdapter", "Listen was cancelled, no more updates will occur");
+            }
+
+        });
+    }
+
+    private static class Chat {
+        String text;
+        String name;
+        public Chat() {
+            // empty default constructor, necessary for Firebase to be able to deserialize blog posts
+        }
+        public String getName() {
+            return name;
+        }
+        public String getText() {
+            return text;
+        }
+    }
+
+    //Set data in the array
+    public void setListData(String name, String text)
+    {
+        if (name.equals("My User Name")) {
+            chatArrayAdapter.add(new ChatMessage(true, "My User Name", text));
+        }
+        else {
+            chatArrayAdapter.add(new ChatMessage(false, name, text));
+        }
+
     }
 
     private boolean sendChatMessage() {
-        chatArrayAdapter.add(new ChatMessage(side, chatText.getText().toString()));
-        chatText.setText("");
-        side = !side;
+        //TODO: Get my user name
+        String name;
+        if (mySide)
+            name = "My User Name";
+        else
+            name = userName;
+
+        //chatArrayAdapter.add(new ChatMessage(mySide, name, chatText.getText().toString()));
+
+        String text = chatText.getText().toString();
+        if (!text.isEmpty()) {
+            Map<String, Object> values = new HashMap<>();
+            values.put("name", name);
+            values.put("text", text);
+
+            chatsRef.push().setValue(values);
+
+            chatText.setText("");
+        }
+        //mySide = !mySide;
+
         return true;
     }
 
@@ -128,5 +235,13 @@ public class SingleChatActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    //To close the connection
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //chatArrayAdapter.cleanup();
     }
 }

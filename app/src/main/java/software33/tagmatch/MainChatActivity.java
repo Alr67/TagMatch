@@ -28,6 +28,8 @@ public class MainChatActivity extends AppCompatActivity {
     public ArrayList<ListChatModel> CustomListViewValuesArrSearch;
     boolean searching = false;
 
+    private Firebase myFirebaseRef;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -36,6 +38,10 @@ public class MainChatActivity extends AppCompatActivity {
         setTitle(R.string.main_chat_activity_title);
 
         CustomListView = this;
+
+        //Get Firebase Reference
+        myFirebaseRef =
+                new Firebase("https://torrid-torch-42.firebaseio.com/");
 
         /******** Take some data in Arraylist ( CustomListViewValuesArr ) ***********/
         setListData();
@@ -95,10 +101,6 @@ public class MainChatActivity extends AppCompatActivity {
     //Set data in the array
     public void setListData()
     {
-
-        Firebase myFirebaseRef =
-                new Firebase("https://torrid-torch-42.firebaseio.com/#-KDTJDhghptJG7CRDwtv|b141f94cffa90bfba7d0f306e9b11038");
-
         for (int i = 0; i < 10; i++) {
 
             final ListChatModel sched = new ListChatModel();
@@ -176,4 +178,9 @@ public class MainChatActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //chatArrayAdapter.cleanup();
+    }
 }
