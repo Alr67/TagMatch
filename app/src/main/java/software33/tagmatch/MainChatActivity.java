@@ -92,6 +92,9 @@ public class MainChatActivity extends AppCompatActivity {
             }
 
         });
+        Resources res =getResources();
+        adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+        list.setAdapter( adapter );
     }
 
     @Override
@@ -328,25 +331,37 @@ public class MainChatActivity extends AppCompatActivity {
     }
 
     public void onItemLongClick(int mPosition) {
-        ListChatModel tempValues;
-        if (searching) tempValues = ( ListChatModel ) CustomListViewValuesArrSearch.get(mPosition);
-        else tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
-
         AlertDialog alertDialog = createDeleteDialog(mPosition);
         alertDialog.show();
     }
 
     private void onPossitiveButtonClick(int mPosition) {
         Resources res =getResources();
+        ListChatModel tempValues;
+        if (searching) tempValues = ( ListChatModel ) CustomListViewValuesArrSearch.get(mPosition);
+        else tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
 
+        //Remove from the list
         if (searching) {
+            //Remove first from the non-search array
+            ListChatModel lToRemove = new ListChatModel();
+            for (ListChatModel l : CustomListViewValuesArr){
+                if (l.equals(CustomListViewValuesArrSearch.get(mPosition)))
+                    lToRemove = l;
+            }
             CustomListViewValuesArrSearch.remove(mPosition);
+            CustomListViewValuesArr.remove(lToRemove);
             adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArrSearch,res );
         }
         else {
             CustomListViewValuesArr.remove(mPosition);
             adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
         }
+
+        //Remove from Firebase
+        Pair<String,String> ids = idChatsUser.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
+        usersRef.child(myId).child("chats").child(ids.first).setValue(new HashMap<String, Object>());
+
         list.setAdapter( adapter );
     }
 

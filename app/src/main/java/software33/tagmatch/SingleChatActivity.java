@@ -159,16 +159,6 @@ public class SingleChatActivity extends AppCompatActivity {
         }
     }
 
-    private static class Chat {
-        long autoId;
-        public Chat() {
-            // empty default constructor, necessary for Firebase to be able to deserialize blog posts
-        }
-        public long getAutoId() {
-            return autoId;
-        }
-    }
-
     //Set data in the array
     public void setListData(String senderId, String text)
     {
