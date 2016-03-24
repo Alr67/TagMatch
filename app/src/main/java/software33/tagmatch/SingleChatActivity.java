@@ -40,6 +40,8 @@ public class SingleChatActivity extends AppCompatActivity {
     private String userName;
     private String titleProduct;
     private String idChat;
+    private String myId;
+    private String idUser;
     private ChildEventListener mListener;
 
     @Override
@@ -53,12 +55,15 @@ public class SingleChatActivity extends AppCompatActivity {
         userName = b.getString("UserName");
         titleProduct = b.getString("TitleProduct");
         idChat = b.getString("IdChat");
+        idUser = b.getString("IdUser");
+        myId = "56d3f1d3-6b50-473a-9aa3-ff0007b3df29";
 
         //Get Firebase Reference
         myFirebaseRef =
                 new Firebase("https://torrid-torch-42.firebaseio.com/");
 
         messagesRef = myFirebaseRef.child("chats").child(idChat).child("messages");
+        usersRef = myFirebaseRef.child("users");
 
         /************** Set the action Bar *****************/
 
@@ -119,7 +124,7 @@ public class SingleChatActivity extends AppCompatActivity {
         mListener = this.messagesRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                Chat c = dataSnapshot.getValue(Chat.class);
+                ChatText c = dataSnapshot.getValue(ChatText.class);
                 setListData(c.getSenderId(), c.getText());
             }
 
@@ -140,10 +145,10 @@ public class SingleChatActivity extends AppCompatActivity {
         });
     }
 
-    private static class Chat {
+    private static class ChatText {
         String senderId;
         String text;
-        public Chat() {
+        public ChatText() {
             // empty default constructor, necessary for Firebase to be able to deserialize blog posts
         }
         public String getSenderId() {
@@ -154,34 +159,56 @@ public class SingleChatActivity extends AppCompatActivity {
         }
     }
 
-    //Set data in the array
-    public void setListData(String name, String text)
-    {
-        if (name.equals("My Id")) {
-            chatArrayAdapter.add(new ChatMessage(true, "My Id", text));
+    private static class Chat {
+        long autoId;
+        public Chat() {
+            // empty default constructor, necessary for Firebase to be able to deserialize blog posts
         }
-        else {
-            chatArrayAdapter.add(new ChatMessage(false, name, text));
+        public long getAutoId() {
+            return autoId;
         }
+    }
 
+    //Set data in the array
+    public void setListData(String senderId, String text)
+    {
+        chatArrayAdapter.add(new ChatMessage((senderId.equals(myId)), senderId, text));
     }
 
     private boolean sendChatMessage() {
         String text = chatText.getText().toString();
         if (!text.isEmpty()) {
             //TODO: Get my id
-            String idName = "My Id";
+            String senderId = myId;
 
             Map<String, Object> values = new HashMap<>();
-            values.put("senderId", idName);
+            values.put("senderId", senderId);
             values.put("text", text);
 
             messagesRef.push().setValue(values);
-
             chatText.setText("");
+
+            //Check if the other user have a chat with you ONCE
+            checkUserChat();
         }
 
         return true;
+    }
+
+    private void checkUserChat() {
+        usersRef.child(idUser).child("chats").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                if (!snapshot.hasChild(idChat)) {
+                    Map<String, Object> chats = new HashMap<>();
+                    chats.put(idChat,"");
+                    usersRef.child(idUser).child("chats").setValue(chats);
+                }
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+            }
+        });
     }
 
     @Override

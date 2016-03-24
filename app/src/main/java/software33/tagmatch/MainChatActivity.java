@@ -43,10 +43,12 @@ public class MainChatActivity extends AppCompatActivity {
     private Firebase chatsRef;
     private Firebase usersRef;
 
+    private String myId;
+
     private ChildEventListener mListener;
 
-    //Identified by IdProduct, UserName
-    public Map<Pair<String, String>, String> idChats = new HashMap<>();
+    //Identified by IdProduct, UserName and have the id of the chat and it's user
+    public Map<Pair<String, String>, Pair<String, String>> idChatsUser = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,15 +67,14 @@ public class MainChatActivity extends AppCompatActivity {
         chatsRef = myFirebaseRef.child("chats");
         usersRef = myFirebaseRef.child("users");
 
-        createUser("correu1@xd.com", "contra123");
+        //createUser("correu1@xd.com", "contra123");
+        myId = "56d3f1d3-6b50-473a-9aa3-ff0007b3df29";
 
-        /******** Take some data in Arraylist ( CustomListViewValuesArr ) ***********/
-        //Update Data
-        mListener = this.chatsRef.addChildEventListener(new ChildEventListener() {
+        //Accessing to the chats of my user
+        mListener = this.usersRef.child(myId).child("chats").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                ChatInfo c = dataSnapshot.child("info").getValue(ChatInfo.class);
-                setListData(c.getIdProduct(), c.getUsers(), dataSnapshot.getKey());
+                getChat(dataSnapshot.getKey());
             }
 
             @Override
@@ -253,52 +254,74 @@ public class MainChatActivity extends AppCompatActivity {
         chats1.put(id.getKey(),"");
         usersRef.child(id1).child("chats").setValue(chats1);
 
+        /*
         Map<String, Object> chats2 = new HashMap<>();
         chats2.put(id.getKey(),"");
         usersRef.child(id2).child("chats").setValue(chats2);
+        */
 
         return id.getKey();
     }
 
     //Set data in the array
-    public void setListData(String idProduct, Map<String, Object> users, String id) {
-        if (users.containsValue("My User Name")) {
-            String userName = "";
-            for (Object o : users.values()){
-                if (!o.toString().equals("My User Name"))
-                    userName = o.toString();
+    public void setListData(String idProduct, Map<String, Object> users, String idChat) {
+        String userName = "";
+        for (Object o : users.values()){
+            if (!o.toString().equals("My User Name")) {
+                userName = o.toString();
             }
-            final ListChatModel sched = new ListChatModel();
-
-            sched.setUserName(userName);
-            //TODO: get image
-            sched.setImage("image" + 0);
-            sched.setTitleProduct(idProduct);
-
-            CustomListViewValuesArr.add(sched);
-
-            //Save the id
-            idChats.put(new Pair<String, String>(idProduct,userName),id);
-
-            /**************** Create Custom Adapter *********/
-            Resources res =getResources();
-            adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
-            list.setAdapter( adapter );
         }
+        String idUser = "";
+        for (String s : users.keySet()){
+            if (!s.equals(myId)) {
+                idUser = s;
+            }
+        }
+        final ListChatModel sched = new ListChatModel();
+
+        sched.setUserName(userName);
+        //TODO: get image
+        sched.setImage("image" + 0);
+        sched.setTitleProduct(idProduct);
+
+        CustomListViewValuesArr.add(sched);
+
+        //Save the id
+        idChatsUser.put(new Pair<String, String>(idProduct,userName),new Pair<String, String>(idChat,idUser));
+
+        Resources res =getResources();
+        adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+        list.setAdapter( adapter );
     }
+
+    public void getChat(final String idChat) {
+        //Accessing to the chat with idChat ONCE
+        chatsRef.child(idChat).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                ChatInfo c = snapshot.getValue(ChatInfo.class);
+                setListData(c.getIdProduct(), c.getUsers(), idChat);
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+            }
+        });
+    }
+
 
     public void onItemClick(int mPosition) {
         ListChatModel tempValues;
         if (searching) tempValues = ( ListChatModel ) CustomListViewValuesArrSearch.get(mPosition);
         else tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
 
-        String id = idChats.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
+        Pair<String,String> ids = idChatsUser.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
 
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
         b.putString("UserName", tempValues.getUserName());
         b.putString("TitleProduct", tempValues.getTitleProduct());
-        b.putString("IdChat", id);
+        b.putString("IdChat", ids.first);
+        b.putString("IdUser", ids.second);
         intent.putExtras(b);
 
         startActivity(intent);
