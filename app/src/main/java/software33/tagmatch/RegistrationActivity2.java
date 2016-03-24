@@ -7,24 +7,23 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapView;
-
-import java.io.IOException;
+import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 
 public class RegistrationActivity2 extends AppCompatActivity {
 
     private static final int PICK_IMAGE = 1;
     ImageView iv;
     String username;
-    GoogleMap googleMap;
-    MapView mapView;
+    GoogleMap map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,34 +35,13 @@ public class RegistrationActivity2 extends AppCompatActivity {
         iv = (ImageView) findViewById(R.id.imageView);
         //username = intentData.getString("username");
 
-        initMap(savedInstanceState);
+        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.registrationMap)).getMap();
+        //map.addMarker(new MarkerOptions().position(new LatLng(0, 0)));
     }
 
     @Override
     protected void onResume(){
         super.onResume();
-        mapView.onResume();
-    }
-
-    @Override
-    protected void onDestroy(){
-        super.onDestroy();
-        mapView.onDestroy();
-    }
-
-    @Override
-    protected void onPause(){
-        super.onPause();
-        mapView.onPause();
-    }
-
-    private void initMap(Bundle savedInstanceState) {
-        mapView = (MapView) findViewById(R.id.registrationMap);
-        mapView.onCreate(savedInstanceState);
-
-        googleMap = mapView.getMap();
-        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
-        googleMap.setMyLocationEnabled(true);
     }
 
     public void addPhoto(View view){
