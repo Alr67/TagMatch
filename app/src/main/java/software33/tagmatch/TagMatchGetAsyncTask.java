@@ -1,5 +1,6 @@
 package software33.tagmatch;
 
+import android.os.AsyncTask;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -16,10 +17,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by rafax on 23/03/2016.
- */
-public class TagMatchGetAsyncTask {
+
+public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
     private URL url;
 
     public TagMatchGetAsyncTask(String url) {

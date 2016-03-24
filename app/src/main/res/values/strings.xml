@@ -21,4 +21,7 @@
     <string name="new_user_button">Registre</string>
     <string name="user_name">Nom usuari</string>
     <string name="user_password">Contrasenya</string>
+    <string name="empty_pass">La contrasenya està buida</string>
+    <string name="empty_user">Usuari està buit</string>
+    <string name="ip_server">192.168.1.16</string>
 </resources>
