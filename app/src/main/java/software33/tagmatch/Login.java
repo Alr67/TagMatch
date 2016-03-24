@@ -61,7 +61,7 @@ public class Login extends AppCompatActivity {
                 jObject.put("password", pass);
 
                 String direcc = getResources().getString(R.string.ip_server);
-                direcc += "/users";
+                direcc += "/users/";
 
 
                 new TagMatchGetAsyncTask(direcc) {
@@ -100,8 +100,9 @@ public class Login extends AppCompatActivity {
     }
 
     private void continueLogin() {
-        Intent success = new Intent(this, Login.class); //FAlta guardar en algun puesto l'usuari
-        startActivity(success);
+        Toast.makeText(getApplicationContext(),"MOLT BE, HAS FET LOGIN! :D", Toast.LENGTH_SHORT).show();
+        /*Intent success = new Intent(this, Login.class); //FAlta guardar en algun puesto l'usuari
+        startActivity(success);*/
     }
 
 }

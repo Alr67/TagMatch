@@ -21,16 +21,17 @@ import java.util.Map;
 public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
     private URL url;
 
-    public TagMatchGetAsyncTask(String url) {
+    public TagMatchGetAsyncTask(String url2) {
         try {
-            this.url = new URL(url);
+            url = new URL(url2);
         } catch (MalformedURLException e) {
-            Log.e("TagMatchGetAsyncTask", "", e);
+            Log.v("TagMatchGetAsyncTask", "", e);
         }
     }
 
     protected JSONObject doInBackground(JSONObject... params) {
         try {
+            System.out.println("CACAAAA"+url.toString());
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setDoInput(true);
             con.setRequestMethod("GET");
@@ -43,9 +44,6 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
 
             con.getOutputStream().close();
             con.connect();
-
-            /*>=400 errorStream
-            else inputStream*/
 
             JSONObject aux;
 
