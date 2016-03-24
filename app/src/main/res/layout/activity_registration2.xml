@@ -12,20 +12,37 @@
     android:weightSum="1">
 
     <ImageView
-        android:layout_width="164dp"
-        android:layout_height="wrap_content"
+        android:layout_width="125dp"
+        android:layout_height="125dp"
         android:id="@+id/imageView"
         android:layout_gravity="center_horizontal"
-        android:layout_weight="0.30"
         android:baselineAlignBottom="false"
         android:contextClickable="false" />
 
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="New Button"
-        android:id="@+id/button2"
+        android:text="@string/registration_search_button"
+        android:id="@+id/gallerySearch"
         android:layout_gravity="center_horizontal"
         android:onClick="addPhoto" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="0.12" />
+
+    <com.google.android.gms.maps.MapView
+        android:id="@+id/registrationMap"
+        android:layout_width="wrap_content"
+        android:layout_height="125dp"
+        android:layout_weight="0.8" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/registration_end_registrer"
+        android:id="@+id/endRegister"
+        android:layout_gravity="center_horizontal" />
 
 </LinearLayout>

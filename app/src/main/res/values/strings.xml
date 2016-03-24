@@ -21,5 +21,7 @@
     <string name="registration_wrong_username">Ja existeix un usuari amb aquest nom d\'usuari.</string>
     <string name="registration_wrong_password">Les dos contrasenyes no son iguals.</string>
     <string name="registration_wrong_mail">Ja existeix un usuari amb aquest correu.</string>
-    <string name="title_activity_registration2">RegistrationActivity2</string>
+    <string name="registration_search_button">Buscar Foto</string>
+    <string name="registration_end_registrer">Finalitzar</string>
+
 </resources>

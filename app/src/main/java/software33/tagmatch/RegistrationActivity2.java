@@ -13,19 +13,57 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.MapView;
+
 import java.io.IOException;
 
 public class RegistrationActivity2 extends AppCompatActivity {
 
     private static final int PICK_IMAGE = 1;
     ImageView iv;
+    String username;
+    GoogleMap googleMap;
+    MapView mapView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration2);
 
+        Bundle intentData = getIntent().getExtras();
+
         iv = (ImageView) findViewById(R.id.imageView);
+        //username = intentData.getString("username");
+
+        initMap(savedInstanceState);
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        mapView.onResume();
+    }
+
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        mapView.onDestroy();
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        mapView.onPause();
+    }
+
+    private void initMap(Bundle savedInstanceState) {
+        mapView = (MapView) findViewById(R.id.registrationMap);
+        mapView.onCreate(savedInstanceState);
+
+        googleMap = mapView.getMap();
+        googleMap.setMapType(GoogleMap.MAP_TYPE_NORMAL);
+        googleMap.setMyLocationEnabled(true);
     }
 
     public void addPhoto(View view){
@@ -36,7 +74,7 @@ public class RegistrationActivity2 extends AppCompatActivity {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode,resultCode,data);
+        super.onActivityResult(requestCode, resultCode, data);
         switch(requestCode) {
             case PICK_IMAGE:
                 if(resultCode==RESULT_OK){
@@ -57,5 +95,9 @@ public class RegistrationActivity2 extends AppCompatActivity {
                 }
                 break;
         }
+    }
+
+    public void endRegistrer(View view){
+        //TO-DO
     }
 }

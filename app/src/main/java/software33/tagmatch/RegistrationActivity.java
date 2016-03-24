@@ -1,6 +1,7 @@
 package software33.tagmatch;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -27,15 +28,19 @@ public class RegistrationActivity extends AppCompatActivity {
             Toast toast = Toast.makeText(context, text, duration);
             toast.show();
         } else {
-            EditText pass = (EditText) findViewById(R.id.registrationPassword);
             EditText user = (EditText) findViewById(R.id.registrationUsername);
+            EditText pass = (EditText) findViewById(R.id.registrationPassword);
             EditText mail = (EditText) findViewById(R.id.registrationMail);
+
+            boolean haveError = false;
 
             try {
                 JSONObject jObject = new JSONObject();
                 jObject.put("username", user.getText().toString());
                 jObject.put("password", pass.getText().toString());
                 jObject.put("email", mail.getText().toString());
+
+                boolean err = false;
 
                 new TagMatchPostAsyncTask(getString(R.string.ip_server) + "/users"){
                     @Override
@@ -44,15 +49,21 @@ public class RegistrationActivity extends AppCompatActivity {
                             String error = jsonObject.get("error").toString();
                             Toast.makeText(RegistrationActivity.this, error, Toast.LENGTH_LONG).show();
                         } catch (JSONException ignored) {
+                            continueRegistration();
                         }
                     }
                 }.execute(jObject);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
-
-
         }
+    }
+
+    private void continueRegistration(){
+        EditText user = (EditText) findViewById(R.id.registrationUsername);
+        Intent act = new Intent(this, RegistrationActivity2.class);
+        act.putExtra("username", user.getText().toString());
+        startActivity(act);
     }
 
     private boolean validatePassword() {
@@ -60,4 +71,6 @@ public class RegistrationActivity extends AppCompatActivity {
         EditText pass2 = (EditText) findViewById(R.id.registrationPasswordConfirm);
         return pass1.getText().toString().equals(pass2.getText().toString());
     }
+
+
 }
