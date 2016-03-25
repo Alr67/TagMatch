@@ -31,7 +31,6 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
 
     protected JSONObject doInBackground(JSONObject... params) {
         try {
-            System.out.println("CACAAAA"+url.toString());
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setDoInput(true);
             con.setRequestMethod("GET");
