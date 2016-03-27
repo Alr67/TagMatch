@@ -19,9 +19,12 @@
     <string name="registration_hint_password">Contrasenya</string>
     <string name="registration_hint_password_confirm">Confirmacíó Contrasenya</string>
     <string name="registration_wrong_username">Ja existeix un usuari amb aquest nom d\'usuari.</string>
-    <string name="registration_wrong_password">Les dos contrasenyes no son iguals.</string>
+    <string name="registration_wrong_password_missmatch">Les dos contrasenyes no son iguals.</string>
     <string name="registration_wrong_mail">Ja existeix un usuari amb aquest correu.</string>
     <string name="registration_search_button">Buscar Foto</string>
     <string name="registration_end_registrer">Finalitzar</string>
+    <string name="registration_login">Ja ets membre? Inicia Sessió</string>
+    <string name="registration_wrong_mail_match">Fica un correu correcte</string>
+    <string name="registration_wrong_username_void">El camp d'usuari no pot estar vuit</string>
 
 </resources>

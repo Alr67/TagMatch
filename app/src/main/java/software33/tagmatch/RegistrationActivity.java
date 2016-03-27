@@ -20,43 +20,48 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     public void validateUser(View view) {
-        if (!validatePassword()) {
-            Context context = getApplicationContext();
-            CharSequence text = getString(R.string.registration_wrong_password);
-            int duration = Toast.LENGTH_SHORT;
 
-            Toast toast = Toast.makeText(context, text, duration);
-            toast.show();
-        } else {
-            EditText user = (EditText) findViewById(R.id.registrationUsername);
-            EditText pass = (EditText) findViewById(R.id.registrationPassword);
-            EditText mail = (EditText) findViewById(R.id.registrationMail);
+        String user = ((EditText) findViewById(R.id.registrationUsername)).getText().toString();
+        String pass = ((EditText) findViewById(R.id.registrationPassword)).getText().toString();
+        String email = ((EditText) findViewById(R.id.registrationMail)).getText().toString();
 
-            boolean haveError = false;
-
-            try {
-                JSONObject jObject = new JSONObject();
-                jObject.put("username", user.getText().toString());
-                jObject.put("password", pass.getText().toString());
-                jObject.put("email", mail.getText().toString());
-
-                boolean err = false;
-
-                new TagMatchPostAsyncTask(getString(R.string.ip_server) + "/users"){
-                    @Override
-                    protected void onPostExecute(JSONObject jsonObject) {
-                        try {
-                            String error = jsonObject.get("error").toString();
-                            Toast.makeText(RegistrationActivity.this, error, Toast.LENGTH_LONG).show();
-                        } catch (JSONException ignored) {
-                            continueRegistration();
-                        }
-                    }
-                }.execute(jObject);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+        if(user.isEmpty()) {
+            showError(getString(R.string.registration_wrong_username_void));
+            return;
         }
+
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
+            showError(getString(R.string.registration_wrong_mail_match));
+            return;
+        }
+
+        if (!validatePassword()) {
+            return;
+        }
+
+        try {
+            JSONObject jObject = new JSONObject();
+            jObject.put("username", user);
+            jObject.put("password", pass);
+            jObject.put("email", email);
+
+            boolean err = false;
+
+            new TagMatchPostAsyncTask(getString(R.string.ip_server) + "/users"){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        String error = jsonObject.get("error").toString();
+                        showError(error);
+                    } catch (JSONException ignored) {
+                        continueRegistration();
+                    }
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
     }
 
     private void continueRegistration(){
@@ -67,9 +72,27 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private boolean validatePassword() {
-        EditText pass1 = (EditText) findViewById(R.id.registrationPassword);
-        EditText pass2 = (EditText) findViewById(R.id.registrationPasswordConfirm);
-        return pass1.getText().toString().equals(pass2.getText().toString());
+        String pass1 = ((EditText) findViewById(R.id.registrationPassword)).getText().toString();
+        String pass2 = ((EditText) findViewById(R.id.registrationPasswordConfirm)).getText().toString();
+        if(pass1.isEmpty() || pass2.isEmpty()){
+            showError(getString(R.string.registration_wrong_mail_match));
+            return false;
+        }
+        if(!pass1.equals(pass2)){
+            showError(getString(R.string.registration_wrong_password_missmatch));
+            return false;
+        }
+        return true;
+    }
+
+    private void showError (String msg){
+        Context context = getApplicationContext();
+        CharSequence text = msg;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+        return;
     }
 
 

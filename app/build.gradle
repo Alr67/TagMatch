@@ -5,7 +5,7 @@ android {
         debug {
             keyAlias 'test'
             keyPassword 'tagMatch'
-            storeFile file('C:/Users/sergi/Desktop/WorkSpace/TagMatch/mystore.keystore')
+            storeFile file('D:/workspace/TagMatchAndroid/TagMatch/mystore.keystore')
             storePassword 'tagMatch'
         }
     }
