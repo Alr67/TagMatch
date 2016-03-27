@@ -1,29 +1,53 @@
 package software33.tagmatch;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.Toast;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-public class RegistrationActivity2 extends AppCompatActivity {
+public class RegistrationActivity2 extends AppCompatActivity implements
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener,
+        android.location.LocationListener {
 
     private static final int PICK_IMAGE = 1;
-    ImageView iv;
-    String username;
-    GoogleMap map;
+    private ImageView iv;
+    private String username;
+    private GoogleMap map;
+    private GoogleApiClient mGoogleApiClient;
+    private Location userLocation;
+
+    // The minimum distance to change Updates in meters
+    private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
+
+    // The minimum time between updates in milliseconds
+    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,17 +58,40 @@ public class RegistrationActivity2 extends AppCompatActivity {
 
         iv = (ImageView) findViewById(R.id.imageView);
         //username = intentData.getString("username");
-
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.registrationMap)).getMap();
-        //map.addMarker(new MarkerOptions().position(new LatLng(0, 0)));
+
+        mGoogleApiClient = new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
+
+        LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+        }
+        locationManager.requestLocationUpdates(
+                LocationManager.GPS_PROVIDER,
+                MIN_TIME_BW_UPDATES,
+                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+
+        userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+
+        if (userLocation != null) {
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()), 13.0f));
+            map.addMarker(new MarkerOptions().position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude())));
+        }
+
     }
 
+
     @Override
-    protected void onResume(){
+    protected void onResume() {
         super.onResume();
     }
 
-    public void addPhoto(View view){
+    public void addPhoto(View view) {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE);
@@ -53,9 +100,9 @@ public class RegistrationActivity2 extends AppCompatActivity {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch(requestCode) {
+        switch (requestCode) {
             case PICK_IMAGE:
-                if(resultCode==RESULT_OK){
+                if (resultCode == RESULT_OK) {
                     Uri uri = data.getData();
                     String[] projection = {MediaStore.Images.Media.DATA};
 
@@ -75,7 +122,74 @@ public class RegistrationActivity2 extends AppCompatActivity {
         }
     }
 
-    public void endRegistrer(View view){
+    public void endRegistrer(View view) {
         //TO-DO
     }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // Connect the client.
+        mGoogleApiClient.connect();
+    }
+
+    @Override
+    protected void onStop() {
+        // Disconnecting the client invalidates it.
+        mGoogleApiClient.disconnect();
+        super.onStop();
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        }
+        userLocation = LocationServices.FusedLocationApi.getLastLocation(
+                mGoogleApiClient);
+
+
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+        Log.i("INFO", "GoogleApiClient connection has been suspend");
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+        Log.i("INFO", "GoogleApiClient connection has failed");
+    }
+
+    LocationListener myLocationListener = new LocationListener() {
+
+        public void onLocationChanged(Location location) {
+
+        }
+        public void onProviderDisabled(String provider) {}
+        public void onProviderEnabled(String provider) {}
+        public void onStatusChanged(String provider, int status, Bundle extras) {}
+    };
+
+
+    @Override
+    public void onLocationChanged(Location location) {
+
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+
+    }
 }
+
+
