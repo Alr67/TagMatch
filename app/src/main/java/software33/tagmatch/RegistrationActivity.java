@@ -65,7 +65,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     public void backToLogin(View view){
-        //Intent act = new Intent(this, )
+        //TO-DO
     }
 
     private void continueRegistration(){

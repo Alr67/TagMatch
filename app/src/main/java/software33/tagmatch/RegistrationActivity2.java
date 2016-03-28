@@ -11,6 +11,7 @@ import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
@@ -35,6 +36,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         android.location.LocationListener {
 
     private static final int PICK_IMAGE = 1;
+    private static final int GPS_PERMISSION = 8000 ;
     private ImageView iv;
     private String username;
     private GoogleMap map;
@@ -46,7 +48,6 @@ public class RegistrationActivity2 extends AppCompatActivity implements
 
     // The minimum time between updates in milliseconds
     private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,14 +69,24 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
         }
-        locationManager.requestLocationUpdates(
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},GPS_PERMISSION);
+        }
+        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
+            locationManager.requestLocationUpdates(
                 LocationManager.GPS_PROVIDER,
                 MIN_TIME_BW_UPDATES,
                 MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-
-        userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        } else if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
+            locationManager.requestLocationUpdates(
+                    LocationManager.NETWORK_PROVIDER,
+                    MIN_TIME_BW_UPDATES,
+                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+            userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        }
 
         if (userLocation != null) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()), 13.0f));
@@ -83,7 +94,6 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         }
 
     }
-
 
     @Override
     protected void onResume() {
