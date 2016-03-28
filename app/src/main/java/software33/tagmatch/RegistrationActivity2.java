@@ -56,6 +56,13 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         //username = intentData.getString("username");
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.registrationMap)).getMap();
 
+        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                map.addMarker(new MarkerOptions().position(latLng));
+            }
+        });
+
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
                 .addConnectionCallbacks(this)
