@@ -38,6 +38,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     private GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
     private Location userLocation;
+    private static LatLng userMarker;
 
     // The minimum distance to change Updates in meters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
@@ -59,9 +60,12 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                map.addMarker(new MarkerOptions().position(latLng));
+                map.clear();
+                userMarker = latLng;
+                map.addMarker(new MarkerOptions().position(userMarker));
             }
         });
+
 
         mGoogleApiClient = new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -101,8 +105,9 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         }
 
         if (userLocation != null) {
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()), 13.0f));
-            map.addMarker(new MarkerOptions().position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude())));
+            userMarker = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
+            map.moveCamera(CameraUpdateFactory.newLatLngZoom(userMarker, 13.0f));
+            map.addMarker(new MarkerOptions().position(userMarker));
         }
 
 
