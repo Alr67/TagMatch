@@ -8,6 +8,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -18,6 +19,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.webkit.GeolocationPermissions;
 import android.widget.ImageView;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -66,6 +68,8 @@ public class RegistrationActivity2 extends AppCompatActivity implements
                 .addOnConnectionFailedListener(this)
                 .build();
 
+
+
         LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -87,11 +91,19 @@ public class RegistrationActivity2 extends AppCompatActivity implements
                     MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
             userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         }
+        else if(locationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)){
+            locationManager.requestLocationUpdates(
+                    LocationManager.PASSIVE_PROVIDER,
+                    MIN_TIME_BW_UPDATES,
+                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
+            userLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
+        }
 
         if (userLocation != null) {
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(userLocation.getLatitude(), userLocation.getLongitude()), 13.0f));
             map.addMarker(new MarkerOptions().position(new LatLng(userLocation.getLatitude(), userLocation.getLongitude())));
         }
+
 
     }
 
