@@ -37,7 +37,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         GoogleApiClient.OnConnectionFailedListener,
         android.location.LocationListener {
 
-    private static final int PICK_IMAGE = 1;
+    private static final int PICK_IMAGE = 8888;
     private static final int GPS_PERMISSION = 8000 ;
     private ImageView iv;
     private String username;
@@ -113,7 +113,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     }
 
     public void addPhoto(View view) {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        Intent intent = new Intent(Intent.ACTION_PICK);
         intent.setType("image/*");
         startActivityForResult(intent, PICK_IMAGE);
     }
@@ -121,25 +121,27 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (requestCode) {
-            case PICK_IMAGE:
-                if (resultCode == RESULT_OK) {
-                    Uri uri = data.getData();
-                    String[] projection = {MediaStore.Images.Media.DATA};
+        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && null != data) {
+            Uri selectedImage = data.getData();
+            String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-                    Cursor c = getContentResolver().query(uri, projection, null, null, null);
-                    c.moveToFirst();
+            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+            cursor.moveToFirst();
 
-                    int columnIndex = c.getColumnIndex(projection[0]);
-                    String filePath = c.getString(columnIndex);
-                    c.close();
+            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+            String picturePath = cursor.getString(columnIndex);
+            Log.i("img path", picturePath+".");
+            cursor.close();
+            String selectedPic = picturePath;
 
-                    Bitmap imageSelected = BitmapFactory.decodeFile(filePath);
-                    Drawable d = new BitmapDrawable(imageSelected);
 
-                    iv.setBackground(d);
-                }
-                break;
+            BitmapWorkerTask task = new BitmapWorkerTask(iv);
+            Integer hp, wp;
+            hp = iv.getHeight();
+            wp = iv.getWidth();
+            task.execute(selectedPic, hp.toString(), wp.toString());
+
+            iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
         }
     }
 

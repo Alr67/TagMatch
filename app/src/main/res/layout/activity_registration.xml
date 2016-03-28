@@ -28,8 +28,7 @@
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_marginTop="8dp">
             <EditText android:id="@+id/registrationUsername"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -40,9 +39,7 @@
         <!-- Email Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_height="wrap_content">
             <EditText android:id="@+id/registrationMail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -53,9 +50,7 @@
         <!-- Password Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_height="wrap_content">
             <EditText android:id="@+id/registrationPassword"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -66,9 +61,7 @@
         <!-- RePassword Label -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
+            android:layout_height="wrap_content">
             <EditText android:id="@+id/registrationPasswordConfirm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
