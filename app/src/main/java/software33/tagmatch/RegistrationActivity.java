@@ -64,6 +64,10 @@ public class RegistrationActivity extends AppCompatActivity {
 
     }
 
+    public void backToLogin(View view){
+        //Intent act = new Intent(this, )
+    }
+
     private void continueRegistration(){
         EditText user = (EditText) findViewById(R.id.registrationUsername);
         Intent act = new Intent(this, RegistrationActivity2.class);

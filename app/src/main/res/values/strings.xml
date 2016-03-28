@@ -25,6 +25,6 @@
     <string name="registration_end_registrer">Finalitzar</string>
     <string name="registration_login">Ja ets membre? Inicia Sessió</string>
     <string name="registration_wrong_mail_match">Fica un correu correcte</string>
-    <string name="registration_wrong_username_void">El camp d'usuari no pot estar vuit</string>
+    <string name="registration_wrong_username_void">El camp d\'usuari no pot estar vuit</string>
 
 </resources>
