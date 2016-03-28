@@ -11,6 +11,14 @@
     tools:context="software33.tagmatch.RegistrationActivity2"
     android:weightSum="1">
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/registration_profile_foto"
+        android:id="@+id/textView3"
+        android:layout_gravity="center_horizontal" />
+
     <ImageView
         android:layout_width="125dp"
         android:layout_height="125dp"
@@ -20,7 +28,7 @@
         android:contextClickable="false" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/registration_search_button"
         android:id="@+id/gallerySearch"
@@ -30,16 +38,30 @@
     <Space
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="0.12" />
+        android:layout_weight="0.40" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:text="@string/registration_default_sell_location"
+        android:id="@+id/textView4"
+        android:layout_gravity="center_horizontal" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="0.76" />
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
         android:name="com.google.android.gms.maps.MapFragment"
         android:id="@+id/registrationMap"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="190dp" />
 
     <Button
-        android:layout_width="wrap_content"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:text="@string/registration_end_registrer"
         android:id="@+id/endRegister"
