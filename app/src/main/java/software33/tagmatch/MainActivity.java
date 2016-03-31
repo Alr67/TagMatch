@@ -10,11 +10,17 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.firebase.client.Firebase;
+
 public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //Setup the Firebase library
+        Firebase.setAndroidContext(this);
+
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
