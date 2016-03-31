@@ -11,8 +11,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
+import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,19 +31,20 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
         }
     }
 
-    protected JSONObject doInBackground(JSONObject... params) {
+    protected JSONObject doInBackground(final JSONObject... params) {
         try {
+            final String user = params[0].getString("username").toString();
+            final String password = params[0].getString("password").toString();
+            Authenticator.setDefault(new Authenticator() {
+                protected PasswordAuthentication getPasswordAuthentication() {
+                    return new PasswordAuthentication(user, password.toCharArray());
+                }
+            });
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setDoInput(true);
             con.setRequestMethod("GET");
+            con.setUseCaches(false);
             con.setRequestProperty("Content-Type", "application/json");
-
-            OutputStreamWriter wr= new OutputStreamWriter(con.getOutputStream());
-            wr.write(params[0].toString());
-            wr.flush();
-            wr.close();
-
-            con.getOutputStream().close();
             con.connect();
 
             JSONObject aux;
