@@ -17,7 +17,6 @@
     <string name="hint_single_chat">Escriu el teu missatge…</string>
 
 
-
     <string name="login">Login</string>
     <string name="forgotten">He oblidat la meva contrasenya</string>
     <string name="new_user_text">Nou usuari? Registrat</string>
@@ -27,4 +26,11 @@
     <string name="empty_pass">La contrasenya està buida</string>
     <string name="empty_user">Usuari està buit</string>
     <string name="ip_server">http://192.168.1.16:8080</string>
+    <string name="title_activity_new_advertisement">NewAdvertisement</string>
+
+    <!-- New Advertisement -->
+    <string name="input_title">Títol de l'anunci</string>
+    <string name="input_description">Descripció de l'anunci</string>
+    <string name="input_hashtags">Hashtags descriptius</string>
+    <string name="but_new_advert">Crea</string>
 </resources>
