@@ -27,30 +27,34 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 public class RegistrationActivity2 extends AppCompatActivity implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
-        android.location.LocationListener {
+        GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private static final int PICK_IMAGE = 8888;
-    private static final int GPS_PERMISSION = 8000 ;
+    private static final int GPS_PERMISSION = 8000;
     private ImageView iv;
     private String username;
     private GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
     private Location userLocation;
     private static LatLng userMarker;
+    private LocationManager locationManager;
+    private Boolean ubicacionActiva;
 
     // The minimum distance to change Updates in meters
     private static final long MIN_DISTANCE_CHANGE_FOR_UPDATES = 10; // 10 meters
 
     // The minimum time between updates in milliseconds
-    private static final long MIN_TIME_BW_UPDATES = 1000 * 60 * 1; // 1 minute
+    private static final long MIN_TIME_BW_UPDATES = 0; // 1 minute
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration2);
-
+        new GoogleApiClient.Builder(this)
+                .addApi(LocationServices.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
         Bundle intentData = getIntent().getExtras();
 
         iv = (ImageView) findViewById(R.id.imageView);
@@ -67,50 +71,23 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         });
 
 
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
-
-
-
-        LocationManager locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
-
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-        }
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(new String[]{Manifest.permission.ACCESS_FINE_LOCATION},GPS_PERMISSION);
-        }
-        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)){
-            locationManager.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                MIN_TIME_BW_UPDATES,
-                MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-            userLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        } else if(locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)){
-            locationManager.requestLocationUpdates(
-                    LocationManager.NETWORK_PROVIDER,
-                    MIN_TIME_BW_UPDATES,
-                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-            userLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        }
-        else if(locationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)){
-            locationManager.requestLocationUpdates(
-                    LocationManager.PASSIVE_PROVIDER,
-                    MIN_TIME_BW_UPDATES,
-                    MIN_DISTANCE_CHANGE_FOR_UPDATES, this);
-            userLocation = locationManager.getLastKnownLocation(LocationManager.PASSIVE_PROVIDER);
-        }
-
-        if (userLocation != null) {
-            userMarker = new LatLng(userLocation.getLatitude(), userLocation.getLongitude());
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(userMarker, 13.0f));
-            map.addMarker(new MarkerOptions().position(userMarker));
+        if (mGoogleApiClient == null) {
+            mGoogleApiClient = new GoogleApiClient.Builder(this)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .addApi(LocationServices.API)
+                    .build();
         }
 
 
+        locationManager = (LocationManager) this.getSystemService(LOCATION_SERVICE);
+
+        if(locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER) || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER) || locationManager.isProviderEnabled(LocationManager.PASSIVE_PROVIDER)){
+
+        }
+        else{
+
+        }
     }
 
     @Override
@@ -136,7 +113,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
 
             int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
             String picturePath = cursor.getString(columnIndex);
-            Log.i("img path", picturePath+".");
+            Log.i("img path", picturePath + ".");
             cursor.close();
             String selectedPic = picturePath;
 
@@ -172,11 +149,15 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
         }
-        userLocation = LocationServices.FusedLocationApi.getLastLocation(
+        Location pos = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-
-
+        if (pos != null) {
+            map.clear();
+           map.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(pos.getLatitude(), pos.getLongitude()), 14.f));
+            map.addMarker(new MarkerOptions().position(new LatLng(pos.getLatitude(), pos.getLongitude())));
+        }
     }
 
     @Override
@@ -189,35 +170,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         Log.i("INFO", "GoogleApiClient connection has failed");
     }
 
-    LocationListener myLocationListener = new LocationListener() {
-
-        public void onLocationChanged(Location location) {
-
-        }
-        public void onProviderDisabled(String provider) {}
-        public void onProviderEnabled(String provider) {}
-        public void onStatusChanged(String provider, int status, Bundle extras) {}
-    };
 
 
-    @Override
-    public void onLocationChanged(Location location) {
-
-    }
-
-    @Override
-    public void onStatusChanged(String provider, int status, Bundle extras) {
-
-    }
-
-    @Override
-    public void onProviderEnabled(String provider) {
-
-    }
-
-    @Override
-    public void onProviderDisabled(String provider) {
-
-    }
 }
 
