@@ -26,5 +26,6 @@
     <string name="user_password">Contrasenya</string>
     <string name="empty_pass">La contrasenya està buida</string>
     <string name="empty_user">Usuari està buit</string>
+    <string name="error_login">Usuari o contrasenya incorrectes</string>
     <string name="ip_server">http://192.168.1.16:8080</string>
 </resources>

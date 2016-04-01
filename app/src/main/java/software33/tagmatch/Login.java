@@ -47,7 +47,7 @@ public class Login extends AppCompatActivity {
         app_header.setTypeface(face);
         /* MÈTODE PER FER SERVIR FONTS EXTERNES*/
 
-        //CANVIAR COOR DE LA STATUS BAR
+        //CANVIAR COLOR DE LA STATUS BAR
         Window window = this.getWindow();
         // clear FLAG_TRANSLUCENT_STATUS flag:
         window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
@@ -74,15 +74,18 @@ public class Login extends AppCompatActivity {
                 String direcc = getResources().getString(R.string.ip_server);
                 direcc += "/users";
 
-
                 new TagMatchGetAsyncTask(direcc) {
                     @Override
                     protected void onPostExecute(JSONObject jsonObject) {
                         try {
-                            String error = jsonObject.get("error").toString();
-                            Toast.makeText(getApplicationContext(), error, Toast.LENGTH_LONG).show();
-                        } catch (JSONException ignored) {
-                            continueLogin();
+                            if(jsonObject.get("valid").toString().equals("false")) {
+                                Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_LONG).show();
+                            }
+                            else {
+                                Toast.makeText(getApplicationContext(), "MOLT BÉ", Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
                         }
                     }
                 }.execute(jObject);
