@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Typeface;
 import android.location.Location;
 import android.net.Uri;
 import android.os.Build;
@@ -16,7 +17,10 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.appindexing.Action;
@@ -41,7 +45,6 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     private static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 8000;
     private static final int PICK_IMAGE = 8001;
     private ImageView iv;
-    private String username;
     private GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
     private LatLng userMarker;
@@ -51,6 +54,15 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration2);
+
+        //CANVIAR COLOR DE LA STATUS BAR
+        Window window = this.getWindow();
+        // clear FLAG_TRANSLUCENT_STATUS flag:
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        // finally change the color
+        window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimaryDark));
 
         String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
@@ -194,8 +206,8 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     }
 
     private void backToLogin() {
-       /* Intent act = new Intent(this, Login.class);
-        startActivity(act);    */
+        Intent act = new Intent(this, Login.class);
+        startActivity(act);
     }
 
     @Override

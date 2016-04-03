@@ -3,10 +3,14 @@ package software33.tagmatch;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -20,6 +24,21 @@ public class RegistrationActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
+
+        TextView registrationTitle = (TextView) findViewById(R.id.registrationTitle);
+        /* MÈTODE PER FER SERVIR FONTS EXTERNES*/
+        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/LobsterTwo-BoldItalic.ttf");
+        registrationTitle.setTypeface(face);
+        /* MÈTODE PER FER SERVIR FONTS EXTERNES*/
+
+        //CANVIAR COLOR DE LA STATUS BAR
+        Window window = this.getWindow();
+        // clear FLAG_TRANSLUCENT_STATUS flag:
+        window.clearFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
+        // add FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS flag to the window
+        window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+        // finally change the color
+        window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimaryDark));
     }
 
     public void validateUser(View view) {
@@ -62,8 +81,8 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     public void backToLogin(View view){
-        /*Intent act = new Intent(this, Login.class);
-        startActivity(act);*/
+        Intent act = new Intent(this, Login.class);
+        startActivity(act);
     }
 
     private void continueRegistration(String username, String passw){
