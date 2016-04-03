@@ -75,7 +75,7 @@ public class Login extends AppCompatActivity {
                 String direcc = getResources().getString(R.string.ip_server);
                 direcc += "/users";
 
-                new TagMatchGetAsyncTask(direcc) {
+                new TagMatchGetAsyncTask(direcc, getApplicationContext()) {
                     @Override
                     protected void onPostExecute(JSONObject jsonObject) {
                         try {
