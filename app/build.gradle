@@ -27,6 +27,11 @@ android {
             signingConfig signingConfigs.debug
         }
     }
+    packagingOptions {
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/LICENSE-FIREBASE.txt'
+        exclude 'META-INF/NOTICE'
+    }
 }
 
 dependencies {
@@ -40,4 +45,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-ads:8.4.0'
     compile 'com.google.android.gms:play-services-identity:8.4.0'
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
+    compile 'com.firebase:firebase-client-android:2.5.1+'
+    compile files('TagMatch/libs/firebase-client-android-2.5.1.jar')
 }

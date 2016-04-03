@@ -1,6 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#3F51B5</color>
-    <color name="colorPrimaryDark">#303F9F</color>
-    <color name="colorAccent">#FF4081</color>
+    <color name="colorPrimary">#198cff</color>
+    <color name="colorPrimaryDark">#0073e5</color>
+    <color name="colorAccent">#ffffff</color>
+    <color name="back_color">#198cff</color>
+    <color name="app_header_color">#ffffff</color>
+    <color name="login_button_color">#0073e5</color>
+    <color name="reg_color">#f2f2f2</color>
 </resources>
