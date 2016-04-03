@@ -1,4 +1,5 @@
 <resources>
+    <string name="ip_server">http://192.168.1.129:8080</string>
     <string name="app_name">TagMatch!</string>
     <string name="action_settings">Settings</string>
     <string name="chat_button">Xats</string>
@@ -14,10 +15,25 @@
     <string name="dialog_message_delete_chat">Estàs segur de voler eliminar aquest xat?</string>
     <string name="dialog_confirm_delete_chat">Sí</string>
     <string name="dialog_cancel_delete_chat">Cancelar</string>
+    <string name="registration_title">Registre</string>
+    <string name="registration_button">Envia</string>
+    <string name="registration_hint_username">Usuari</string>
+    <string name="registration_hint_mail">Correu Electrònic</string>
+    <string name="registration_hint_password">Contrasenya</string>
+    <string name="registration_hint_password_confirm">Confirmacíó Contrasenya</string>
+    <string name="registration_wrong_username">Ja existeix un usuari amb aquest nom d\'usuari.</string>
+    <string name="registration_wrong_password_missmatch">Les dos contrasenyes no son iguals.</string>
+    <string name="registration_wrong_mail">Ja existeix un usuari amb aquest correu.</string>
+    <string name="registration_search_button">Buscar Foto</string>
+    <string name="registration_end_registrer">Finalitzar</string>
+    <string name="registration_login">Ja ets membre? Inicia Sessió</string>
+    <string name="registration_wrong_mail_match">Fica un correu correcte</string>
+    <string name="registration_wrong_username_void">El camp d\'usuari no pot estar vuit</string>
+    <string name="registration_profile_foto">Foto de perfil</string>
+    <string name="registration_default_sell_location">Des d\'on vols vendre per defecte?</string>
+    <string name="no_network_connection">No hi ha connexió a internet</string>
+    <string name="connection_timeout">No ha sigut possible conectarse amb el servidor</string>
     <string name="hint_single_chat">Escriu el teu missatge…</string>
-
-
-
     <string name="login">Login</string>
     <string name="forgotten">He oblidat la meva contrasenya</string>
     <string name="new_user_text">Nou usuari? Registrat</string>
@@ -27,5 +43,4 @@
     <string name="empty_pass">La contrasenya està buida</string>
     <string name="empty_user">Usuari està buit</string>
     <string name="error_login">Usuari o contrasenya incorrectes</string>
-    <string name="ip_server">http://192.168.1.16:8080</string>
 </resources>

@@ -106,7 +106,7 @@ public class Login extends AppCompatActivity {
     @OnClick(R.id.link_signup)
     protected void intent_reg() {
         Firebase.setAndroidContext(this);
-        Intent intent = new Intent(this, MainChatActivity.class);
+        Intent intent = new Intent(this, RegistrationActivity.class);
         startActivity(intent);
     }
 
