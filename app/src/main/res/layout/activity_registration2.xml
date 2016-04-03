@@ -65,6 +65,7 @@
         android:layout_height="wrap_content"
         android:text="@string/registration_end_registrer"
         android:id="@+id/endRegister"
-        android:layout_gravity="center_horizontal" />
+        android:layout_gravity="center_horizontal"
+        android:onClick="endRegistrer" />
 
 </LinearLayout>

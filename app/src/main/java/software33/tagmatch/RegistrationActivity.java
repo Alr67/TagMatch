@@ -2,6 +2,7 @@ package software33.tagmatch;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
@@ -13,6 +14,8 @@ import org.json.JSONObject;
 
 public class RegistrationActivity extends AppCompatActivity {
 
+    private static final String SH_PREF_NAME = "TagMatch_pref";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -20,21 +23,18 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     public void validateUser(View view) {
-
-        String user = ((EditText) findViewById(R.id.registrationUsername)).getText().toString();
-        String pass = ((EditText) findViewById(R.id.registrationPassword)).getText().toString();
+        final String user = ((EditText) findViewById(R.id.registrationUsername)).getText().toString();
+        final String pass = ((EditText) findViewById(R.id.registrationPassword)).getText().toString();
         String email = ((EditText) findViewById(R.id.registrationMail)).getText().toString();
 
         if(user.isEmpty()) {
             showError(getString(R.string.registration_wrong_username_void));
             return;
         }
-
         if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()){
             showError(getString(R.string.registration_wrong_mail_match));
             return;
         }
-
         if (!validatePassword()) {
             return;
         }
@@ -45,33 +45,34 @@ public class RegistrationActivity extends AppCompatActivity {
             jObject.put("password", pass);
             jObject.put("email", email);
 
-            boolean err = false;
-
-            new TagMatchPostAsyncTask(getString(R.string.ip_server) + "/users"){
+            new TagMatchPostAsyncTask(getString(R.string.ip_server) + "/users", this){
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
                         String error = jsonObject.get("error").toString();
                         showError(error);
                     } catch (JSONException ignored) {
-                        continueRegistration();
+                        continueRegistration(user, pass);
                     }
                 }
             }.execute(jObject);
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
     }
 
     public void backToLogin(View view){
-        //TO-DO
+        /*Intent act = new Intent(this, Login.class);
+        startActivity(act);*/
     }
 
-    private void continueRegistration(){
-        EditText user = (EditText) findViewById(R.id.registrationUsername);
+    private void continueRegistration(String username, String passw){
+        SharedPreferences.Editor editor = getSharedPreferences(SH_PREF_NAME, MODE_PRIVATE).edit();
+        editor.putString("name", username);
+        editor.putString("password",passw);
+        editor.commit();
+
         Intent act = new Intent(this, RegistrationActivity2.class);
-        act.putExtra("username", user.getText().toString());
         startActivity(act);
     }
 
@@ -98,6 +99,4 @@ public class RegistrationActivity extends AppCompatActivity {
         toast.show();
         return;
     }
-
-
 }

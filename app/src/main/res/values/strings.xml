@@ -28,5 +28,7 @@
     <string name="registration_wrong_username_void">El camp d\'usuari no pot estar vuit</string>
     <string name="registration_profile_foto">Foto de perfil</string>
     <string name="registration_default_sell_location">Des d\'on vols vendre per defecte?</string>
+    <string name="no_network_connection">No hi ha connexió a internet</string>
+    <string name="connection_timeout">No ha sigut possible conectarse amb el servidor</string>
 
 </resources>

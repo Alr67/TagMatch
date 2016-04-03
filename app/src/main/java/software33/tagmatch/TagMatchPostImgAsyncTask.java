@@ -11,6 +11,9 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,56 +24,42 @@ import java.net.MalformedURLException;
 import java.net.PasswordAuthentication;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
+public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, JSONObject> {
 
     private URL url;
     private Context context;
     private String imgExtension;
-    private boolean needLogin;
+    private byte[] img;
 
-    public TagMatchPostAsyncTask(String url, Context context) {
-        try {
-            this.url = new URL(url);
-            this.context = context;
-            needLogin = false;
-        } catch (MalformedURLException e) {
-            Log.e("TagMatchPostAsyncTask", "", e);
-        }
-    }
-
-    public TagMatchPostAsyncTask(String url, Context context, String imgExtension) {
+    public TagMatchPostImgAsyncTask(String url, Context context, byte[] img, String imgExtension) {
         try {
             this.url = new URL(url);
             this.context = context;
             this.imgExtension = imgExtension;
-            needLogin = true;
+            this.img = img;
         } catch (MalformedURLException e) {
             Log.e("TagMatchPostAsyncTask", "", e);
         }
     }
 
-    protected JSONObject doInBackground(JSONObject... params) {
+    protected JSONObject doInBackground(Byte[]... params) {
         try {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             con.setDoInput(true);
             con.setRequestMethod("POST");
+            connectUser(con);
+            con.setRequestProperty("Content-Type", "image/" + imgExtension);
 
-            if (needLogin) {
-                connectUser(con);
-            }
-
-            if (imgExtension == null)
-                con.setRequestProperty("Content-Type", "application/json");
-            else
-                con.setRequestProperty("Content-Type", "image/" + imgExtension);
-
-            OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
-            wr.write(params[0].toString());
+            DataOutputStream wr = new DataOutputStream(
+                    con.getOutputStream());
+            wr.write(img);
+            //wr.write(new String(img, Charset.forName("US-ASCII")));
             wr.flush();
             wr.close();
 
@@ -110,20 +99,15 @@ public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, 
     }
 
     private void connectUser(HttpURLConnection c) {
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        SharedPreferences prefs = context.getSharedPreferences("TagMatch_pref", Context.MODE_PRIVATE);
         final String user = prefs.getString("name", "");
         final String password = prefs.getString("password", "");
 
-        Log.i("userPost", user);
-        Log.i("passPost", password);
-        Authenticator.setDefault(new Authenticator() {
-            protected PasswordAuthentication getPasswordAuthentication() {
-                return new PasswordAuthentication(user, password.toCharArray());
-            }
-        });
+        Log.i("userPostImg", user);
+        Log.i("passPostimg", password);
         String userPass = user + ":" + password;
-        c.setRequestProperty("Authorization", "basic " +
-                Base64.encode(userPass.getBytes(), Base64.DEFAULT));
+        c.setRequestProperty("Authorization", "Basic " +
+                new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT)));
     }
 
     public String iStreamToString(InputStream is1) {
