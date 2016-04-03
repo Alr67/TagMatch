@@ -29,8 +29,13 @@
     <string name="title_activity_new_advertisement">NewAdvertisement</string>
 
     <!-- New Advertisement -->
-    <string name="input_title">Títol de l'anunci</string>
-    <string name="input_description">Descripció de l'anunci</string>
+    <string name="input_title">Títol de l\'anunci</string>
+    <string name="input_description">Descripció de l\'anunci</string>
     <string name="input_hashtags">Hashtags descriptius</string>
     <string name="but_new_advert">Crea</string>
+    <string name="noTitle">Introdueix un títol siusplau</string>
+    <string name="noDescription">Introdueix una descripció siusplau</string>
+    <string name="noTag">Introdueix un tag com a mínim siusplau</string>
+
+
 </resources>

@@ -31,7 +31,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".NewAdvertisement"
+            android:name=".Advertisement.NewAdvertisement"
             android:label="@string/title_activity_new_advertisement"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
