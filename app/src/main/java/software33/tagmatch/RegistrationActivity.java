@@ -25,7 +25,7 @@ public class RegistrationActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_registration);
 
-        TextView registrationTitle = (TextView) findViewById(R.id.registrationTitle);
+        TextView registrationTitle = (TextView) findViewById(R.id.registration_title);
         /* MÈTODE PER FER SERVIR FONTS EXTERNES*/
         Typeface face= Typeface.createFromAsset(getAssets(), "fonts/LobsterTwo-BoldItalic.ttf");
         registrationTitle.setTypeface(face);
