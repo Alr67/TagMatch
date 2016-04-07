@@ -1,4 +1,4 @@
-package software33.tagmatch;
+package software33.tagmatch.Chat;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,8 +13,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -23,13 +21,13 @@ import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
-import com.firebase.client.Query;
 import com.firebase.client.ValueEventListener;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
+
+import software33.tagmatch.R;
 
 public class MainChatActivity extends AppCompatActivity {
     ListView list;

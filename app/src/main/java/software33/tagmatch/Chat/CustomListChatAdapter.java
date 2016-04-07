@@ -1,4 +1,4 @@
-package software33.tagmatch;
+package software33.tagmatch.Chat;
 
 import android.app.Activity;
 import android.content.Context;
@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+
+import software33.tagmatch.R;
 
 public class CustomListChatAdapter extends BaseAdapter implements View.OnClickListener {
 

@@ -1,4 +1,4 @@
-package software33.tagmatch;
+package software33.tagmatch.Login_Register;
 
 import android.content.Intent;
 import android.graphics.Typeface;
@@ -20,6 +20,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import software33.tagmatch.Advertisement.NewAdvertisement;
+import software33.tagmatch.R;
 
 public class Login extends AppCompatActivity {
     /*Declaracions ButterKnife*/

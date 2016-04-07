@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import software33.tagmatch.R;
-import software33.tagmatch.Utils.BitmapWorkerTask;
+import software33.tagmatch.Domain.BitmapWorkerTask;
 
 /**
  * Created by Cristina on 04/04/2016.

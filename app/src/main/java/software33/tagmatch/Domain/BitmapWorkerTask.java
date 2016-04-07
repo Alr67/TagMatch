@@ -1,18 +1,22 @@
-package software33.tagmatch.Utils;
+package software33.tagmatch.Domain;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
-import android.widget.ImageView;
 
 import java.lang.ref.WeakReference;
 
-public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
-    private final WeakReference<ImageView> imageViewReference;
+import software33.tagmatch.Advertisement.CustomPagerAdapter;
 
-    public BitmapWorkerTask(ImageView imageView) {
+/**
+ * Created by Cristina on 04/04/2016.
+ */
+public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
+    private final WeakReference<CustomPagerAdapter> ActivityReference;
+
+    public BitmapWorkerTask(CustomPagerAdapter parent) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
-        imageViewReference = new WeakReference<ImageView>(imageView);
+        ActivityReference = new WeakReference<CustomPagerAdapter>(parent);
 
     }
 
@@ -48,10 +52,10 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     // Once complete, see if ImageView is still around and set bitmap.
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-        if (imageViewReference != null && bitmap != null) {
-            final ImageView imageView = imageViewReference.get();
-            if (imageView != null) {
-                imageView.setImageBitmap(bitmap);
+        if (ActivityReference != null && bitmap != null) {
+            final CustomPagerAdapter parent = ActivityReference.get();
+            if (parent != null) {
+                parent.newImageConverted(bitmap);
             }
         }
     }

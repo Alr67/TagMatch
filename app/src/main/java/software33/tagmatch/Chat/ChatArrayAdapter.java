@@ -1,4 +1,4 @@
-package software33.tagmatch;
+package software33.tagmatch.Chat;
 
 import android.content.Context;
 import android.view.LayoutInflater;
@@ -9,6 +9,8 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import software33.tagmatch.R;
 
 public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
 

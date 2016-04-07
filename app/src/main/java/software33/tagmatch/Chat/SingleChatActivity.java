@@ -1,11 +1,10 @@
-package software33.tagmatch;
+package software33.tagmatch.Chat;
 
 import android.database.DataSetObserver;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -23,9 +22,12 @@ import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.Map;
 import com.firebase.client.ChildEventListener;
+
+import software33.tagmatch.Chat.ChatArrayAdapter;
+import software33.tagmatch.Chat.ChatMessage;
+import software33.tagmatch.R;
 
 public class SingleChatActivity extends AppCompatActivity {
 

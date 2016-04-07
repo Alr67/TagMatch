@@ -1,4 +1,4 @@
-package software33.tagmatch;
+package software33.tagmatch.Chat;
 
 public class ListChatModel {
     private  String UserName="";
