@@ -76,7 +76,7 @@ public class Advertisement {
         return 0.0;
     }
 
-    public List<String> getWantedTags() {
-        return new ArrayList<>();
+    public String[] getWantedTags() {
+        return new String[0];
     }
 }

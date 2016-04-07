@@ -1,6 +1,8 @@
 package software33.tagmatch.Advertisement;
 
 import android.app.AlertDialog;
+import android.app.DialogFragment;
+import android.app.FragmentTransaction;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -8,49 +10,58 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
+import software33.tagmatch.Domain.AdvChange;
 import software33.tagmatch.Domain.AdvGift;
+import software33.tagmatch.Domain.AdvSell;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.Utils.Constants;
+import software33.tagmatch.Utils.DialogError;
 
 public class NewAdvertisement extends AppCompatActivity implements View.OnClickListener {
 
-    private Spinner categorySpinner, typeSpinner;
     private Button createButton, newImage;
-    private EditText title,description, tag;
-    private List<Bitmap> images;
+    private EditText title,description, tag, wantedTags;
+    private TextInputLayout wantedTagsLayout;
     private CustomPagerAdapter mCustomPagerAdapter;
     private ViewPager mViewPager;
     private String imgExtension;
+    private final String DebugTag = "DEBUG ADVERT";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_new_advertisement);
         initElements();
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
     }
 
     private void initElements(){
@@ -58,13 +69,13 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item, Constants.typeList);
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         typeSpinner.setAdapter(typeAdapter);
-        typeSpinner.setOnItemSelectedListener(new CustomSpinnerOnItemSelectedListener());
+        typeSpinner.setOnItemSelectedListener(new CustomSpinnerOnItemSelectedListener(this));
 
         categorySpinner = (Spinner) findViewById(R.id.categorySpinner);
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,Constants.categoryList);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         categorySpinner.setAdapter(categoryAdapter);
-        categorySpinner.setOnItemSelectedListener(new CustomSpinnerOnItemSelectedListener());
+        categorySpinner.setOnItemSelectedListener(new CustomSpinnerOnItemSelectedListener(this));
 
         createButton = (Button) findViewById(R.id.btn_newAdvert);
         createButton.setOnClickListener(this);
@@ -72,9 +83,14 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         newImage = (Button) findViewById(R.id.newImage);
         newImage.setOnClickListener(this);
 
+        wantedTagsLayout = (TextInputLayout) findViewById(R.id.input_price_textInput);
+      //  wantedTagsLayout.setHint(getString(R.string.input_price));
+
         title = (EditText) findViewById(R.id.input_title);
         description = (EditText) findViewById(R.id.input_description);
         tag  = (EditText) findViewById(R.id.input_hashtags);
+        wantedTags  = (EditText) findViewById(R.id.input_price);
+        wantedTags.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
 
         images = new ArrayList<>();
 
@@ -100,34 +116,57 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             case R.id.btn_newAdvert:
                 onAdvertCreateClicked();
                 break;
+            default:
+                InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+                imm.hideSoftInputFromWindow(view.getWindowToken(),0);
+                break;
+
         }
+    }
+
+    public void showBasicErrorMessage(String message) {
+        FragmentTransaction frag = getFragmentManager().beginTransaction();
+        DialogFragment dialogFragment = DialogError.newInstance(message, getString(R.string.ok),getString(R.string.title_error_newAdvert));
+        dialogFragment.show(frag, "ShowErrorMessage");
     }
 
     public void onAdvertCreateClicked() {
         if(title.getText().toString().replaceAll("\\s","") == "") {
-            Toast.makeText(this, getResources().getString(R.string.noTitle), Toast.LENGTH_SHORT).show();
+           showBasicErrorMessage(getResources().getString(R.string.noTitle));
         }
         else if(description.getText().toString().replaceAll("\\s","") == "") {
-            Toast.makeText(this, getResources().getString(R.string.noDescription), Toast.LENGTH_SHORT).show();
+            showBasicErrorMessage(getResources().getString(R.string.noDescription));
         }
         else if(tag.getText().toString().replaceAll("\\s","") == "") {
-            Toast.makeText(this, getResources().getString(R.string.noTag), Toast.LENGTH_SHORT).show();
+            showBasicErrorMessage(getResources().getString(R.string.noTag));
         }
         else {
             String[] tags = tag.getText().toString().split(" ");
             Advertisement adv;
-            Log.v("DEBUG NewAdvert","Tipus seleccionat: " + typeSpinner.getSelectedItem());
+            Log.v(DebugTag,"Tipus seleccionat: " + typeSpinner.getSelectedItem());
+            User owner = Constants.testUser;
             if(typeSpinner.getSelectedItem().equals(Constants.typeGift)) {
                 //owner, title, images, desc, tags, category
-                User owner = Constants.testUser;
                 adv = new AdvGift(owner,title.getText().toString(),images,description.getText().toString(),tags,categorySpinner.getSelectedItem().toString());
                 Toast.makeText(this,"Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
             }
-            else if(typeSpinner.getSelectedItem().equals(Constants.typeGift)) {
-
+            else if(typeSpinner.getSelectedItem().equals(Constants.typeExchange)) {
+                String[] wantedTag =  wantedTags.getText().toString().split(" ");
+                adv = new AdvChange(owner,title.getText().toString(),images,description.getText().toString(),tags,categorySpinner.getSelectedItem().toString(),wantedTag);
+                Toast.makeText(this,"Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
             }
-            else if(typeSpinner.getSelectedItem().equals(Constants.typeGift)) {
-
+            else if(typeSpinner.getSelectedItem().equals(Constants.typeSell)) {
+                String text = wantedTags.getText().toString();
+                if(!text.equals("")) {
+                    Double price = Double.parseDouble(text);
+                    if(price <= 0.0) showBasicErrorMessage(getResources().getString(R.string.zeroPrice));
+                    else {
+                        Log.v(DebugTag, "Price: " + price);
+                        adv = new AdvSell(owner, title.getText().toString(), images, description.getText().toString(), tags, categorySpinner.getSelectedItem().toString(), price);
+                        Toast.makeText(this, "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
+                    }
+                }
+                else showBasicErrorMessage(getResources().getString(R.string.emptyPrice));
             }
             else {
                 Toast.makeText(this,"ERROR DE TIPUUUUUS", Toast.LENGTH_SHORT).show();
@@ -136,7 +175,32 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }
     }
 
+ /** MARK: Spinner type manager*/
+    private Spinner categorySpinner, typeSpinner;
+
+    public void onTypeSpinnerChanged(String newType) {
+        if(newType.equals(Constants.typeGift)) {
+            wantedTagsLayout.setHint(getString(R.string.input_gift));
+            wantedTags.setEnabled(false);
+            wantedTags.setText("");
+        }
+        else if(newType.equals(Constants.typeExchange)) {
+            wantedTagsLayout.setHint(getString(R.string.input_wantedHashtags));
+            wantedTags.setEnabled(true);
+            wantedTags.setText("");
+            wantedTags.setInputType(InputType.TYPE_CLASS_TEXT);
+        }
+        else if(newType.equals(Constants.typeSell)) {
+            wantedTagsLayout.setHint(getString(R.string.input_price));
+            wantedTags.setEnabled(true);
+            wantedTags.setText("");
+            wantedTags.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        }
+    }
+
  /** MARK: IMAGES */
+    private List<Bitmap> images;
+
     public void onNewImageClicked() {
         AlertDialog.Builder builder =
                 new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
@@ -164,8 +228,55 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     public void cameraPick() {
+        Log.v(DebugTag,"Vaig al cameraPicker");
         Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-        startActivityForResult(takePicture, Constants.codeCameraPicker);
+        File photoFile = null;
+        try {
+            photoFile = createImageFile();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        if (photoFile != null) {
+            takePicture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+            startActivityForResult(takePicture, Constants.codeCameraPicker);
+        }
+        else Log.e(DebugTag,"Error en crear la foto");
+    }
+
+    private String pathfoto;
+    private File createImageFile() throws IOException {
+        Log.v(DebugTag, "Anem a crear el fitxer de la foto");
+        //Create an unique name for the new picture
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        //We save it at the default picture folder
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile( imageFileName, ".jpg",storageDir);
+        pathfoto = image.getAbsolutePath();
+        return image;
+    }
+
+    public String getImagePathFromUri(Uri selectedImage) {
+        String[] filePathColumn = {MediaStore.Images.Media.DATA};
+        Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+        cursor.moveToFirst();
+
+        int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+        String picturePath = cursor.getString(columnIndex);
+        Log.i(DebugTag, picturePath);
+        cursor.close();
+
+        String selectedPic = picturePath;
+
+        String[] parts = selectedPic.split("\\.");
+        imgExtension = parts[parts.length - 1];
+        if (imgExtension.equals("jpg")) imgExtension = "jpeg";
+        Log.i(DebugTag, imgExtension);
+        return selectedPic;
+    }
+
+    public void newImageConverted(Bitmap bitmap) {
+        images.add(bitmap);
     }
 
  /** MARK: ACTIVITY RESULT**/
@@ -174,156 +285,20 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             case Constants.codeImagePicker:
                 if(resultCode == RESULT_OK){
                     Uri selectedImage = imageReturnedIntent.getData();
-
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    String picturePath = cursor.getString(columnIndex);
-                    Log.i("img path", picturePath);
-                    cursor.close();
-
-                    String selectedPic = picturePath;
-
-                    String[] parts = selectedPic.split("\\.");
-                    imgExtension = parts[parts.length - 1];
-                    if (imgExtension.equals("jpg")) imgExtension = "jpeg";
-                    Log.i("extension", imgExtension);
-
+                    String selectedPic = getImagePathFromUri(selectedImage);
                     mCustomPagerAdapter.addImage(selectedPic);
                 }
                 break;
             case Constants.codeCameraPicker:
                 if(resultCode == RESULT_OK) {
-                    Uri selectedImage = imageReturnedIntent.getData();
-                /*    Drawable newImage = Drawable.createFromPath(selectedImage.getPath());
-                    images.add(newImage);
-                    mCustomPagerAdapter.addImage(newImage);
-                    mCustomPagerAdapter.notifyAll();
-*/
+                    Log.v(DebugTag,"Path: "+pathfoto);
+                    mCustomPagerAdapter.addImage(pathfoto);
                 }
                 break;
             default:
-                Log.e("Perfil", "Error, He entrat al default del onActivityResult");
+                Log.e(DebugTag, "Error, He entrat al default del onActivityResult");
                 break;
         }
     }
 
-/*
-
-private File createImageFile() throws IOException {
-        //Crea un nom unic per la foto
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        String imageFileName = "JPEG_" + timeStamp + "_";
-        //La guarda a la carpeta Pictures per defecte
-        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-        File image = File.createTempFile( imageFileName, ".jpg",storageDir);
-        pathfoto = image.getAbsolutePath();
-        return image;
-    }
-
-@Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.perfil_foto:
-                Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
-                    File photoFile = null;
-                    try {
-                        photoFile = createImageFile();
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                    if (photoFile != null) {
-                        takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
-                        startActivityForResult(takePictureIntent, 123);
-                    }
-                    else Log.e("Perfil","Error en crear la foto");
-                }
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
-
-    protected void onActivityResult(int requestCode, int resultCode,Intent imageReturnedIntent) {
-        switch(requestCode) {
-            case Constants.codeImagePicker:
-                if(resultCode == RESULT_OK){
-                    Uri selectedImage = imageReturnedIntent.getData();
-                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
-
-                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-                    cursor.moveToFirst();
-
-                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-                    String filePath = cursor.getString(columnIndex);
-                    cursor.close();
-
-                    TaskFoto go = new TaskFoto();
-                    go.execute(filePath);
-                }
-                break;
-            case 123:
-                if(resultCode == RESULT_OK) {
-                    TaskFoto go = new TaskFoto();
-                    go.execute(pathfoto);
-                }
-                break;
-            default:
-                Log.e("Perfil", "Error, He entrat al default del onActivityResult");
-                break;
-        }
-    }
-
-
-
-    private class TaskFoto extends AsyncTask<String,Void,Bitmap> {
-        @Override
-        protected Bitmap doInBackground(String... path) {
-            if(!primera) {
-                db = ioh.getWritableDatabase();
-                if (db != null) {
-                    String[] s = {};
-                    db.execSQL("UPDATE TLogin SET photo='" + path[0] + "' WHERE username = '" + MenuPrincipal.nomUser + "'", s);
-                }
-                db.close();
-            }
-            else primera = false;
-//Redimensionem la imatge
-            int targetW = foto.getWidth();
-            int targetH = foto.getHeight();
-
-            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-            bmOptions.inJustDecodeBounds = true;
-            BitmapFactory.decodeFile(path[0], bmOptions);
-            int photoW = bmOptions.outWidth;
-            int photoH = bmOptions.outHeight;
-            int scaleFactor = Math.min(photoW/targetW, photoH/targetH);
-
-            bmOptions.inJustDecodeBounds = false;
-            bmOptions.inSampleSize = scaleFactor;
-            bmOptions.inPurgeable = true;
-            return BitmapFactory.decodeFile(path[0], bmOptions);
-        }
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            //   super.onPostExecute(bitmap);
-            foto.setImageBitmap(bitmap);
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
-        }
-    }
-
-    */
 }

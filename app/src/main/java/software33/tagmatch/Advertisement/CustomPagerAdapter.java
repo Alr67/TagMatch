@@ -3,6 +3,7 @@ package software33.tagmatch.Advertisement;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.support.v4.view.PagerAdapter;
+import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,14 +26,17 @@ public class CustomPagerAdapter extends PagerAdapter {
     LayoutInflater mLayoutInflater;
     List<Bitmap> mResources;
     private Integer imageHeight, imageWidth;
+    private ViewGroup privateContainer;
+    private NewAdvertisement parent;
  //   List<String> mURLResources;
 
-    public CustomPagerAdapter(Context context, Integer height, Integer width) {
-        mContext = context;
+    public CustomPagerAdapter( NewAdvertisement father, Integer height, Integer width) {
+        mContext = father.getApplicationContext();
         mResources = new ArrayList<>();
         mLayoutInflater = (LayoutInflater) mContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         this.imageHeight = height;
         this.imageWidth = width;
+        parent = father;
     }
 
     @Override
@@ -47,6 +51,7 @@ public class CustomPagerAdapter extends PagerAdapter {
 
     @Override
     public Object instantiateItem(ViewGroup container, int position) {
+        privateContainer = container;
         View itemView = mLayoutInflater.inflate(R.layout.pager_item, container, false);
         ImageView imageView = (ImageView) itemView.findViewById(R.id.imageView);
         ViewGroup.LayoutParams params = imageView.getLayoutParams();
@@ -74,8 +79,11 @@ public class CustomPagerAdapter extends PagerAdapter {
         task.execute(url,imageHeight.toString(),imageWidth.toString());
     }
 
+
     public void newImageConverted(Bitmap bitmap) {
         mResources.add(bitmap);
         this.notifyDataSetChanged();
+        ((ViewPager)privateContainer).setCurrentItem(mResources.size()-1);
+        parent.newImageConverted(bitmap);
     }
 }

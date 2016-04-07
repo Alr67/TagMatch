@@ -32,6 +32,9 @@
     <string name="input_title">Títol de l\'anunci</string>
     <string name="input_description">Descripció de l\'anunci</string>
     <string name="input_hashtags">Hashtags descriptius</string>
+    <string name="input_wantedHashtags">Hashtags del que vols a canvi</string>
+    <string name="input_price">Preu</string>
+    <string name="input_gift">Gràcies per la teva doncaió!</string>
     <string name="but_new_advert">Crea</string>
     <string name="noTitle">Introdueix un títol siusplau</string>
     <string name="noDescription">Introdueix una descripció siusplau</string>
@@ -40,6 +43,12 @@
     <string name="imagePickText">D\'on vols seleccionar la imatge?</string>
     <string name="imagePickCamera">De la Càmera</string>
     <string name="imagePickGallery">De la Galeria</string>
+    <string name="title_error_newAdvert">Falta algun camp</string>
+    <string name="ok">Entesos</string>
+    <string name="emptyPrice">Si el vols vendre, has de posar un preu, si no, regala\'l!</string>
+    <string name="zeroPrice">El preu ha de ser més gran que 0 si vols vendre, si no, regala\'l!</string>
+
+
 
 
 </resources>

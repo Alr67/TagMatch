@@ -11,14 +11,14 @@ import software33.tagmatch.Utils.Constants;
  */
 public class AdvChange extends Advertisement{
 
-    List<String> wanted;
+    String[] wanted;
 
-    public AdvChange(Integer aid, User owner, String title, List<Bitmap> images, List<String> imagesIDs, String desc, String[] tags, String category, List<String> wanted){
+    public AdvChange(Integer aid, User owner, String title, List<Bitmap> images, List<String> imagesIDs, String desc, String[] tags, String category, String[] wanted){
         super(aid, owner, title, images,imagesIDs, desc, tags, category);
         this.wanted = wanted;
     }
 
-    public AdvChange(User owner, String title, List<Bitmap> images, String desc, String[] tags, String category, List<String> wanted){
+    public AdvChange(User owner, String title, List<Bitmap> images, String desc, String[] tags, String category, String[] wanted){
         super(owner, title, images, desc, tags, category);
         this.wanted = wanted;
 
@@ -49,7 +49,7 @@ public class AdvChange extends Advertisement{
     }
 
     @Override
-    public List<String> getWantedTags() {
+    public String[] getWantedTags() {
         return wanted;
     }
 }

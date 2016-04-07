@@ -20,14 +20,22 @@ tools:context=".Advertisement.NewAdvertisement">
     android:layout_height="wrap_content"
     android:paddingTop="56dp"
     android:paddingLeft="24dp"
-    android:paddingRight="24dp">
+    android:paddingRight="24dp"
+    android:id="@+id/linearLayoutNewAdvert"
+    android:focusable="true"
+    android:clickable="true"
+    android:onClick="onClick">
 
     <!--    if the image doesnt fit
     android:adjustViewBounds="true"  -->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_weight="5">
+        android:layout_weight="5"
+        android:id="@+id/relativeLayoutNewAdvert"
+        android:focusable="true"
+        android:clickable="true"
+        android:onClick="onClick">
 
         <Button
             style="?android:attr/buttonStyleSmall"
@@ -55,7 +63,11 @@ tools:context=".Advertisement.NewAdvertisement">
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_weight="10">
+        android:layout_weight="10"
+        android:id="@+id/linearLayoutNewAdvert2"
+        android:focusable="true"
+        android:clickable="true"
+        android:onClick="onClick">
 
         <android.support.design.widget.TextInputLayout
           android:layout_width="match_parent"
@@ -69,17 +81,7 @@ tools:context=".Advertisement.NewAdvertisement">
               android:inputType="textPersonName" />
       </android.support.design.widget.TextInputLayout>
 
-        <android.support.design.widget.TextInputLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginBottom="8dp">
-            <Spinner
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/typeSpinner" />
-        </android.support.design.widget.TextInputLayout>
-
+        <!-- Description -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -94,6 +96,34 @@ tools:context=".Advertisement.NewAdvertisement">
                 android:hint="@string/input_description"/>
         </android.support.design.widget.TextInputLayout>
 
+        <!-- Type Spinner -->
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+            <Spinner
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/typeSpinner" />
+        </android.support.design.widget.TextInputLayout>
+
+        <!-- Type Content -->
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/input_price_textInput"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp">
+            <EditText android:id="@+id/input_price"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:inputType="textCapWords"
+                android:hint="@string/input_price"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <!-- Category Spinner -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -105,16 +135,19 @@ tools:context=".Advertisement.NewAdvertisement">
                 android:id="@+id/categorySpinner" />
         </android.support.design.widget.TextInputLayout>
 
+        <!-- Hashtags -->
         <android.support.design.widget.TextInputLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:layout_marginBottom="8dp">
-            <EditText android:id="@+id/input_hashtags"
+            <EditText
+                android:id="@+id/input_hashtags"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:inputType="textCapWords"
-                android:hint="@string/input_hashtags"/>
+                android:hint="@string/input_hashtags"
+                />
         </android.support.design.widget.TextInputLayout>
 
         <android.support.v7.widget.AppCompatButton
@@ -128,17 +161,7 @@ tools:context=".Advertisement.NewAdvertisement">
             android:background="@color/login_button_color"
             android:textColor="@color/app_header_color"
             android:gravity="center" />
+
     </LinearLayout>
-
-    <!-- Spinner -->
-
-    <!-- Description -->
-
-
-    <!-- Category -->
-
-    <!-- Hashtags -->
-
-
 </LinearLayout>
 </ScrollView>
