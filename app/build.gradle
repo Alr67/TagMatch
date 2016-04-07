@@ -5,7 +5,7 @@ android {
         debug {
             keyAlias 'test'
             keyPassword 'tagMatch'
-            storeFile file('D:/workspace/TagMatch/TagMatch/mystore.keystore')
+            storeFile file('C:/Users/Cristina/git/TagMatch/mystore.keystore')
             storePassword 'tagMatch'
         }
     }
@@ -38,6 +38,7 @@ android {
 dependencies {
     compile fileTree(include: ['*.jar'], dir: 'libs')
     testCompile 'junit:junit:4.12'
+    compile files('TagMatch/libs/firebase-client-android-2.5.1.jar')
     compile 'com.android.support:appcompat-v7:24.0.0-alpha1'
     compile 'com.android.support:design:24.0.0-alpha1'
     compile 'com.jakewharton:butterknife:7.0.1'
@@ -47,5 +48,6 @@ dependencies {
     compile 'com.google.android.gms:play-services-identity:8.4.0'
     compile 'com.google.android.gms:play-services-gcm:8.4.0'
     compile 'com.firebase:firebase-client-android:2.5.1+'
-    compile files('TagMatch/libs/firebase-client-android-2.5.1.jar')
+    compile 'com.android.support:support-v4:24.0.0-alpha1'
+    compile 'com.google.android.gms:play-services-auth:8.4.0'
 }

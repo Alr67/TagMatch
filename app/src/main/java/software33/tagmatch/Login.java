@@ -1,12 +1,9 @@
 package software33.tagmatch;
 
-
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
-import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -19,10 +16,10 @@ import com.firebase.client.Firebase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import software33.tagmatch.Advertisement.NewAdvertisement;
 
 public class Login extends AppCompatActivity {
     /*Declaracions ButterKnife*/
@@ -33,7 +30,8 @@ public class Login extends AppCompatActivity {
     @Bind(R.id.input_email) EditText username;
     @Bind(R.id.input_password) EditText passw;
 
-
+    //DEVELOP
+    @Bind(R.id.btn_debug_newAdvert) Button newAdvert;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -113,6 +111,12 @@ public class Login extends AppCompatActivity {
         startActivity(intent);
     }
 
+    @OnClick(R.id.btn_debug_newAdvert)
+    protected void intent_newAdvert() {
+      //  Firebase.setAndroidContext(this);
+        Intent intent = new Intent(this, NewAdvertisement.class);
+        startActivity(intent);
+    }
     /*@OnClick(R.id.forg)
     protected void intent_forg() {
         Toast.makeText(getApplicationContext(),username.getText().toString(),Toast.LENGTH_SHORT).show();
