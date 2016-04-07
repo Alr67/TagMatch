@@ -1,8 +1,10 @@
-package software33.tagmatch.Domain;
+package software33.tagmatch.Utils;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+
+import software33.tagmatch.Domain.User;
 
 /**
  * Created by Cristina on 03/04/2016.
@@ -29,5 +31,6 @@ public abstract class Constants {
 
     /* INTENTS CODES*/
     public static final int codeImagePicker = 012;
+    public static final int codeCameraPicker = 013;
 
 }

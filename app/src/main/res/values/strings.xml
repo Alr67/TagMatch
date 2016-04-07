@@ -36,6 +36,10 @@
     <string name="noTitle">Introdueix un títol siusplau</string>
     <string name="noDescription">Introdueix una descripció siusplau</string>
     <string name="noTag">Introdueix un tag com a mínim siusplau</string>
+    <string name="imagePickTitle">Afegeix una imatge</string>
+    <string name="imagePickText">D\'on vols seleccionar la imatge?</string>
+    <string name="imagePickCamera">De la Càmera</string>
+    <string name="imagePickGallery">De la Galeria</string>
 
 
 </resources>

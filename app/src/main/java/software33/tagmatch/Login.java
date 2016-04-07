@@ -12,7 +12,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.firebase.client.Firebase;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -102,9 +101,8 @@ public class Login extends AppCompatActivity {
 
     @OnClick(R.id.link_signup)
     protected void intent_reg() {
-        Firebase.setAndroidContext(this);
-        Intent intent = new Intent(this, MainChatActivity.class);
-        startActivity(intent);
+    //    Intent intent = new Intent(this, MainChatActivity.class);
+     //   startActivity(intent);
     }
 
     @OnClick(R.id.btn_debug_newAdvert)

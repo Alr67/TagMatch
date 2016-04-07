@@ -25,7 +25,7 @@ public class User {
     private List<String> listadoIDAnuncios = new ArrayList<>();
 
 
-    User(){
+    public User(){
         this.UID = "";
         this.alias = "";
       //  this.imgPerfil = new Image();
@@ -35,7 +35,7 @@ public class User {
         this.mail = "";
     }
 
-    User(String username){
+    public User(String username){
         this.UID = "";
         this.alias = username;
        // this.imgPerfil = UIImage()
@@ -45,7 +45,7 @@ public class User {
         this.mail = "";
     }
 
-    User(String username,String password){
+    public User(String username,String password){
         this.UID = "";
         this.alias = username;
      //   this.imgPerfil = UIImage();
@@ -55,7 +55,7 @@ public class User {
         this.mail = "";
     }
 
-    User(String uid, String alias, Image imgPerfil, String desc, String password,String mail){
+    public User(String uid, String alias, Image imgPerfil, String desc, String password,String mail){
         this.UID = uid;
         this.alias = alias;
         this.imgPerfil = imgPerfil;

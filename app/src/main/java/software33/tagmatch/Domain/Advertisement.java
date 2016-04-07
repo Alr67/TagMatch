@@ -1,6 +1,6 @@
 package software33.tagmatch.Domain;
 
-import android.media.Image;
+import android.graphics.Bitmap;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,7 +14,7 @@ public class Advertisement {
     String title;
     User owner;
     String description;
-    List<Image> images;
+    List<Bitmap> images;
     List<String> imagesIDs;
     String[] tags;
     Boolean done;
@@ -32,7 +32,7 @@ public class Advertisement {
         this.imagesIDs = new ArrayList<>();
     }
 
-    public Advertisement(Integer aid, User owner, String title, List<Image> images, List<String> imagesIDs, String desc,String[] tags, String category){
+    public Advertisement(Integer aid, User owner, String title, List<Bitmap> images, List<String> imagesIDs, String desc, String[] tags, String category){
         this.aID = aid;
         this.title = title;
         this.owner = owner;
@@ -44,7 +44,7 @@ public class Advertisement {
         this.imagesIDs = imagesIDs;
     }
 
-    public Advertisement(User owner, String title, List<Image> images, String desc,String[] tags, String category){
+    public Advertisement(User owner, String title, List<Bitmap> images, String desc, String[] tags, String category){
         this.aID = 0;
         this.title = title;
         this.owner = owner;

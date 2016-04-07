@@ -10,7 +10,6 @@ import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.firebase.client.Firebase;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -19,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         //Setup the Firebase library
-        Firebase.setAndroidContext(this);
 
         setContentView(R.layout.activity_main);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -59,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void startMainChatActivity(View view) {
-        Intent intent = new Intent(this, MainChatActivity.class);
-        startActivity(intent);
+      //  Intent intent = new Intent(this, MainChatActivity.class);
+      //  startActivity(intent);
     }
 }
