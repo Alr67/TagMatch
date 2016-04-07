@@ -44,7 +44,6 @@ public class DialogError extends android.app.DialogFragment implements View.OnCl
         return  v;
     }
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
