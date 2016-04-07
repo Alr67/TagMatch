@@ -1,6 +1,7 @@
 package software33.tagmatch.Login_Register;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -33,6 +34,9 @@ public class Login extends AppCompatActivity {
 
     //DEVELOP
     @Bind(R.id.btn_debug_newAdvert) Button newAdvert;
+    private static final String SH_PREF_NAME = "TagMatch_pref";
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,7 +80,7 @@ public class Login extends AppCompatActivity {
                 String direcc = getResources().getString(R.string.ip_server);
                 direcc += "/users";
 
-                new TagMatchGetAsyncTask(direcc) {
+                new TagMatchGetAsyncTask(direcc, getApplicationContext()) {
                     @Override
                     protected void onPostExecute(JSONObject jsonObject) {
                         try {
@@ -84,7 +88,7 @@ public class Login extends AppCompatActivity {
                                 Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_LONG).show();
                             }
                             else {
-                                Toast.makeText(getApplicationContext(), "MOLT BÉ", Toast.LENGTH_LONG).show();
+                                continueLogin();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -125,6 +129,10 @@ public class Login extends AppCompatActivity {
 
     private void continueLogin() {
         Toast.makeText(getApplicationContext(),"MOLT BE, HAS FET LOGIN! :D", Toast.LENGTH_SHORT).show();
+        SharedPreferences.Editor editor = getSharedPreferences(SH_PREF_NAME, MODE_PRIVATE).edit();
+        editor.putString("name", username.getText().toString()); //Fem l'acces dsd aqui perq aqui només s'entra si tot estava OK, aixi q no estarà mai buit
+        editor.putString("password",passw.getText().toString());
+        editor.commit();
         /*Intent success = new Intent(this, Login.class); //FAlta guardar en algun puesto l'usuari
         startActivity(success);*/
     }

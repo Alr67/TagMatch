@@ -1,5 +1,6 @@
 package software33.tagmatch.Login_Register;
 
+import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -18,13 +19,17 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import software33.tagmatch.R;
+
 
 public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
     private URL url;
+    private Context context;
 
-    public TagMatchGetAsyncTask(String url2) {
+    public TagMatchGetAsyncTask(String url2, Context coming_context) {
         try {
             url = new URL(url2);
+            context = coming_context;
         } catch (MalformedURLException e) {
             Log.v("TagMatchGetAsyncTask", "", e);
         }
@@ -58,9 +63,17 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
             return aux;
 
         } catch (IOException | JSONException e) {
-            e.printStackTrace();
+            Log.e("error", e.getMessage());
             Map<String, String> map = new HashMap<>();
-            map.put("error", "Unexpected Error");
+            if(e.getMessage().contains("failed to connect to")){
+                if(e.getMessage().contains("Network is unreachable")){
+                    map.put("error", context.getString(R.string.no_network_connection));
+                } else {
+                    map.put("error", context.getString(R.string.connection_timeout));
+                }
+            } else {
+                map.put("error", "Unexpected Error");
+            }
             return new JSONObject(map);
         }
 
