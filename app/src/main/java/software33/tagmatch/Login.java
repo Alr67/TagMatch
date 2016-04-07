@@ -4,6 +4,7 @@ package software33.tagmatch;
 import android.content.Intent;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Window;
@@ -55,6 +56,8 @@ public class Login extends AppCompatActivity {
         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
         // finally change the color
         window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimaryDark));
+
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     @OnClick(R.id.btn_login)
@@ -120,5 +123,11 @@ public class Login extends AppCompatActivity {
         /*Intent success = new Intent(this, Login.class); //FAlta guardar en algun puesto l'usuari
         startActivity(success);*/
     }
+
+    @Override
+    public void finish(){
+        moveTaskToBack(true);
+    }
+
 
 }
