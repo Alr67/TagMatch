@@ -1,4 +1,4 @@
-package software33.tagmatch.Login_Register;
+package software33.tagmatch.ServerConnection;
 
 import android.content.Context;
 import android.content.SharedPreferences;

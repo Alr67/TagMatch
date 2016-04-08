@@ -1,6 +1,11 @@
 package software33.tagmatch.Domain;
 
 import android.graphics.Bitmap;
+import android.util.Log;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,11 +77,18 @@ public class Advertisement {
         return "";
     }
 
-    public Double getPrice() {
-        return 0.0;
-    }
-
-    public String[] getWantedTags() {
-        return new String[0];
+    public JSONObject toJSON(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("name", title);
+            jsonObject.put("type", getTypeDescription());
+            jsonObject.put("owner", owner.getAlias());
+            Log.i("Alias user", owner.getAlias());
+            jsonObject.put("category", category);
+            jsonObject.put("tags", new JSONArray(tags));
+            jsonObject.put("description", description);
+        } catch (JSONException e) {
+        }
+        return jsonObject;
     }
 }

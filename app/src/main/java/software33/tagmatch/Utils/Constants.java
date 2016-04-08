@@ -6,9 +6,6 @@ import java.util.List;
 
 import software33.tagmatch.Domain.User;
 
-/**
- * Created by Cristina on 03/04/2016.
- */
 public abstract class Constants {
     public static final String typeServerGIFT = "com.walatime.model.GiveawayAdvertisement";
     public static final String typeServerEXCHANGE = "com.walatime.model.ExchangeAdvertisement";
@@ -27,10 +24,12 @@ public abstract class Constants {
     public static final String typeGift = "Gift";
     public static final List<String> typeList = new ArrayList<>(Arrays.asList(typeSell,typeExchange,typeGift));
 
-    public static final User testUser = new User("testUser");
+    public static final String IP_ALEJANDRO = "192.168.1.129";
+    public static final String IP_SERVER = "http://" + IP_ALEJANDRO + ":8080";
 
     /* INTENTS CODES*/
     public static final int codeImagePicker = 012;
     public static final int codeCameraPicker = 013;
+    public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 14;
 
 }

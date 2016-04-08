@@ -2,6 +2,9 @@ package software33.tagmatch.Domain;
 
 import android.graphics.Bitmap;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import software33.tagmatch.Utils.Constants;
@@ -43,9 +46,16 @@ public class AdvSell extends Advertisement {
         return Constants.typeServerSELL;
     }
 
-    @Override
     public Double getPrice()  {
         return price;
     }
 
+    @Override
+    public JSONObject toJSON() {
+        JSONObject jsonObject = super.toJSON();
+        try {
+            jsonObject.put("price", getPrice());
+        } catch (JSONException ignored) {}
+        return jsonObject;
+    }
 }

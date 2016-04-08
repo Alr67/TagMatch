@@ -85,4 +85,8 @@ public class User {
     public List<String> getUsersBlocked(){
         return usuariosBloqueados;
     }
+
+    public String getAlias() {
+        return alias;
+    }
 }

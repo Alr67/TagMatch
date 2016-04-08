@@ -1,5 +1,6 @@
 package software33.tagmatch.Advertisement;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
@@ -9,6 +10,7 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
@@ -29,6 +31,9 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -42,6 +47,7 @@ import software33.tagmatch.Domain.AdvSell;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.DialogError;
 
@@ -62,6 +68,14 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         initElements();
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
+        }
+
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
     private void initElements(){
@@ -142,9 +156,12 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }
         else {
             String[] tags = tag.getText().toString().split(" ");
-            Advertisement adv;
+            Advertisement adv = new Advertisement();
             Log.v(DebugTag,"Tipus seleccionat: " + typeSpinner.getSelectedItem());
-            User owner = Constants.testUser;
+
+            //TODO sujeto a cambios cuando implementemos los usuarios
+            User owner = new User(getSharedPreferences("TagMatch_pref", Context.MODE_PRIVATE).getString("name", ""));
+
             if(typeSpinner.getSelectedItem().equals(Constants.typeGift)) {
                 //owner, title, images, desc, tags, category
                 adv = new AdvGift(owner,title.getText().toString(),images,description.getText().toString(),tags,categorySpinner.getSelectedItem().toString());
@@ -171,7 +188,22 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             else {
                 Toast.makeText(this,"ERROR DE TIPUUUUUS", Toast.LENGTH_SHORT).show();
             }
-            //TODO: send to server the new adv
+
+            final Context context = this.getApplicationContext();
+
+            new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        String error = jsonObject.get("error").toString();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    } catch (JSONException ignored){
+                        //TODO coger id para hacer el post imagen
+                    }
+                }
+            }.execute(adv.toJSON());
+            Log.i("jsonAdvert", adv.toJSON().toString());
+            //TODO post para foto anuncio
         }
     }
 

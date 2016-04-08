@@ -2,6 +2,10 @@ package software33.tagmatch.Domain;
 
 import android.graphics.Bitmap;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.List;
 
 import software33.tagmatch.Utils.Constants;
@@ -48,8 +52,16 @@ public class AdvChange extends Advertisement{
         return Constants.typeServerEXCHANGE;
     }
 
-    @Override
     public String[] getWantedTags() {
         return wanted;
+    }
+
+    @Override
+    public JSONObject toJSON() {
+        JSONObject jsonObject = super.toJSON();
+        try {
+            jsonObject.put("wantedTags", new JSONArray(getWantedTags()));
+        } catch (JSONException ignored) {}
+        return jsonObject;
     }
 }

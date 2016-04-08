@@ -16,8 +16,9 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import software33.tagmatch.MainActivity;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
+import software33.tagmatch.Utils.Constants;
 
 public class RegistrationActivity extends AppCompatActivity {
 
@@ -69,7 +70,7 @@ public class RegistrationActivity extends AppCompatActivity {
             jObject.put("password", pass);
             jObject.put("email", email);
 
-            new TagMatchPostAsyncTask(getString(R.string.ip_server) + "/users", this){
+            new TagMatchPostAsyncTask(Constants.IP_SERVER + "/users", this, false){
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {

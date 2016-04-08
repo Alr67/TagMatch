@@ -25,6 +25,8 @@ import butterknife.OnClick;
 import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.MainActivity;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
 public class Login extends AppCompatActivity {
@@ -85,7 +87,7 @@ public class Login extends AppCompatActivity {
                 jObject.put("username", name);
                 jObject.put("password", pass);
 
-                String direcc = getResources().getString(R.string.ip_server);
+                String direcc = Constants.IP_SERVER;
                 direcc += "/users";
 
                 new TagMatchGetAsyncTask(direcc, getApplicationContext()) {

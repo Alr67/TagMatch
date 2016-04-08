@@ -1,4 +1,4 @@
-package software33.tagmatch.Login_Register;
+package software33.tagmatch.ServerConnection;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -10,10 +10,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
-import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -22,38 +22,32 @@ import java.util.Map;
 
 import software33.tagmatch.R;
 
-public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, JSONObject> {
+public abstract class TagMatchPutAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
 
     private URL url;
     private Context context;
-    private String imgExtension;
-    private byte[] img;
 
-    public TagMatchPostImgAsyncTask(String url, Context context, byte[] img, String imgExtension) {
+    public TagMatchPutAsyncTask(String url, Context context) {
         try {
             this.url = new URL(url);
             this.context = context;
-            this.imgExtension = imgExtension;
-            this.img = img;
         } catch (MalformedURLException e) {
-            Log.e("TagMatchPostAsyncTask", "", e);
+            Log.e("TagMatchPutAsyncTask", "", e);
         }
     }
 
-    protected JSONObject doInBackground(Byte[]... params) {
+    protected JSONObject doInBackground(JSONObject... params) {
         try {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            connectUser(con);
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);
             con.setDoInput(true);
-            con.setRequestMethod("POST");
-            connectUser(con);
-            con.setRequestProperty("Content-Type", "image/" + imgExtension);
+            con.setRequestMethod("PUT");
+            con.setRequestProperty("Content-Type", "application/json");
 
-            DataOutputStream wr = new DataOutputStream(
-                    con.getOutputStream());
-            wr.write(img);
-            //wr.write(new String(img, Charset.forName("US-ASCII")));
+            OutputStreamWriter wr= new OutputStreamWriter(con.getOutputStream());
+            wr.write(params[0].toString());
             wr.flush();
             wr.close();
 
@@ -65,7 +59,7 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
 
             JSONObject aux;
 
-            Log.i("post status code", Integer.toString(con.getResponseCode()));
+            Log.i("put status code", Integer.toString(con.getResponseCode()));
 
             if (con.getResponseCode() >= 400)
                 aux = new JSONObject(iStreamToString(con.getErrorStream()));
@@ -79,8 +73,8 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
         } catch (IOException | JSONException e) {
             Log.e("error", e.getMessage());
             Map<String, String> map = new HashMap<>();
-            if (e.getMessage().contains("failed to connect to")) {
-                if (e.getMessage().contains("Network is unreachable")) {
+            if(e.getMessage().contains("failed to connect to")){
+                if(e.getMessage().contains("Network is unreachable")){
                     map.put("error", context.getString(R.string.no_network_connection));
                 } else {
                     map.put("error", context.getString(R.string.connection_timeout));
@@ -97,8 +91,6 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
         final String user = prefs.getString("name", "");
         final String password = prefs.getString("password", "");
 
-        Log.i("userPostImg", user);
-        Log.i("passPostimg", password);
         String userPass = user + ":" + password;
         c.setRequestProperty("Authorization", "Basic " +
                 new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT)));
@@ -121,6 +113,5 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
         String contentOfMyInputStream = sb.toString();
         return contentOfMyInputStream;
     }
-
 
 }

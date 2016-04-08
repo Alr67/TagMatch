@@ -38,13 +38,14 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.BitmapWorkerTask;
+import software33.tagmatch.Utils.Constants;
 
 public class RegistrationActivity2 extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 8000;
-    private static final int PICK_IMAGE = 8001;
     private ImageView iv;
     private GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
@@ -68,7 +69,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(permissions, REQUEST_ID_MULTIPLE_PERMISSIONS);
+            requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
         }
 
         iv = (ImageView) findViewById(R.id.imageView);
@@ -107,14 +108,14 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
             Intent intent = new Intent(Intent.ACTION_PICK);
             intent.setType("image/*");
-            startActivityForResult(intent, PICK_IMAGE);
+            startActivityForResult(intent, Constants.codeImagePicker);
         }
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == PICK_IMAGE && resultCode == RESULT_OK && null != data) {
+        if (requestCode == Constants.codeImagePicker && resultCode == RESULT_OK && null != data) {
             Uri selectedImage = data.getData();
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
@@ -168,7 +169,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
 
             Log.i("updateImg", "he entrado");
 
-            new TagMatchPostImgAsyncTask(getString(R.string.ip_server) + "/users/photo", this, byteArray, imgExtension) {
+            new TagMatchPostImgAsyncTask(Constants.IP_SERVER + "/users/photo", this, byteArray, imgExtension) {
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -191,7 +192,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
 
             Log.i("updateLoc", "he entrado");
 
-            new TagMatchPutAsyncTask(getString(R.string.ip_server) + "/users", this) {
+            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/users", this) {
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {

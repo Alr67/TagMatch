@@ -1,6 +1,4 @@
 <resources>
-    <string name="ip_server">https://tagmatch.herokuapp.com</string>
-    <string name="ip_server2">http://192.168.1.16:8080</string>
     <string name="app_name">TagMatch!</string>
     <string name="action_settings">Settings</string>
     <string name="chat_button">Xats</string>
