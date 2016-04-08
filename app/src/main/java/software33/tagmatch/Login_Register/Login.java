@@ -17,11 +17,15 @@ import com.firebase.client.Firebase;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import software33.tagmatch.Advertisement.NewAdvertisement;
+import software33.tagmatch.MainActivity;
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.Helpers;
 
 public class Login extends AppCompatActivity {
     /*Declaracions ButterKnife*/
@@ -42,8 +46,13 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this); //Necessari per a q funcioni tot lo de ButterKnife
-       /* Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);*/
+
+        ArrayList<String> existing_login = new ArrayList<String>();
+        existing_login = new Helpers().getPersonalData(getApplicationContext());
+        if(existing_login != null && existing_login.get(0) != null && existing_login.get(1) != null) {
+            Intent success = new Intent(this, MainActivity.class); //FAlta guardar en algun puesto l'usuari
+            startActivity(success);
+        }
 
         TextView app_header = (TextView) findViewById(R.id.app_header);
         /* MÈTODE PER FER SERVIR FONTS EXTERNES*/

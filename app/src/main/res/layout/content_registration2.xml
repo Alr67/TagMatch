@@ -78,6 +78,7 @@
         android:id="@+id/endRegister"
         android:layout_gravity="center_horizontal"
         android:background="@color/login_button_color"
+        android:onClick="endRegistrer"
         android:textColor="@color/app_header_color" />
 
 </LinearLayout>
