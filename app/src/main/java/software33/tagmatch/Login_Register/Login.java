@@ -123,6 +123,7 @@ public class Login extends AppCompatActivity {
         Firebase.setAndroidContext(this);
         Intent intent = new Intent(this, RegistrationActivity.class);
         startActivity(intent);
+        finish();
     }
 
     @OnClick(R.id.btn_debug_newAdvert)
@@ -130,6 +131,7 @@ public class Login extends AppCompatActivity {
       //  Firebase.setAndroidContext(this);
         Intent intent = new Intent(this, NewAdvertisement.class);
         startActivity(intent);
+        finish();
     }
     /*@OnClick(R.id.forg)
     protected void intent_forg() {
@@ -137,19 +139,18 @@ public class Login extends AppCompatActivity {
     }*/
 
     private void continueLogin() {
-        Toast.makeText(getApplicationContext(),"MOLT BE, HAS FET LOGIN! :D", Toast.LENGTH_SHORT).show();
         SharedPreferences.Editor editor = getSharedPreferences(SH_PREF_NAME, MODE_PRIVATE).edit();
         editor.putString("name", username.getText().toString()); //Fem l'acces dsd aqui perq aqui només s'entra si tot estava OK, aixi q no estarà mai buit
         editor.putString("password",passw.getText().toString());
         editor.commit();
-        /*Intent success = new Intent(this, Login.class); //FAlta guardar en algun puesto l'usuari
-        startActivity(success);*/
+        Intent success = new Intent(this, MainActivity.class); //FAlta guardar en algun puesto l'usuari
+        startActivity(success);
+        finish();
     }
 
     @Override
-    public void finish(){
-        moveTaskToBack(true);
+    public void onBackPressed() {
+        finish();
     }
-
 
 }

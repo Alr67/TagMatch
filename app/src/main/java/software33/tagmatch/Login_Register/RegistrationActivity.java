@@ -16,6 +16,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import software33.tagmatch.MainActivity;
 import software33.tagmatch.R;
 
 public class RegistrationActivity extends AppCompatActivity {
@@ -87,6 +88,7 @@ public class RegistrationActivity extends AppCompatActivity {
     public void backToLogin(View view){
         Intent act = new Intent(this, Login.class);
         startActivity(act);
+        finish();
     }
 
     private void continueRegistration(String username, String passw){
@@ -121,5 +123,11 @@ public class RegistrationActivity extends AppCompatActivity {
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
         return;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent success = new Intent(this, Login.class); //FAlta guardar en algun puesto l'usuari
+        startActivity(success);
     }
 }

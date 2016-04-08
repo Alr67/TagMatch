@@ -209,6 +209,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     private void backToLogin() {
         Intent act = new Intent(this, Login.class);
         startActivity(act);
+        finish();
     }
 
     @Override
