@@ -16,4 +16,13 @@ public class Helpers {
         data.add(prefs.getString("password", null));
         return data;
     }
+
+    public void logout(Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        editor.remove("name");
+        editor.remove("password");
+        editor.commit();
+    }
+
+
 }

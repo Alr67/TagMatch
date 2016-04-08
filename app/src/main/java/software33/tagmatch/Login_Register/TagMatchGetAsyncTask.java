@@ -1,7 +1,10 @@
 package software33.tagmatch.Login_Register;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -39,16 +42,20 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
         try {
             final String user = params[0].getString("username").toString();
             final String password = params[0].getString("password").toString();
+
+            String userPass = user + ":" + password;
+            HttpURLConnection con = (HttpURLConnection) url.openConnection();
             Authenticator.setDefault(new Authenticator() {
                 protected PasswordAuthentication getPasswordAuthentication() {
                     return new PasswordAuthentication(user, password.toCharArray());
                 }
             });
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setDoInput(true);
             con.setRequestMethod("GET");
-            con.setUseCaches(false);
-            con.setRequestProperty("Content-Type", "application/json");
+            con.setRequestProperty("Authorization", "basic " +
+                    Base64.encode(userPass.getBytes(), Base64.DEFAULT));
+            //con.setDoInput(true);
+//            con.setUseCaches(false);
+//            con.setRequestProperty("Content-Type", "application/json");
             con.connect();
 
             JSONObject aux;

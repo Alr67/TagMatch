@@ -79,7 +79,6 @@ public class Login extends AppCompatActivity {
         if(!username.getText().toString().matches("") && !passw.getText().toString().matches("")) {
             name = username.getText().toString();
             pass = passw.getText().toString();
-            boolean haveError = false;
 
             try {
                 JSONObject jObject = new JSONObject();
@@ -93,11 +92,11 @@ public class Login extends AppCompatActivity {
                     @Override
                     protected void onPostExecute(JSONObject jsonObject) {
                         try {
-                            if(jsonObject.get("valid").toString().equals("false")) {
-                                Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_LONG).show();
+                            if(jsonObject.getBoolean("valid")) {
+                                continueLogin();
                             }
                             else {
-                                continueLogin();
+                                Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_LONG).show();
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

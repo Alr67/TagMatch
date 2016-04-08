@@ -9,11 +9,17 @@ import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
 
+import software33.tagmatch.Advertisement.NewAdvertisement;
+import software33.tagmatch.Chat.MainChatActivity;
 import software33.tagmatch.Login_Register.Login;
+import software33.tagmatch.Utils.Helpers;
 
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener {
+
+    Button logout,xat,anunci;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -25,14 +31,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        logout = (Button) findViewById(R.id.logout);
+        anunci = (Button) findViewById(R.id.anunci);
+        xat = (Button) findViewById(R.id.xat);
+        logout.setOnClickListener(this);
+        anunci.setOnClickListener(this);
+        xat.setOnClickListener(this);
     }
 
     @Override
@@ -53,13 +57,36 @@ public class MainActivity extends AppCompatActivity {
         if (id == R.id.action_settings) {
             Intent intent = new Intent(this, Login.class);
             startActivity(intent);
+            finish();
         }
 
         return super.onOptionsItemSelected(item);
     }
 
     public void startMainChatActivity(View view) {
-      //  Intent intent = new Intent(this, MainChatActivity.class);
-      //  startActivity(intent);
+      //  Inent intent = new Intent(this, MainChatActivity.class);
+        //  startActivity(intent);t
+    }
+
+    @Override
+    public void onClick(View v) {
+        switch (v.getId()) {
+            case (R.id.xat):
+                Intent intent = new Intent(this, MainChatActivity.class);
+                startActivity(intent);
+                finish();
+                break;
+            case (R.id.anunci):
+                Intent intent2 = new Intent(this, NewAdvertisement.class);
+                startActivity(intent2);
+                finish();
+                break;
+            case (R.id.logout):
+                new Helpers().logout(getApplicationContext());
+                Intent intent3 = new Intent(this, Login.class);
+                startActivity(intent3);
+                finish();
+                break;
+        }
     }
 }
