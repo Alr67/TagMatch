@@ -16,6 +16,7 @@ import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TextInputLayout;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -71,8 +72,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nav_new_advert);
         initElements();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_new_advert);
-        setSupportActionBar(toolbar);
 
         String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
@@ -351,7 +350,18 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        Log.i("DEBUG","item selected");
-        return NavigationController.onItemSelected(item.getItemId(),this);
+        return  NavigationController.onItemSelected(item.getItemId(),this);
+    }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+            Log.i("DEBUG","Drawer is open");
+        } else {
+            Log.i("DEBUG","Drawer is NOT open");
+            super.onBackPressed();
+        }
     }
 }

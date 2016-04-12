@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.Toast;
 
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.Utils.NavigationController;
@@ -38,12 +39,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        logout = (Button) findViewById(R.id.logout);
-        anunci = (Button) findViewById(R.id.anunci);
-        xat = (Button) findViewById(R.id.xat);
+        logout = (Button) findViewById(R.id.xat);
         logout.setOnClickListener(this);
-        anunci.setOnClickListener(this);
-        xat.setOnClickListener(this);
 
     }
 
@@ -78,25 +75,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void onClick(View v) {
-        Log.i("DEBUG","BOTO CLICAT");
-     /*  switch (v.getId()) {
-            case (R.id.xat):
-                Intent intent = new Intent(this, MainChatActivity.class);
-                startActivity(intent);
-                finish();
-                break;
-            case (R.id.anunci):
-                Intent intent2 = new Intent(this, NewAdvertisement.class);
-                startActivity(intent2);
-                finish();
-                break;
-            case (R.id.logout):
-                new Helpers().logout(getApplicationContext());
-                Intent intent3 = new Intent(this, Login.class);
-                startActivity(intent3);
-                finish();
-                break;
-        } */
+        Toast.makeText(this,"NOT IMPLEMENTED YET",Toast.LENGTH_SHORT).show();
     }
 
     @Override

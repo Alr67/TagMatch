@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.util.Log;
 import android.widget.Toast;
 
 import software33.tagmatch.Advertisement.NewAdvertisement;
@@ -20,6 +21,7 @@ public final class NavigationController {
     
     public static Boolean onItemSelected(Integer id, Activity parent) {
 
+        Log.i("DEBUG","item selected");
         if (id == R.id.nav_viewUser) {
             Intent intent = new Intent(parent, ViewProfile.class);
             parent.startActivity(intent);
