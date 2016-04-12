@@ -16,13 +16,9 @@ import software33.tagmatch.Utils.NavigationController;
 public class ViewProfile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-   /*     DrawerLayout dl = (DrawerLayout) findViewById(R.id.drawer_layout);
-        LayoutInflater layoutInflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-        layoutInflater.inflate(R.layout.content_login,dl); */
         setContentView(R.layout.nav_view_profile);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view_profile);
         setSupportActionBar(toolbar);
@@ -35,6 +31,8 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+
     }
 
 
