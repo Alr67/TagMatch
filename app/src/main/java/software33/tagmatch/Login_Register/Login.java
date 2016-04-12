@@ -88,16 +88,16 @@ public class Login extends AppCompatActivity {
                 jObject.put("username", name);
                 jObject.put("password", pass);
 
-                /*String direcc = Constants.IP_SERVER;
-                direcc += "/users";*/
-                String direcc = "https://tagmatch.herokuapp.com/users";
+                String direcc = Constants.IP_SERVER;
+                direcc += "/users";
+
                 new TagMatchGetAsyncTask(direcc, getApplicationContext()) {
                     @Override
                     protected void onPostExecute(JSONObject jsonObject) {
                         try {
-                            if(jsonObject.getInt("status") != 200) Toast.makeText(getApplicationContext(),R.string.error_login,Toast.LENGTH_LONG).show();
+                            if(jsonObject.has("status") && jsonObject.getInt("status") != 200) Toast.makeText(getApplicationContext(),R.string.error_login,Toast.LENGTH_LONG).show();
                             else {
-                                if (jsonObject.getBoolean("valid")) {
+                                if (jsonObject.has("valid") && jsonObject.getBoolean("valid")) {
                                     continueLogin();
                                 } else {
                                     Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_LONG).show();
