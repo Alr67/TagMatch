@@ -66,8 +66,8 @@
             android:theme="@style/AppTheme.NoActionBar"></activity>
         <activity android:name=".Chat.MainChatActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
-        <activity android:name=".Chat.SingleChatActivity"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+
+        <activity android:name=".Chat.SingleChatActivity"/>
     </application>
 
 </manifest>

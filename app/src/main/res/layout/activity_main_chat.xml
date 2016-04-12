@@ -16,6 +16,7 @@
         android:layout_height="?attr/actionBarSize"
         android:background="?attr/colorPrimary"
         app:popupTheme="@style/AppTheme.PopupOverlay" />
+
     </android.support.design.widget.AppBarLayout>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,7 +30,7 @@
         tools:showIn="@layout/nav_activity_main">
 
     <ListView
-        android:id="@+id/list"
+        android:id="@+id/list_chats"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_weight="1"/>

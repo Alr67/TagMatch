@@ -71,7 +71,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         setTitle(R.string.main_chat_activity_title);
 
         CustomListView = this;
-        list= ( ListView )findViewById( R.id.list );
+        list= ( ListView )findViewById( R.id.list_chats );
         Firebase.setAndroidContext(this);
         //Get Firebase Reference
         myFirebaseRef =

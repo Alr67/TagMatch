@@ -1,9 +1,9 @@
 package software33.tagmatch.Chat;
 
 import android.database.DataSetObserver;
+import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -16,6 +16,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
@@ -23,10 +24,7 @@ import com.firebase.client.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.firebase.client.ChildEventListener;
 
-import software33.tagmatch.Chat.ChatArrayAdapter;
-import software33.tagmatch.Chat.ChatMessage;
 import software33.tagmatch.R;
 
 public class SingleChatActivity extends AppCompatActivity {
@@ -67,9 +65,11 @@ public class SingleChatActivity extends AppCompatActivity {
         messagesRef = myFirebaseRef.child("chats").child(idChat).child("messages");
         usersRef = myFirebaseRef.child("users");
 
+
+
         /************** Set the action Bar *****************/
 
-        ActionBar actionBar = getSupportActionBar();
+       ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayOptions(actionBar.getDisplayOptions()
                 | ActionBar.DISPLAY_SHOW_CUSTOM);
         actionBar.setCustomView(R.layout.actionbar_single_chat);
@@ -84,6 +84,7 @@ public class SingleChatActivity extends AppCompatActivity {
         image.setImageResource(R.drawable.image0);
 
         /****************************************************/
+
 
         /************** Set the chat ************************/
 
