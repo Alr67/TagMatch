@@ -3,12 +3,16 @@ package software33.tagmatch.Chat;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.support.design.widget.NavigationView;
 import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -28,8 +32,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.NavigationController;
 
-public class MainChatActivity extends AppCompatActivity {
+public class MainChatActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
     ListView list;
     CustomListChatAdapter adapter;
     public MainChatActivity CustomListView = null;
@@ -51,13 +56,23 @@ public class MainChatActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main_chat);
+        setContentView(R.layout.nav_chats);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_chats);
+        setSupportActionBar(toolbar);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
 
         setTitle(R.string.main_chat_activity_title);
 
         CustomListView = this;
         list= ( ListView )findViewById( R.id.list );
-
+        Firebase.setAndroidContext(this);
         //Get Firebase Reference
         myFirebaseRef =
                 new Firebase("https://torrid-torch-42.firebaseio.com/");
@@ -137,6 +152,12 @@ public class MainChatActivity extends AppCompatActivity {
             }
         });
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        Log.i("DEBUG","item selected");
+        return NavigationController.onItemSelected(item.getItemId(),this);
     }
 
     private static class ChatInfo {

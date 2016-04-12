@@ -10,12 +10,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.firebase.client.Firebase;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
@@ -25,8 +21,6 @@ import butterknife.OnClick;
 import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.MainActivity;
 import software33.tagmatch.R;
-import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
-import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
 public class Login extends AppCompatActivity {
@@ -74,10 +68,12 @@ public class Login extends AppCompatActivity {
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 
+
     @OnClick(R.id.btn_login)
     protected void validate_login()  {
         String name,pass;
-
+        continueLogin();
+/*
         if(!username.getText().toString().matches("") && !passw.getText().toString().matches("")) {
             name = username.getText().toString();
             pass = passw.getText().toString();
@@ -116,7 +112,7 @@ public class Login extends AppCompatActivity {
             if (passw.getText().toString().matches("")) {
                 Toast.makeText(getApplicationContext(), R.string.empty_pass, Toast.LENGTH_SHORT).show();
             }
-        }
+        } */
     }
 
     @OnClick(R.id.link_signup)

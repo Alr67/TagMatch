@@ -14,13 +14,17 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.support.design.widget.NavigationView;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -50,8 +54,9 @@ import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.DialogError;
+import software33.tagmatch.Utils.NavigationController;
 
-public class NewAdvertisement extends AppCompatActivity implements View.OnClickListener {
+public class NewAdvertisement extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private Button createButton, newImage;
     private EditText title,description, tag, wantedTags;
@@ -64,9 +69,9 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_new_advertisement);
+        setContentView(R.layout.nav_new_advert);
         initElements();
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_new_advert);
         setSupportActionBar(toolbar);
 
         String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -79,6 +84,17 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     private void initElements(){
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_new_advert);
+        setSupportActionBar(toolbar);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         typeSpinner = (Spinner) findViewById(R.id.typeSpinner);
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item, Constants.typeList);
         typeAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -333,4 +349,9 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        Log.i("DEBUG","item selected");
+        return NavigationController.onItemSelected(item.getItemId(),this);
+    }
 }
