@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Window;
 import android.view.WindowManager;
@@ -90,11 +91,13 @@ public class Login extends AppCompatActivity {
                     @Override
                     protected void onPostExecute(JSONObject jsonObject) {
                         try {
-                            if(jsonObject.getBoolean("valid")) {
-                                continueLogin();
-                            }
+                            if(jsonObject.has("status") && jsonObject.getInt("status") != 200) Toast.makeText(getApplicationContext(),R.string.error_login,Toast.LENGTH_LONG).show();
                             else {
-                                Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_LONG).show();
+                                if (jsonObject.has("valid") && jsonObject.getBoolean("valid")) {
+                                    continueLogin();
+                                } else {
+                                    Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_LONG).show();
+                                }
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();
