@@ -63,11 +63,15 @@
         <activity
             android:name=".Users.ViewProfile"
             android:label="@string/title_activity_view_profile"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Chat.MainChatActivity"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity android:name=".Chat.SingleChatActivity" />
+        <activity
+            android:name=".Advertisement.ViewAdvert"
+            android:label="@string/title_activity_view_advert"
             android:theme="@style/AppTheme.NoActionBar"></activity>
-        <activity android:name=".Chat.MainChatActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
-
-        <activity android:name=".Chat.SingleChatActivity"/>
     </application>
 
 </manifest>
