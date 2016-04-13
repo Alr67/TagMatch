@@ -17,7 +17,6 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
     public BitmapWorkerTask(CustomPagerAdapter parent) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
         ActivityReference = new WeakReference<CustomPagerAdapter>(parent);
-
     }
 
     // Decode image in background.

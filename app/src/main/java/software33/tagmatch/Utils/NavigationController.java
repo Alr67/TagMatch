@@ -41,6 +41,7 @@ public final class NavigationController {
             parent.finish();
         } else if (id == R.id.nav_viewAdvert) {
             Intent intent = new Intent(parent, ViewAdvert.class);
+            intent.putExtra(Constants.TAG_BUNDLE_VIEWADVERT,Constants.testAdvertGift.toJSON().toString());
             parent.startActivity(intent);
             parent.finish();
         } else {

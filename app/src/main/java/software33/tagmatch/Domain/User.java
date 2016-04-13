@@ -24,6 +24,29 @@ public class User {
     ///Listado de los ids de todos los anuncios que tiene el usuario
     private List<String> listadoIDAnuncios = new ArrayList<>();
 
+    public String getUID() {
+        return UID;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public Image getImgPerfil() {
+        return imgPerfil;
+    }
+
+    public String getMail() {
+        return mail;
+    }
+
+    public Integer getValoration() {
+        return valoration;
+    }
 
     public User(){
         this.UID = "";

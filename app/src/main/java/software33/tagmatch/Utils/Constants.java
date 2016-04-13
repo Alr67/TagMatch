@@ -1,9 +1,13 @@
 package software33.tagmatch.Utils;
 
+import android.graphics.Bitmap;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import software33.tagmatch.Domain.AdvGift;
+import software33.tagmatch.Domain.AdvSell;
 import software33.tagmatch.Domain.User;
 
 public abstract class Constants {
@@ -33,4 +37,14 @@ public abstract class Constants {
     public static final int codeCameraPicker = 013;
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 14;
 
+    /* Bundle TAGS */
+    public static final String TAG_BUNDLE_VIEWADVERT = "AdvertisementToView";
+
+
+    /** A ELIMINAR */
+    public static final User testUser = new User("test","test");
+    public static final List<Bitmap> testImages = new ArrayList(0);
+    public static final String testTags[]= new String[] {"Ankit","Bohra","Xyz"};
+    public static final AdvGift testAdvertGift = new AdvGift(testUser,"REGAL 1",testImages,"TExtmolt llarg",testTags,"Categoria");
+    public static final AdvSell testAdvertSell = new AdvSell(testUser,"REGAL 1",testImages,"TExtmolt llarg",testTags,"Categoria",32.2);
 }

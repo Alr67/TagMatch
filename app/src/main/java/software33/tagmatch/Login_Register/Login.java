@@ -22,7 +22,6 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.MainActivity;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
@@ -38,8 +37,6 @@ public class Login extends AppCompatActivity {
     @Bind(R.id.input_email) EditText username;
     @Bind(R.id.input_password) EditText passw;
 
-    //DEVELOP
-    @Bind(R.id.btn_debug_newAdvert) Button newAdvert;
     private static final String SH_PREF_NAME = "TagMatch_pref";
 
 
@@ -130,13 +127,6 @@ public class Login extends AppCompatActivity {
         finish();
     }
 
-    @OnClick(R.id.btn_debug_newAdvert)
-    protected void intent_newAdvert() {
-      //  Firebase.setAndroidContext(this);
-        Intent intent = new Intent(this, NewAdvertisement.class);
-        startActivity(intent);
-        finish();
-    }
     /*@OnClick(R.id.forg)
     protected void intent_forg() {
         Toast.makeText(getApplicationContext(),username.getText().toString(),Toast.LENGTH_SHORT).show();

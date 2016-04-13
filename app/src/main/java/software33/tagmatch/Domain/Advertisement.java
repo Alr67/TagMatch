@@ -91,4 +91,40 @@ public class Advertisement {
         }
         return jsonObject;
     }
+
+    public Integer getaID() {
+        return aID;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<Bitmap> getImages() {
+        return images;
+    }
+
+    public List<String> getImagesIDs() {
+        return imagesIDs;
+    }
+
+    public String[] getTags() {
+        return tags;
+    }
+
+    public Boolean getDone() {
+        return done;
+    }
+
+    public String getCategory() {
+        return category;
+    }
 }

@@ -62,7 +62,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private Button createButton, newImage;
     private EditText title,description, tag, wantedTags;
     private TextInputLayout wantedTagsLayout;
-    private CustomPagerAdapter mCustomPagerAdapter;
+    private CustomPagerAdapterNewAdvert mCustomPagerAdapterNewAdvert;
     private ViewPager mViewPager;
     private String imgExtension;
     private final String DebugTag = "DEBUG ADVERT";
@@ -132,8 +132,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         ViewGroup.LayoutParams params = mViewPager.getLayoutParams();
         params.height = deviceHeight/3;
         mViewPager.setLayoutParams(params);
-        mCustomPagerAdapter = new CustomPagerAdapter(this,params.height,params.width);
-        mViewPager.setAdapter(mCustomPagerAdapter);
+        mCustomPagerAdapterNewAdvert = new CustomPagerAdapterNewAdvert(this,params.height,params.width);
+        mViewPager.setAdapter(mCustomPagerAdapterNewAdvert);
 
     }
 
@@ -333,13 +333,13 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                 if(resultCode == RESULT_OK){
                     Uri selectedImage = imageReturnedIntent.getData();
                     String selectedPic = getImagePathFromUri(selectedImage);
-                    mCustomPagerAdapter.addImage(selectedPic);
+                    mCustomPagerAdapterNewAdvert.addImage(selectedPic);
                 }
                 break;
             case Constants.codeCameraPicker:
                 if(resultCode == RESULT_OK) {
                     Log.v(DebugTag,"Path: "+pathfoto);
-                    mCustomPagerAdapter.addImage(pathfoto);
+                    mCustomPagerAdapterNewAdvert.addImage(pathfoto);
                 }
                 break;
             default:
