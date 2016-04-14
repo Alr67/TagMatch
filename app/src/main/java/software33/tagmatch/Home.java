@@ -1,12 +1,16 @@
 package software33.tagmatch;
 
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -15,13 +19,20 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.Utils.NavigationController;
 
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    Button logout,xat,anunci;
+    private RecyclerView recycler;
+    private AdapterAdvert adapter;
+    private RecyclerView.LayoutManager lManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -39,8 +50,58 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        logout = (Button) findViewById(R.id.xat);
-        logout.setOnClickListener(this);
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                /*Intent novaRecepta = new Intent(getApplicationContext(), NovaRecepta.class);
+                startActivity(novaRecepta);
+                finish();*/
+            }
+        });
+
+
+
+        //final ArrayList<Receptes> items = new DBController().loadLlistaReceptes(this);
+        final ArrayList<AdvertContent> items = new ArrayList<>();
+        File f = new File(getApplicationContext().getCacheDir()+"/espaguetis.jpg");
+        if (!f.exists()) try {
+
+            InputStream is = getApplicationContext().getAssets().open("espaguetis.jpg");
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+
+
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(buffer);
+            fos.close();
+        } catch (Exception e) { throw new RuntimeException(e); }
+        AdvertContent aux = new AdvertContent("prova",f.getPath(),0);
+        items.add(aux);
+
+        this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
+
+        recycler = (RecyclerView) findViewById(R.id.reciclador);//Creamos el recycler
+        recycler.setHasFixedSize(true);
+
+        lManager = new LinearLayoutManager(this);//El manager
+        recycler.setLayoutManager(lManager);
+
+        adapter = new AdapterAdvert(items);// Y el adaptador
+
+        adapter.setOnClickListener(new View.OnClickListener() {
+            @Override  //recView.getChildPosition(v)
+            public void onClick(View v) {
+                /*String temp = items.get(v.getTag().hashCode()).getNom();
+                Intent viewRecepta = new Intent(getApplicationContext(), ViewRecepta.class).putExtra("NomRecepta", temp).putExtra("direct", true);
+                startActivity(viewRecepta);
+                finish();*/
+            }
+        });
+
+        recycler.setAdapter(adapter);
 
     }
 
@@ -66,16 +127,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    public void startMainChatActivity(View view) {
-      //  Inent intent = new Intent(this, MainChatActivity.class);
-        //  startActivity(intent);t
-    }
-
-    @Override
-    public void onClick(View v) {
-        Toast.makeText(this,"NOT IMPLEMENTED YET",Toast.LENGTH_SHORT).show();
     }
 
     @Override

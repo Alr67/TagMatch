@@ -23,7 +23,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import software33.tagmatch.Advertisement.NewAdvertisement;
-import software33.tagmatch.MainActivity;
+import software33.tagmatch.Home;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.Utils.Constants;
@@ -52,7 +52,7 @@ public class Login extends AppCompatActivity {
         ArrayList<String> existing_login = new ArrayList<String>();
         existing_login = new Helpers().getPersonalData(getApplicationContext());
         if(existing_login != null && existing_login.get(0) != null && existing_login.get(1) != null) {
-            Intent success = new Intent(this, MainActivity.class); //FAlta guardar en algun puesto l'usuari
+            Intent success = new Intent(this, Home.class); //FAlta guardar en algun puesto l'usuari
             startActivity(success);
         }
 
@@ -147,7 +147,7 @@ public class Login extends AppCompatActivity {
         editor.putString("name", username.getText().toString()); //Fem l'acces dsd aqui perq aqui només s'entra si tot estava OK, aixi q no estarà mai buit
         editor.putString("password",passw.getText().toString());
         editor.commit();
-        Intent success = new Intent(this, MainActivity.class); //FAlta guardar en algun puesto l'usuari
+        Intent success = new Intent(this, Home.class); //FAlta guardar en algun puesto l'usuari
         startActivity(success);
         finish();
     }
