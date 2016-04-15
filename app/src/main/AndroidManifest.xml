@@ -35,7 +35,7 @@
             android:value="@integer/google_play_services_version" />
 
         <activity
-            android:name=".Home"
+            android:name=".AdCards.Home"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity

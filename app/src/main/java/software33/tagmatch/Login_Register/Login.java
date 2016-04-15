@@ -23,7 +23,7 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import software33.tagmatch.Advertisement.NewAdvertisement;
-import software33.tagmatch.Home;
+import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.Utils.Constants;

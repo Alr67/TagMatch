@@ -4,7 +4,7 @@
         android:layout_height="match_parent"
         android:background="#efefef"
         android:orientation="vertical"
-        tools:context=".Home">
+        tools:context=".AdCards.Home">
 
         <ListView
             android:id="@+id/msgview"

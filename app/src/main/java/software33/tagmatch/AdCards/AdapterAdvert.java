@@ -1,4 +1,4 @@
-package software33.tagmatch;
+package software33.tagmatch.AdCards;
 
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import software33.tagmatch.R;
 import software33.tagmatch.Utils.BitmapWorkerTask;
 
 /**

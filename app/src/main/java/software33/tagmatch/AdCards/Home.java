@@ -1,4 +1,4 @@
-package software33.tagmatch;
+package software33.tagmatch.AdCards;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -16,8 +16,6 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
-import android.widget.Toast;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -25,6 +23,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 
 import software33.tagmatch.Login_Register.Login;
+import software33.tagmatch.R;
 import software33.tagmatch.Utils.NavigationController;
 
 
@@ -64,22 +63,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         //final ArrayList<Receptes> items = new DBController().loadLlistaReceptes(this);
         final ArrayList<AdvertContent> items = new ArrayList<>();
-        File f = new File(getApplicationContext().getCacheDir()+"/espaguetis.jpg");
-        if (!f.exists()) try {
 
-            InputStream is = getApplicationContext().getAssets().open("espaguetis.jpg");
-            int size = is.available();
-            byte[] buffer = new byte[size];
-            is.read(buffer);
-            is.close();
+        /*for(int q = 0; q < items.size(); ++q) { FOR PARA TRATAR COSAS QUE NOS LLEGARAN DEL SERVER. TENDREMOS QUE PILLAR NAME Y EL PATH DEL IMGUR
+            items.add(new CardCreator(getApplicationContext(),items.get(q)));
+        }*/
 
-
-            FileOutputStream fos = new FileOutputStream(f);
-            fos.write(buffer);
-            fos.close();
-        } catch (Exception e) { throw new RuntimeException(e); }
-        AdvertContent aux = new AdvertContent("prova",f.getPath(),0);
-        items.add(aux);
+        items.add(new CardCreator().createCard(getApplicationContext(),"Espaguetis","espaguetis.jpg"));
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
 

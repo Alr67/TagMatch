@@ -10,7 +10,7 @@ import android.widget.Toast;
 import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
 import software33.tagmatch.Chat.MainChatActivity;
-import software33.tagmatch.Home;
+import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.R;
 import software33.tagmatch.Users.ViewProfile;
 
