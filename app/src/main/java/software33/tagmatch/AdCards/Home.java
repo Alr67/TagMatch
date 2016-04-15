@@ -68,8 +68,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         /*for(int q = 0; q < items.size(); ++q) { FOR PARA TRATAR COSAS QUE NOS LLEGARAN DEL SERVER. TENDREMOS QUE PILLAR NAME Y EL PATH DEL IMGUR
             items.add(new CardCreator(getApplicationContext(),items.get(q)));
         }*/
-                                                                            //0-> GiveAway 1-> Change 2-> Sell
-        items.add(new CardCreator().createCard(getApplicationContext(),"Espaguetis","espaguetis.jpg", Constants.card_exchange ,0)); // primer cero es opcion, el segundo precio
+                                                                            //0-> GiveAway 1-> Exchange 2-> Sell
+        items.add(new CardCreator().createCard(getApplicationContext(),"Espaguetis 2 Caca A ver que Ostia Que Esto Ha Hecho Algo Muy Guay","espaguetis.jpg", Constants.card_exchange ,0)); // primer cero es opcion, el segundo precio
+        items.add(new CardCreator().createCard(getApplicationContext(),"Espaguetis 2 Caca A ver que Ostia Que Esto Ha Hecho Algo Muy Guay","espaguetis.jpg", Constants.card_sell , 33));
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
 

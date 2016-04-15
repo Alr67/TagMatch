@@ -40,7 +40,7 @@
 
             <TextView
                 android:layout_width="237dp"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:textAppearance="?android:attr/textAppearanceLarge"
                 android:text="Large Text"
                 android:id="@+id/nombre"
@@ -59,11 +59,12 @@
             android:id="@+id/preu"
             android:layout_gravity="left"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentRight="true" />
+            android:layout_alignParentRight="true"
+            android:paddingLeft="5dp" />
 
         <ImageView
-            android:layout_width="200px"
-            android:layout_height="200px"
+            android:layout_width="180px"
+            android:layout_height="180px"
             android:id="@+id/type"
             android:layout_alignParentRight="true"
             android:background="#55676767" />

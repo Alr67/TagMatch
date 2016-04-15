@@ -13,6 +13,7 @@ import java.util.ArrayList;
 
 import software33.tagmatch.R;
 import software33.tagmatch.Utils.BitmapWorkerTask;
+import software33.tagmatch.Utils.Constants;
 
 /**
  * Created by Rafa on 25/11/2015.
@@ -62,16 +63,18 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
     @Override
     public void onBindViewHolder(ReceptesViewHolder viewHolder, int i) {
         viewHolder.nombre.setText(items.get(i).getNom());
-        viewHolder.preu.setText("25€");
         Integer typeaux = items.get(i).getType();
-        if(typeaux == 0) {
+        if(typeaux == Constants.card_giveaway) {
             viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.image0));
+            viewHolder.preu.setVisibility(View.INVISIBLE);
         }
-        else if(typeaux == 1) {
+        else if(typeaux == Constants.card_exchange) {
             viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.image_placeholder));
+            viewHolder.preu.setVisibility(View.INVISIBLE);
         }
-        else if(typeaux == 2) {
+        else if(typeaux == Constants.card_sell) {
             viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.bar_bg));
+            viewHolder.preu.setText(items.get(i).getPrice().toString() + "€");
         }
         else {
             Toast.makeText(context,"Estas fent servir una opcio no valida",Toast.LENGTH_LONG).show();
