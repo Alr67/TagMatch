@@ -36,14 +36,71 @@
         tools:showIn="@layout/nav_activity_main"
         android:orientation="vertical">
 
-        <Button
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TODO"
-            android:id="@+id/xat_profile"
-            android:layout_below="@+id/textView"
-            android:layout_centerHorizontal="true"
-            android:onClick="startMainChatActivity" />
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="User Name"
+            android:id="@+id/tvUserName"
+            android:layout_gravity="center" />
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/ivUserImage"
+            android:layout_gravity="center"
+            android:src="@drawable/image0"
+            android:scaleType="centerCrop" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Location"
+            android:id="@+id/tvLocation"
+            android:layout_gravity="center"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Descripció:"
+            android:id="@+id/textView5" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/tvDespcription"
+            android:background="@drawable/bar_bg" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Interessos:"
+            android:id="@+id/textView6" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:id="@+id/tvInterests"
+            android:background="@drawable/bar_bg" />
+
+        <Space
+            android:layout_width="match_parent"
+            android:layout_height="10dp" />
 
     </LinearLayout>
 </android.support.design.widget.CoordinatorLayout>
