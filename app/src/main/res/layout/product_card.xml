@@ -53,8 +53,8 @@
         </LinearLayout>
 
         <TextView
-            android:layout_width="20dp"
-            android:layout_height="wrap_content"
+            android:layout_width="55dp"
+            android:layout_height="30dp"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:id="@+id/preu"
             android:layout_gravity="left"

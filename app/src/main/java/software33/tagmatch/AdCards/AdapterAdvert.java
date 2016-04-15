@@ -28,12 +28,13 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
 
     public static class ReceptesViewHolder extends RecyclerView.ViewHolder {
         public ImageView imagen, type;
-        public TextView nombre;
+        public TextView nombre, preu;
 
         public ReceptesViewHolder(View v) {
             super(v);
             imagen = (ImageView) v.findViewById(R.id.imagen);
             type = (ImageView) v.findViewById(R.id.type);
+            preu = (TextView) v.findViewById(R.id.preu);
             nombre = (TextView) v.findViewById(R.id.nombre);
         }
     }
@@ -61,6 +62,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
     @Override
     public void onBindViewHolder(ReceptesViewHolder viewHolder, int i) {
         viewHolder.nombre.setText(items.get(i).getNom());
+        viewHolder.preu.setText("25€");
         Integer typeaux = items.get(i).getType();
         if(typeaux == 0) {
             viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.image0));
