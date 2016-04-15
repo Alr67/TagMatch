@@ -24,6 +24,7 @@ import java.util.ArrayList;
 
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.NavigationController;
 
 
@@ -67,8 +68,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         /*for(int q = 0; q < items.size(); ++q) { FOR PARA TRATAR COSAS QUE NOS LLEGARAN DEL SERVER. TENDREMOS QUE PILLAR NAME Y EL PATH DEL IMGUR
             items.add(new CardCreator(getApplicationContext(),items.get(q)));
         }*/
-
-        items.add(new CardCreator().createCard(getApplicationContext(),"Espaguetis","espaguetis.jpg"));
+                                                                            //0-> GiveAway 1-> Change 2-> Sell
+        items.add(new CardCreator().createCard(getApplicationContext(),"Espaguetis","espaguetis.jpg", Constants.card_exchange ,0)); // primer cero es opcion, el segundo precio
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
 
@@ -78,7 +79,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         lManager = new LinearLayoutManager(this);//El manager
         recycler.setLayoutManager(lManager);
 
-        adapter = new AdapterAdvert(items);// Y el adaptador
+        adapter = new AdapterAdvert(items, getApplicationContext());// Y el adaptador
 
         adapter.setOnClickListener(new View.OnClickListener() {
             @Override  //recView.getChildPosition(v)

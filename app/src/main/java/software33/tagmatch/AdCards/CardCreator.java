@@ -12,7 +12,7 @@ import java.io.InputStream;
 public class CardCreator {
 
 
-    public AdvertContent createCard(Context context, String name, String path) {
+    public AdvertContent createCard(Context context, String name, String path, Integer option, Integer price) {
         File f = new File(context.getCacheDir()+"/"+path); // Això haruà de ser algo de bitmaps?? Será diferent amb Heroku
         if (!f.exists()) try {
 
@@ -27,6 +27,25 @@ public class CardCreator {
             fos.write(buffer);
             fos.close();
         } catch (Exception e) { throw new RuntimeException(e); }
-        return new AdvertContent(name,f.getPath(),0);
+        return new AdvertContent(name,f.getPath(),option,price);
+    }
+
+    public AdvertContent createCard(Context context, String name, String path, Integer option) {
+        File f = new File(context.getCacheDir()+"/"+path); // Això haruà de ser algo de bitmaps?? Será diferent amb Heroku
+        if (!f.exists()) try {
+
+            InputStream is = context.getAssets().open(path);
+            int size = is.available();
+            byte[] buffer = new byte[size];
+            is.read(buffer);
+            is.close();
+
+
+            FileOutputStream fos = new FileOutputStream(f);
+            fos.write(buffer);
+            fos.close();
+        } catch (Exception e) { throw new RuntimeException(e); }
+
+        return new AdvertContent(name,f.getPath(),option);
     }
 }
