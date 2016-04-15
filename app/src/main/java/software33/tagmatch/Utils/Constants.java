@@ -25,8 +25,10 @@ public abstract class Constants {
     public static final List<String> typeList = new ArrayList<>(Arrays.asList(typeSell,typeExchange,typeGift));
 
     public static final String IP_ALEJANDRO = "192.168.1.129:8080";
+    public static final String IP_ALEIX = "192.168.1.41:8080";
     public static final String IP_HEROKU = "tagmatch.herokuapp.com";
-    public static final String IP_SERVER = "https://" + IP_HEROKU;
+    public static final String IP_LOCAL = "localhost:8080";
+    public static final String IP_SERVER = "http://" + IP_ALEIX;
 
     /* INTENTS CODES*/
     public static final int codeImagePicker = 012;

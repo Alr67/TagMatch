@@ -5,6 +5,8 @@ import android.content.SharedPreferences;
 
 import java.util.ArrayList;
 
+import software33.tagmatch.Domain.User;
+
 
 public class Helpers {
     private static final String SH_PREF_NAME = "TagMatch_pref";
@@ -15,6 +17,11 @@ public class Helpers {
         data.add(prefs.getString("name", null));
         data.add(prefs.getString("password", null));
         return data;
+    }
+
+    public static User getActualUser(Context context){
+        SharedPreferences prefs = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE);
+        return new User(prefs.getString("name", null),prefs.getString("password", null));
     }
 
     public void logout(Context context) {

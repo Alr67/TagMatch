@@ -2,6 +2,8 @@ package software33.tagmatch.Domain;
 
 import android.media.Image;
 
+import com.google.android.gms.maps.model.LatLng;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,6 +19,9 @@ public class User {
     Image imgPerfil;
     String mail;
     Integer valoration;
+    String city;
+    LatLng coords;
+
     ///Listado de usuarios que tienen bloqueado al usuario
     private List<String> usuariosBloqueados = new ArrayList<>();
     ///Listado de todos los ids de chats que tiene el usuario
@@ -89,4 +94,6 @@ public class User {
     public String getAlias() {
         return alias;
     }
+
+    public String getPassword() { return password; }
 }
