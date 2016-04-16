@@ -22,7 +22,7 @@
     </android.support.design.widget.AppBarLayout>
 
 
-    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -36,13 +36,24 @@
         tools:showIn="@layout/nav_activity_main"
         android:orientation="vertical">
 
+        <Button
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Xat"
+            android:id="@+id/bStartXat"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:onClick="buttonStartXat" />
+
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:text="User Name"
             android:id="@+id/tvUserName"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
 
         <ImageView
             android:layout_width="100dp"
@@ -50,7 +61,9 @@
             android:id="@+id/ivUserImage"
             android:layout_gravity="center"
             android:src="@drawable/image0"
-            android:scaleType="centerCrop" />
+            android:scaleType="centerCrop"
+            android:layout_below="@+id/tvUserName"
+            android:layout_centerHorizontal="true" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -60,15 +73,19 @@
             android:id="@+id/tvLocation"
             android:layout_gravity="center"
             android:textSize="20dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_below="@+id/ivUserImage"
+            android:layout_centerHorizontal="true" />
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             android:name="com.google.android.gms.maps.MapFragment"
             android:id="@+id/profileMap"
             android:layout_width="match_parent"
             android:layout_height="325dp"
-            android:layout_gravity="center" />
+            android:layout_gravity="center"
+            android:layout_below="@+id/tvLocation"
+            android:layout_alignParentEnd="true" />
 
-    </LinearLayout>
+    </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>
 
