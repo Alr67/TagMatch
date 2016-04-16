@@ -54,6 +54,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         tvUserName = (TextView) findViewById(R.id.tvUserName);
         tvLocation = (TextView) findViewById(R.id.tvLocation);
 
+        /* Codi (de merda) de connexió
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
         try {
@@ -87,6 +88,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         } catch (JSONException e) {
             e.printStackTrace();
         }
+        */
 
     }
 

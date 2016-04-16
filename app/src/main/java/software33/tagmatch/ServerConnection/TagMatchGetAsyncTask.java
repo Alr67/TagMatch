@@ -57,28 +57,52 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
             final String user = params[0].getString("username").toString();
             final String password = params[0].getString("password").toString();
 
-
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
-            con.setRequestMethod("GET");
-
             String userPass = user + ":" + password;
 
-            String basicAuth = "Basic "+ new String(Base64.encode(userPass.getBytes(),Base64.NO_WRAP));
-            con.setRequestProperty("Authorization", basicAuth);
+            String basicAuth;
+            if (url.getHost().contains("heroku")) {
+                basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.NO_WRAP));
+                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                con.setConnectTimeout(5000);
+                con.setReadTimeout(5000);
+                con.setRequestMethod("GET");
 
-            JSONObject aux;
+                con.setRequestProperty("Authorization", basicAuth);
 
-            if (con.getResponseCode() >= 400){
-                aux = new JSONObject(iStreamToString(con.getErrorStream()));
-             }
-            else
-                aux = new JSONObject(iStreamToString(con.getInputStream()));
+                JSONObject aux;
 
-            con.disconnect();
+                if (con.getResponseCode() >= 400){
+                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                }
+                else
+                    aux = new JSONObject(iStreamToString(con.getInputStream()));
 
-            return aux;
+                con.disconnect();
+
+                return aux;
+            }
+            else {
+                basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT));
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setConnectTimeout(5000);
+                con.setReadTimeout(5000);
+                con.setRequestMethod("GET");
+
+                con.setRequestProperty("Authorization", basicAuth);
+
+                JSONObject aux;
+
+                if (con.getResponseCode() >= 400){
+                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                }
+                else
+                    aux = new JSONObject(iStreamToString(con.getInputStream()));
+
+                con.disconnect();
+
+                return aux;
+            }
+
 
         } catch (IOException | JSONException e) {
             Log.e("error", e.getMessage());
