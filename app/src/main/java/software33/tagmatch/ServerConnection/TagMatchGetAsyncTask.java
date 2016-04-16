@@ -59,6 +59,8 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
 
             String userPass = user + ":" + password;
 
+            Log.i("DEBUG-UserGet",userPass);
+
             String basicAuth;
             if (url.getHost().contains("heroku")) {
                 basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.NO_WRAP));

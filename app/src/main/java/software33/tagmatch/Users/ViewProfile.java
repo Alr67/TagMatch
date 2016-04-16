@@ -69,7 +69,6 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         Firebase.setAndroidContext(this);
 
-        /* Codi (de merda) de connexió
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
         try {
@@ -77,6 +76,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
             new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users", this) {
+
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -87,6 +87,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                         else if (jsonObject.has("username")){
                             tvUserName.setText(jsonObject.get("username").toString());
                             tvLocation.setText(jsonObject.get("email").toString());
+                            //TODO: Do coords to the map
                             CameraUpdate center=
                                     CameraUpdateFactory.newLatLng(new LatLng(40.76793169992044,
                                             -73.98180484771729));
@@ -103,7 +104,6 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        */
 
     }
 
