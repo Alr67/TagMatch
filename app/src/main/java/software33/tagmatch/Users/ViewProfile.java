@@ -15,6 +15,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,6 +67,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     private String myId, userId;
     private String idChat = "Not exists";
     private String userName, titleProduct;
+    private String imageChat;
     private ChildEventListener mListener;
 
     @Override
@@ -205,6 +207,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         }
         else b.putString("IdChat", idChat);
         b.putString("IdUser", userId);
+        b.putString("ImageChat", imageChat);
         intent.putExtras(b);
 
         startActivity(intent);
@@ -232,26 +235,27 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         chats1.put(id.getKey(),"");
         FirebaseUtils.getUsersRef().child(id1).child("chats").updateChildren(chats1);
 
-        setUserImage();
+        setUserImage(id2);
 
         return id.getKey();
     }
 
-    private void setUserImage(){
+    private void setUserImage(String userId){
         Drawable drawable = ivUserImage.getDrawable();
 
-                BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
+        BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
         Bitmap bitmap = bitmapDrawable .getBitmap();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] imageInByte = stream.toByteArray();
-        ByteArrayInputStream bis = new ByteArrayInputStream(imageInByte);
 
-        Bitmap bm = BitmapFactory.decodeFile("/path/to/image.jpg");
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
-        byte[] b = baos.toByteArray();
+        String encodedImage = Base64.encodeToString(imageInByte, Base64.DEFAULT);
 
+        Map<String, Object> img = new HashMap<>();
+        img.put("img",encodedImage);
+        FirebaseUtils.getUsersRef().child(userId).updateChildren(img);
+
+        imageChat = encodedImage;
     }
 
     private void getChat(final String idChat) {

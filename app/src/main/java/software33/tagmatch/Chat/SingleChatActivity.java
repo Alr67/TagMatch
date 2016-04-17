@@ -1,9 +1,11 @@
 package software33.tagmatch.Chat;
 
 import android.database.DataSetObserver;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -42,6 +44,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private String idChat;
     private String myId;
     private String idUser;
+    private String imageChat;
     private ChildEventListener mListener;
 
     @Override
@@ -56,6 +59,7 @@ public class SingleChatActivity extends AppCompatActivity {
         titleProduct = b.getString("TitleProduct");
         idChat = b.getString("IdChat");
         idUser = b.getString("IdUser");
+        imageChat = b.getString("ImageChat");
         myId = "56d3f1d3-6b50-473a-9aa3-ff0007b3df29";
 
         //Get Firebase Reference
@@ -81,7 +85,9 @@ public class SingleChatActivity extends AppCompatActivity {
         mytext.setText(titleProduct);
 
         ImageView image = (ImageView) findViewById(R.id.singleChatImage);
-        image.setImageResource(R.drawable.image0);
+
+        byte[] imageAsBytes = Base64.decode(imageChat, Base64.DEFAULT);
+        image.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
 
         /****************************************************/
 
