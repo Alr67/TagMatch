@@ -1,6 +1,14 @@
 package software33.tagmatch.Chat;
 
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.util.Log;
+
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -11,17 +19,23 @@ public abstract class FirebaseUtils {
     private static Firebase chatsRef = myFirebaseRef.child("chats");
     private static Firebase usersRef = myFirebaseRef.child("users");
 
-    private String myId = "56d3f1d3-6b50-473a-9aa3-ff0007b3df29";
+    private static final String SH_PREF_FIREBASE = "Firebase_pref";
 
-    public String getMyId() {
-        return myId;
+
+    public static String getMyId(Context context){
+        String data;
+        SharedPreferences prefs = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE);
+        data = (prefs.getString("uid", null));
+        return data;
     }
 
-    public void setMyId(String myId) {
-        this.myId = myId;
+    public static void setMyId(String myId, Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE).edit();
+        editor.putString("uid",myId);
+        editor.commit();
     }
 
-    public Firebase getChatsRef() {
+    public static Firebase getChatsRef() {
         return chatsRef;
     }
 
@@ -50,4 +64,5 @@ public abstract class FirebaseUtils {
             return users;
         }
     }
+
 }

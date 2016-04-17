@@ -81,7 +81,10 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         usersRef = myFirebaseRef.child("users");
 
         //createUser("correu1@xd.com", "contra123");
-        myId = "aec6538a-bde2-4ea8-98bf-6fdc3f95127e";
+        //TODO: set correctly the my uid
+        FirebaseUtils.setMyId("56d3f1d3-6b50-473a-9aa3-ff0007b3df29",this);
+
+        myId = FirebaseUtils.getMyId(this);
 
         //Accessing to the chats of my user
         mListener = this.usersRef.child(myId).child("chats").addChildEventListener(new ChildEventListener() {

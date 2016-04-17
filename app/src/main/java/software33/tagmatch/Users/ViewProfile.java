@@ -17,7 +17,11 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdate;
@@ -46,6 +50,9 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     Button bStartXat;
     private GoogleMap map;
     private String myId, userId;
+    private String idChat = "Not exists";
+    private String userName, titleProduct;
+    private ChildEventListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,6 +75,11 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         bStartXat = (Button) findViewById(R.id.bStartXat);
 
         Firebase.setAndroidContext(this);
+
+        //TODO:Get user and product
+        userName = "Usuario0";
+        titleProduct = "ProductExample";
+        userId = "aec6538a-bde2-4ea8-98bf-6fdc3f95127e";
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
@@ -105,6 +117,31 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             e.printStackTrace();
         }
 
+        mListener = FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                getChat(dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.e("FirebaseListAdapter", "Listen was cancelled, no more updates will occur");
+            }
+
+        });
+
     }
 
     @Override
@@ -138,42 +175,79 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         //TODO: Get userName and TitleProduct
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
-        b.putString("UserName", "userName");
-        b.putString("TitleProduct", "titleProduct");
+        b.putString("UserName", userName);
+        b.putString("TitleProduct", titleProduct);
 
-        b.putString("IdChat", createChat());
-        b.putString("IdUser", "aec6538a-bde2-4ea8-98bf-6fdc3f95127e");
+        if (idChat.equals("Not exists")) {
+            b.putString("IdChat", createChat());
+        }
+        else b.putString("IdChat", idChat);
+        b.putString("IdUser", userId);
         intent.putExtras(b);
 
         startActivity(intent);
     }
 
     public String createChat() {
-        Firebase id = FirebaseUtils.getUsersRef().push();
+        Firebase id = FirebaseUtils.getChatsRef().push();
 
+        //TODO: hardcoded userId
         userId = "aec6538a-bde2-4ea8-98bf-6fdc3f95127e";
         FirebaseUtils firebaseUtils = new FirebaseUtils() {};
-        String id1 = firebaseUtils.getMyId();
+        String id1 = firebaseUtils.getMyId(this);
         String id2 = userId;
 
         Map<String, Object> users = new HashMap<>();
         users.put(id1, "My User Name");
-        users.put(id2, "Usuari0");
+        users.put(id2, userName);
 
-        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo("Anuncio Test", users);
+        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(titleProduct, users);
         id.child("info").setValue(chatInfo);
 
         //Set the chats to each user
+
         Map<String, Object> chats1 = new HashMap<>();
         chats1.put(id.getKey(),"");
-        FirebaseUtils.getUsersRef().child(id1).child("chats").setValue(chats1);
+        FirebaseUtils.getUsersRef().child(id1).child("chats").updateChildren(chats1);
 
-        /*
-        Map<String, Object> chats2 = new HashMap<>();
-        chats2.put(id.getKey(),"");
-        usersRef.child(id2).child("chats").setValue(chats2);
-        */
 
         return id.getKey();
+    }
+
+    private void getChat(final String idChat) {
+        //Accessing to the chat with idChat ONCE
+        FirebaseUtils.getChatsRef().child(idChat).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                FirebaseUtils.ChatInfo c = snapshot.getValue(FirebaseUtils.ChatInfo.class);
+                setButtonXat(c.getIdProduct(), c.getUsers(), idChat);
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+            }
+        });
+    }
+
+    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat) {
+        String userName = "";
+        for (Object o : users.values()){
+            if (!o.toString().equals("My User Name")) {
+                userName = o.toString();
+            }
+        }
+        String userId = "";
+        for (String s : users.keySet()){
+            if (!s.equals(myId)) {
+                userId = s;
+            }
+        }
+
+        Log.i("VEDUG", "idPRdoc" + idProduct + "title" + titleProduct);
+        Log.i("VEDUG", "iduser" + userId + "user" + this.userId);
+        if (idProduct.equals(titleProduct) && userId.equals(this.userId)){
+            bStartXat.setText("Xatejant");
+            this.idChat = idChat;
+        }
+        else this.idChat = "Not exists";
     }
 }

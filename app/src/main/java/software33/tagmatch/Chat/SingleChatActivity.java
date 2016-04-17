@@ -195,7 +195,7 @@ public class SingleChatActivity extends AppCompatActivity {
                 if (!snapshot.hasChild(idChat)) {
                     Map<String, Object> chats = new HashMap<>();
                     chats.put(idChat,"");
-                    usersRef.child(idUser).child("chats").setValue(chats);
+                    usersRef.child(idUser).child("chats").updateChildren(chats);
                 }
             }
             @Override
