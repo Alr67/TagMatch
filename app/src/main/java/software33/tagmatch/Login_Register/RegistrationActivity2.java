@@ -3,6 +3,7 @@ package software33.tagmatch.Login_Register;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
@@ -26,6 +27,7 @@ import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
@@ -38,6 +40,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.BitmapWorkerTask;
@@ -46,11 +49,17 @@ import software33.tagmatch.Utils.Constants;
 public class RegistrationActivity2 extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
+    private static final String SH_PREF_NAME = "TagMatch_pref";
+
     private ImageView iv;
     private GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
     private LatLng userMarker;
     private String imgExtension;
+
+    private String email;
+    private String username;
+    private String password;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,9 +108,13 @@ public class RegistrationActivity2 extends AppCompatActivity implements
                     .addApi(LocationServices.API)
                     .addApi(AppIndex.API).build();
         }
+        getInfo(getIntent().getExtras());
+    }
 
-        //connectUser();
-
+    private void getInfo(Bundle bundle) {
+        email = bundle.getString("email");
+        username = bundle.getString("username");
+        password = bundle.getString("password");
     }
 
     public void addPhoto(View view) {
@@ -148,10 +161,38 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     }
 
     public void endRegistrer(View view) {
-        if(imgExtension != null)
+        try {
+            JSONObject jObject = new JSONObject();
+            jObject.put("username", username);
+            jObject.put("password", password);
+            jObject.put("email", email);
+
+            new TagMatchPostAsyncTask(Constants.IP_SERVER + "/users", this, false){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        String error = jsonObject.get("error").toString();
+                        showError(error);
+
+                    } catch (JSONException ignored) {
+                        updateIMGLocation();
+                    }
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateIMGLocation() {
+        SharedPreferences.Editor editor = getSharedPreferences(SH_PREF_NAME, MODE_PRIVATE).edit();
+        editor.putString("name", username);
+        editor.putString("password", password);
+        editor.commit();
+
+        if (imgExtension != null)
             updateIMG();
-        if(userMarker != null)
-            updateLocation();
+        updateLocation();
         backToLogin();
     }
 
@@ -264,6 +305,15 @@ public class RegistrationActivity2 extends AppCompatActivity implements
             map.clear();
             userMarker = new LatLng(pos.getLatitude(), pos.getLongitude());
             map.moveCamera(CameraUpdateFactory.newLatLngZoom(userMarker, 14.f));
+            map.addMarker(new MarkerOptions().position(userMarker));
+        } else {
+            map.clear();
+            userMarker = new LatLng(41.385064, 2.173403);
+            CameraUpdate center =
+                    CameraUpdateFactory.newLatLng(userMarker);
+            CameraUpdate zoom = CameraUpdateFactory.zoomTo(14);
+            map.moveCamera(center);
+            map.animateCamera(zoom);
             map.addMarker(new MarkerOptions().position(userMarker));
         }
     }

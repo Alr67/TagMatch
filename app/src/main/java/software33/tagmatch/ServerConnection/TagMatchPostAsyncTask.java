@@ -23,6 +23,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+
 import software33.tagmatch.R;
 
 public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
@@ -43,48 +45,84 @@ public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, 
 
     protected JSONObject doInBackground(JSONObject... params) {
         try {
-            HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
-            con.setDoInput(true);
-            con.setRequestMethod("POST");
+            if (url.getHost().contains("heroku")) {
+                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                con.setConnectTimeout(5000);
+                con.setReadTimeout(5000);
+                con.setDoInput(true);
+                con.setRequestMethod("POST");
 
-            if (needLogin) {
-                connectUser(con);
+                if (needLogin) {
+                    connectUser(con);
+                }
+                con.setRequestProperty("Content-Type", "application/json");
+
+                OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+                wr.write(params[0].toString());
+                wr.flush();
+                wr.close();
+
+                con.getOutputStream().close();
+                con.connect();
+
+                /*>=400 errorStream
+                else inputStream*/
+
+                JSONObject aux;
+
+                Log.i("post status code", Integer.toString(con.getResponseCode()));
+
+                if (con.getResponseCode() >= 400)
+                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                else
+                    aux = new JSONObject(iStreamToString(con.getInputStream()));
+                
+                con.disconnect();
+
+                return aux;
+            } else {
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setConnectTimeout(5000);
+                con.setReadTimeout(5000);
+                con.setDoInput(true);
+                con.setRequestMethod("POST");
+
+                if (needLogin) {
+                    connectUser(con);
+                }
+                con.setRequestProperty("Content-Type", "application/json");
+
+                OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
+                wr.write(params[0].toString());
+                wr.flush();
+                wr.close();
+
+                con.getOutputStream().close();
+                con.connect();
+
+                /*>=400 errorStream
+                else inputStream*/
+
+                JSONObject aux;
+
+                Log.i("post status code", Integer.toString(con.getResponseCode()));
+
+                if (con.getResponseCode() >= 400)
+                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                else
+                    aux = new JSONObject(iStreamToString(con.getInputStream()));
+
+                con.disconnect();
+
+                return aux;
             }
-            con.setRequestProperty("Content-Type", "application/json");
-
-            OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
-            wr.write(params[0].toString());
-            wr.flush();
-            wr.close();
-
-            con.getOutputStream().close();
-            con.connect();
-
-            /*>=400 errorStream
-            else inputStream*/
-
-            JSONObject aux;
-
-            Log.i("post status code", Integer.toString(con.getResponseCode()));
-
-            if (con.getResponseCode() >= 400)
-                aux = new JSONObject(iStreamToString(con.getErrorStream()));
-            else
-                aux = new JSONObject(iStreamToString(con.getInputStream()));
-
-            con.disconnect();
-
-            return aux;
-
         } catch (IOException | JSONException e) {
             Log.e("error", e.getMessage());
             Map<String, String> map = new HashMap<>();
             if (e.getMessage().contains("failed to connect to")) {
                 if (e.getMessage().contains("Network is unreachable"))
                     map.put("error", context.getString(R.string.no_network_connection));
-            } else if(e.getMessage().equals("timeout"))
+            } else if (e.getMessage().equals("timeout"))
                 map.put("error", context.getString(R.string.connection_timeout));
             else {
                 map.put("error", "Unexpected Error");

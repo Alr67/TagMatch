@@ -57,7 +57,6 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
             final String user = params[0].getString("username").toString();
             final String password = params[0].getString("password").toString();
 
-
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
             con.setConnectTimeout(5000);
             con.setReadTimeout(5000);

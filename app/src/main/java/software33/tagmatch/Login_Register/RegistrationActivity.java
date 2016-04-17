@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -21,8 +22,6 @@ import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.Utils.Constants;
 
 public class RegistrationActivity extends AppCompatActivity {
-
-    private static final String SH_PREF_NAME = "TagMatch_pref";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,8 +47,8 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     public void validateUser(View view) {
-        final String user = ((EditText) findViewById(R.id.registrationUsername)).getText().toString();
-        final String pass = ((EditText) findViewById(R.id.registrationPassword)).getText().toString();
+        String user = ((EditText) findViewById(R.id.registrationUsername)).getText().toString();
+        String pass = ((EditText) findViewById(R.id.registrationPassword)).getText().toString();
         String email = ((EditText) findViewById(R.id.registrationMail)).getText().toString();
 
         if(user.isEmpty()) {
@@ -64,26 +63,7 @@ public class RegistrationActivity extends AppCompatActivity {
             return;
         }
 
-        try {
-            JSONObject jObject = new JSONObject();
-            jObject.put("username", user);
-            jObject.put("password", pass);
-            jObject.put("email", email);
-
-            new TagMatchPostAsyncTask(Constants.IP_SERVER + "/users", this, false){
-                @Override
-                protected void onPostExecute(JSONObject jsonObject) {
-                    try {
-                        String error = jsonObject.get("error").toString();
-                        showError(error);
-                    } catch (JSONException ignored) {
-                        continueRegistration(user, pass);
-                    }
-                }
-            }.execute(jObject);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        continueRegistration(email, user, pass);
     }
 
     public void backToLogin(View view){
@@ -92,13 +72,11 @@ public class RegistrationActivity extends AppCompatActivity {
         finish();
     }
 
-    private void continueRegistration(String username, String passw){
-        SharedPreferences.Editor editor = getSharedPreferences(SH_PREF_NAME, MODE_PRIVATE).edit();
-        editor.putString("name", username);
-        editor.putString("password",passw);
-        editor.commit();
-
+    private void continueRegistration(String email, String username, String passw){
         Intent act = new Intent(this, RegistrationActivity2.class);
+        act.putExtra("email", email);
+        act.putExtra("username", username);
+        act.putExtra("password", passw);
         startActivity(act);
     }
 
