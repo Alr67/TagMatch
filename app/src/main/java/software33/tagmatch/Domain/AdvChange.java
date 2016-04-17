@@ -1,6 +1,7 @@
 package software33.tagmatch.Domain;
 
 import android.graphics.Bitmap;
+import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,7 +26,14 @@ public class AdvChange extends Advertisement{
     public AdvChange(User owner, String title, List<Bitmap> images, String desc, String[] tags, String category, String[] wanted){
         super(owner, title, images, desc, tags, category);
         this.wanted = wanted;
+        clearWantedTag();
+    }
 
+    protected void clearWantedTag() {
+        for (int i=0; i<wanted.length; ++i) {
+            if(wanted[i].startsWith("#"))
+                wanted[i] = wanted[i].replaceFirst("#", "");
+        }
     }
 
     @Override
