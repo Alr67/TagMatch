@@ -86,9 +86,13 @@ public class SingleChatActivity extends AppCompatActivity {
 
         ImageView image = (ImageView) findViewById(R.id.singleChatImage);
 
-        byte[] imageAsBytes = Base64.decode(imageChat, Base64.DEFAULT);
-        image.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
-
+        if (imageChat.equals("")){
+            image.setImageResource(R.drawable.image0);
+        }
+        else {
+            byte[] imageAsBytes = Base64.decode(imageChat, Base64.DEFAULT);
+            image.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
+        }
         /****************************************************/
 
 

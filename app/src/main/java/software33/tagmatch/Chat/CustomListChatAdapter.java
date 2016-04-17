@@ -3,6 +3,9 @@ package software33.tagmatch.Chat;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.BitmapFactory;
+import android.provider.SyncStateContract;
+import android.util.Base64;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -14,6 +17,7 @@ import android.widget.TextView;
 import java.util.ArrayList;
 
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.Constants;
 
 public class CustomListChatAdapter extends BaseAdapter implements View.OnClickListener {
 
@@ -103,10 +107,24 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
 
             holder.text.setText( tempValues.getUserName() );
             holder.text1.setText( tempValues.getTitleProduct() );
+
+            if (tempValues.getImage().equals("")){
+                holder.image.setImageResource(
+                        res.getIdentifier(
+                                "software33.tagmatch:drawable/"+ Constants.defaultImage
+                                ,null,null));
+            }
+            else {
+                //Set image Base64
+                byte[] imageAsBytes = Base64.decode(tempValues.getImage(), Base64.DEFAULT);
+                holder.image.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
+            }
+
+            /* OLD
             holder.image.setImageResource(
                     res.getIdentifier(
                             "software33.tagmatch:drawable/"+tempValues.getImage()
-                            ,null,null));
+                            ,null,null));*/
 
             /******** Set Item Click Listner for LayoutInflater for each row *******/
 
