@@ -1,6 +1,8 @@
 package software33.tagmatch.ServerConnection;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
@@ -9,6 +11,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -25,12 +28,16 @@ import software33.tagmatch.R;
 import software33.tagmatch.Utils.Constants;
 
 
-public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
+public class TagMatchGetImgurImageAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
     private URL url;
     private Context context;
 
-    public TagMatchGetAsyncTask(String url2, Context coming_context) {
+    public TagMatchGetImgurImageAsyncTask(String url2, Context coming_context) {
         try {
+            if(url2.contains("http://")) {
+                String aux = url2.replace("http://", "https://");
+                url2 = aux;
+            }
             url = new URL(url2);
             context = coming_context;
         } catch (MalformedURLException e) {
@@ -39,26 +46,8 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
     }
 
     protected JSONObject doInBackground(final JSONObject... params) {
-        /*ConnectivityManager connMgr = (ConnectivityManager) PER ERRORS DE XARXA
-        getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-                // fetch data
-        } else {
-            // display error
-        }*/
-        Integer statusCode = -1;
-
         try {
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-
-            final String user = params[0].getString("username").toString();
-            final String password = params[0].getString("password").toString();
-
-            String userPass = user + ":" + password;
-
-            String basicAuth = "Basic "+ new String(Base64.encode(userPass.getBytes(),Base64.NO_WRAP));
-            con.setRequestProperty("Authorization", basicAuth);
         //    con.setConnectTimeout(5000);
         //    con.setReadTimeout(5000);
             con.setRequestMethod("GET");
@@ -66,17 +55,13 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
             JSONObject aux;
             Log.i(Constants.DebugTAG,"responseCode: "+con.getResponseCode());
             if (con.getResponseCode() >= 400){
-                statusCode = con.getResponseCode();
                 aux = new JSONObject(iStreamToString(con.getErrorStream()));
                 Log.i(Constants.DebugTAG,"error: "+aux);
              }
-            else if(con.getResponseCode() == 302) {
-                Log.i(Constants.DebugTAG,"ATENCIO, RESPONSE CODE  302: "+con.getURL());
-                aux = new JSONObject();
-                aux.put("302",con.getURL());
-            }
             else {
-                aux = new JSONObject(iStreamToString(con.getInputStream()));
+                Bitmap image = BitmapFactory.decodeStream(con.getInputStream());
+                aux = new JSONObject();
+                aux.put("image",bitMapToString(image));
                 Log.i(Constants.DebugTAG,"input: "+aux);
             }
 
@@ -95,11 +80,19 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
                     map.put("error", context.getString(R.string.connection_timeout));
                 }
             } else {
-                map.put("error", e.getMessage());
+                map.put("error", "Unexpected error");
             }
             return new JSONObject(map);
         }
 
+    }
+
+    public String bitMapToString(Bitmap bitmap){
+        ByteArrayOutputStream baos=new  ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG,100, baos);
+        byte [] b=baos.toByteArray();
+        String temp= Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
     }
 
     public String iStreamToString(InputStream is1) {

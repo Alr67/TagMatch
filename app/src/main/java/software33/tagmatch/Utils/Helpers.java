@@ -2,18 +2,14 @@ package software33.tagmatch.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.util.Log;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.ArrayList;
 
-import software33.tagmatch.Domain.Advertisement;
+import software33.tagmatch.Domain.User;
 
 
 public class Helpers {
-    private static final String SH_PREF_NAME = "TagMatch_pref";
+    public static final String SH_PREF_NAME = "TagMatch_pref";
 
     public ArrayList<String> getPersonalData(Context context){
         ArrayList<String> data = new ArrayList<>();
@@ -23,6 +19,12 @@ public class Helpers {
         return data;
     }
 
+    public static User getActualUser(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE);
+        return new User(prefs.getString("name", null),prefs.getString("password", null));
+
+    }
+
     public void logout(Context context) {
         SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.remove("name");
@@ -30,24 +32,8 @@ public class Helpers {
         editor.commit();
     }
 
-    public static Advertisement getAdvertisementFromJSON(String jsonString) {
-        Advertisement adv = new Advertisement();
-        try {
-            JSONObject json = new JSONObject(jsonString);
-            if(!json.getString("price").equals(null)) {
-                Log.i("DEBUG","ES una sell");
-            }
-            else if(!json.get("wanted").equals(null)) {
-                Log.i("DEBUG","ES un canvi");
-            }
-            else {
-                Log.i("DEBUG","ES un regal");
-            }
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        return adv;
+    public static String checkServerError(Integer statusCode ) {
+        return "";
     }
 
 

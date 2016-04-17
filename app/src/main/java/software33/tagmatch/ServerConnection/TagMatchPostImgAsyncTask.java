@@ -1,7 +1,6 @@
 package software33.tagmatch.ServerConnection;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
@@ -20,7 +19,9 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.Helpers;
 
 public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, JSONObject> {
 
@@ -93,13 +94,8 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
     }
 
     private void connectUser(HttpURLConnection c) {
-        SharedPreferences prefs = context.getSharedPreferences("TagMatch_pref", Context.MODE_PRIVATE);
-        final String user = prefs.getString("name", "");
-        final String password = prefs.getString("password", "");
-
-        Log.i("userPostImg", user);
-        Log.i("passPostimg", password);
-        String userPass = user + ":" + password;
+        User actualUser = Helpers.getActualUser(context);
+        String userPass = actualUser.getAlias() + ":" + actualUser.getPassword();
         c.setRequestProperty("Authorization", "Basic " +
                 new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT)));
     }

@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import java.util.ArrayList;
 import java.util.List;
 
-import software33.tagmatch.Domain.BitmapWorkerTask;
 import software33.tagmatch.R;
 
 /**
@@ -69,7 +68,7 @@ public class CustomPagerAdapter extends PagerAdapter {
     }
 
     public void addImage(String url) {
-        BitmapWorkerTask task = new BitmapWorkerTask(this);
+        BitmapWorkerTaskFromURL task = new BitmapWorkerTaskFromURL(this);
         task.execute(url,imageHeight.toString(),imageWidth.toString());
     }
 

@@ -1,4 +1,4 @@
-package software33.tagmatch.Domain;
+package software33.tagmatch.Advertisement;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -6,15 +6,13 @@ import android.os.AsyncTask;
 
 import java.lang.ref.WeakReference;
 
-import software33.tagmatch.Advertisement.CustomPagerAdapter;
-
 /**
  * Created by Cristina on 04/04/2016.
  */
-public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
+public class BitmapWorkerTaskFromURL extends AsyncTask<String, Void, Bitmap> {
     private final WeakReference<CustomPagerAdapter> ActivityReference;
 
-    public BitmapWorkerTask(CustomPagerAdapter parent) {
+    public BitmapWorkerTaskFromURL(CustomPagerAdapter parent) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
         ActivityReference = new WeakReference<CustomPagerAdapter>(parent);
     }

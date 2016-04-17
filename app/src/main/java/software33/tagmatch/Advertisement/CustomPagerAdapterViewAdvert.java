@@ -19,7 +19,8 @@ public class CustomPagerAdapterViewAdvert extends CustomPagerAdapter {
     }
 
     public void addImage(Bitmap image) {
-        mResources.add(image);
+        super.newImageConverted(image);
+        parent.newImageConverted(image);
     }
  /*   public void newImageConverted(Bitmap bitmap) {
         mResources.add(bitmap);
