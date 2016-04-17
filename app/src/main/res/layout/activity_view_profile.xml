@@ -60,7 +60,6 @@
             android:layout_height="100dp"
             android:id="@+id/ivUserImage"
             android:layout_gravity="center"
-            android:src="@drawable/image0"
             android:scaleType="centerCrop"
             android:layout_below="@+id/tvUserName"
             android:layout_centerHorizontal="true" />

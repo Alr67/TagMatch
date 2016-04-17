@@ -2,6 +2,11 @@ package software33.tagmatch.Users;
 
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.util.Pair;
@@ -14,6 +19,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,10 +35,16 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -40,6 +52,7 @@ import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.SingleChatActivity;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
@@ -47,6 +60,7 @@ import software33.tagmatch.Utils.NavigationController;
 public class ViewProfile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     TextView tvUserName, tvLocation;
+    ImageView ivUserImage;
     Button bStartXat;
     private GoogleMap map;
     private String myId, userId;
@@ -73,6 +87,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         tvUserName = (TextView) findViewById(R.id.tvUserName);
         tvLocation = (TextView) findViewById(R.id.tvLocation);
         bStartXat = (Button) findViewById(R.id.bStartXat);
+        ivUserImage = (ImageView) findViewById(R.id.ivUserImage);
 
         Firebase.setAndroidContext(this);
 
@@ -81,6 +96,8 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         titleProduct = "ProductExample";
         userId = "aec6538a-bde2-4ea8-98bf-6fdc3f95127e";
 
+        //ivUserImage.setImageURI(Uri.parse("http://i.imgur.com/VN6Zhot.jpg"));
+
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
         try {
@@ -88,7 +105,6 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
             new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users", this) {
-
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -113,6 +129,13 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                     }
                 }
             }.execute(jsonObject);
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias() + "/photo", this) {
+                @Override
+                protected void onPostExecute(String url) {
+                    Picasso.with(ViewProfile.this).load(url).error(R.drawable.image0).into(ivUserImage);
+                }
+            }.execute(jsonObject);
+
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -141,7 +164,6 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             }
 
         });
-
     }
 
     @Override
@@ -188,7 +210,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         startActivity(intent);
     }
 
-    public String createChat() {
+    private String createChat() {
         Firebase id = FirebaseUtils.getChatsRef().push();
 
         //TODO: hardcoded userId
@@ -210,8 +232,26 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         chats1.put(id.getKey(),"");
         FirebaseUtils.getUsersRef().child(id1).child("chats").updateChildren(chats1);
 
+        setUserImage();
 
         return id.getKey();
+    }
+
+    private void setUserImage(){
+        Drawable drawable = ivUserImage.getDrawable();
+
+                BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
+        Bitmap bitmap = bitmapDrawable .getBitmap();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] imageInByte = stream.toByteArray();
+        ByteArrayInputStream bis = new ByteArrayInputStream(imageInByte);
+
+        Bitmap bm = BitmapFactory.decodeFile("/path/to/image.jpg");
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.JPEG, 100, baos); //bm is the bitmap object
+        byte[] b = baos.toByteArray();
+
     }
 
     private void getChat(final String idChat) {
@@ -242,8 +282,6 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             }
         }
 
-        Log.i("VEDUG", "idPRdoc" + idProduct + "title" + titleProduct);
-        Log.i("VEDUG", "iduser" + userId + "user" + this.userId);
         if (idProduct.equals(titleProduct) && userId.equals(this.userId)){
             bStartXat.setText("Xatejant");
             this.idChat = idChat;
