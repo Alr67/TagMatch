@@ -87,6 +87,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
       //  items.add(CardCreator.createCard(getApplicationContext(),"Espaguetis 2 Caca A ver que Ostia Que Esto Ha Hecho Algo Muy Guay","espaguetis.jpg", Constants.card_exchange ,0)); // primer cero es opcion, el segundo precio
       //  items.add(CardCreator.createCard(getApplicationContext(),"Espaguetis 2 Caca A ver que Ostia Que Esto Ha Hecho Algo Muy Guay","espaguetis.jpg", Constants.card_sell , 33));
 
+        downloadAdvertsFromServer();
+
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
 
         recycler = (RecyclerView) findViewById(R.id.reciclador);//Creamos el recycler
@@ -109,8 +111,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
-        recycler.setAdapter(adapter);
-        downloadAdvertsFromServer();
+        synchronized (items) {
+            items.notify();
+            recycler.setAdapter(adapter);
+        }
+
+
     }
 
     private void downloadAdvertsFromServer() {
@@ -139,6 +145,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 else imageId = "";
                                 items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription() , newAdvert.getPrice(), newAdvert.getID()));
                             }
+
+
                         } catch (JSONException e) {
                             e.printStackTrace();
                         }
