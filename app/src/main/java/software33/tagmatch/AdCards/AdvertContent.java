@@ -1,6 +1,10 @@
 package software33.tagmatch.AdCards;
 
 
+import android.util.Log;
+
+import software33.tagmatch.Utils.Constants;
+
 /**
  * Created by Rafa on 25/11/2015.
  */
@@ -21,6 +25,7 @@ public class AdvertContent {
     }
 
     public AdvertContent( String s, String img, String type, Double price, Integer id) {
+        Log.i(Constants.DebugTAG,"Creo un item");
         this.ad_name = s;
         this.ad_img_id = img;
         this.ad_type = type;

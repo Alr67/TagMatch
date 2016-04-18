@@ -41,6 +41,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
 
         public ReceptesViewHolder(View v) {
             super(v);
+            Log.i(Constants.DebugTAG,"AdapterAdvert created");
             imagen = (ImageView) v.findViewById(R.id.imagen);
             type = (ImageView) v.findViewById(R.id.type);
             preu = (TextView) v.findViewById(R.id.preu);
@@ -87,9 +88,8 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
         else {
             Toast.makeText(context,"Estas fent servir una opcio no valida",Toast.LENGTH_LONG).show();
         }
-
+        Log.i(Constants.DebugTAG,"Abans de cridar la funcio de buscar les imatges, id: " + items);
         getAdvertImage(items.get(i).getAd_id(),items.get(i).getImgId(),context,viewHolder.imagen);
-
     }
 
     public void getAdvertImage(Integer advertId, String photoId, Context context, final ImageView image) {
@@ -102,21 +102,22 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
             Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
             e.printStackTrace();
         }
-        Log.i(Constants.DebugTAG,"Vaig a demanar la foto amb id: "+photoId);
-        String url = Constants.IP_SERVER+"/ads/"+ advertId.toString()+"/photo/";
+        String url = Constants.IP_SERVER+"/ads/"+ advertId.toString()+"/photo/"+photoId;
+        Log.i(Constants.DebugTAG,"Vaig a demanar la foto amb id: "+photoId + ", amb url: "+url);
         final Context auxContext = context;
-        new TagMatchGetAsyncTask(url+photoId,context) {
+        new TagMatchGetAsyncTask(url,context) {
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
                 if(jsonObject.has("302")) {
                     try {
+                        Log.i(Constants.DebugTAG,"Vaig a cridar a imgur amb la url: "+jsonObject.getString("302"));
                         new TagMatchGetImgurImageAsyncTaskAdvert(jsonObject.getString("302"),auxContext) {
                             @Override
                             protected void onPostExecute(JSONObject jsonObject) {
                                 Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
                                 try {
-                                    if(jsonObject.has("image")) {
+                                    if(jsonObject.has("inputStream")) {
                                         InputStream inputStream = (InputStream) jsonObject.get("inputStream");
                                         BitmapWorkerTaskFromBitmap task = new BitmapWorkerTaskFromBitmap(image,inputStream);
                                         task.execute(height.toString(),width.toString());

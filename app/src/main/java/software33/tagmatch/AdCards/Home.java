@@ -111,7 +111,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
-        synchronized (items) {
+          synchronized (items) {
             items.notify();
             recycler.setAdapter(adapter);
         }
@@ -122,7 +122,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private void downloadAdvertsFromServer() {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
-        String url = Constants.IP_SERVER+"/ads?idGreaterThan="+Constants.SERVER_IdGreaterThan+"&idSmallerThan="+Constants.SERVER_IdSmallerThan+"&limit="+Constants.SERVER_limitAdverts;
+        String url = Constants.IP_SERVER+"/ads?idGreaterThan="+Constants.SERVER_IdGreaterThan+"&limit="+Constants.SERVER_limitAdverts;
         Log.i(Constants.DebugTAG,"Vaig a fer el get a: "+ url);
         try {
             jObject.put("username", actualUser.getAlias());
@@ -145,6 +145,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 else imageId = "";
                                 items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription() , newAdvert.getPrice(), newAdvert.getID()));
                             }
+                            adapter.notifyDataSetChanged();
 
 
                         } catch (JSONException e) {

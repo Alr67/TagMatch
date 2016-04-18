@@ -60,7 +60,8 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
              }
             else if(con.getResponseCode() == 302) {
                 aux = new JSONObject();
-                aux.put("302",con.getURL());
+                Log.i(Constants.DebugTAG,con.getURL().toString());
+                aux.put("302",con.getURL().toString());
             }
             else {
                 String response = iStreamToString(con.getInputStream());
