@@ -40,7 +40,6 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
 
         public ReceptesViewHolder(View v) {
             super(v);
-            Log.i(Constants.DebugTAG,"AdapterAdvert created");
             imagen = (ImageView) v.findViewById(R.id.imagen);
             type = (ImageView) v.findViewById(R.id.type);
             preu = (TextView) v.findViewById(R.id.preu);
@@ -72,28 +71,30 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
     public void onBindViewHolder(ReceptesViewHolder viewHolder, int i) {
         viewHolder.nombre.setText(items.get(i).getNom());
         String typeaux = items.get(i).getType();
-        if(typeaux == Constants.typeServerGIFT) {
-            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.image0));
-            viewHolder.preu.setVisibility(View.INVISIBLE);
-        }
-        else if(typeaux == Constants.typeServerEXCHANGE) {
-            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.image_placeholder));
-            viewHolder.preu.setVisibility(View.INVISIBLE);
-        }
-        else if(typeaux == Constants.typeSell) {
-            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.bar_bg));
-            viewHolder.preu.setText(items.get(i).getPrice().toString() + "€");
-        }
-        else {
-            Toast.makeText(context,"Estas fent servir una opcio no valida",Toast.LENGTH_LONG).show();
-        }
-        Log.i(Constants.DebugTAG,"Abans de cridar la funcio de buscar les imatges, id: " + items);
 
         try {
             getAdvertImage(items.get(i).getAd_id(),items.get(i).getImgId(),context,viewHolder.imagen);
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        if(typeaux == Constants.typeServerGIFT) {
+            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.advert_gift));
+            viewHolder.preu.setVisibility(View.INVISIBLE);
+        }
+        else if(typeaux == Constants.typeServerEXCHANGE) {
+            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.advert_exchange));
+            viewHolder.preu.setVisibility(View.INVISIBLE);
+        }
+        else if(typeaux == Constants.typeServerSELL) {
+            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.advert_sell));
+            viewHolder.preu.setText(items.get(i).getPrice().toString() + "€");
+        }
+        else {
+            Toast.makeText(context,"Estas fent servir una opcio no valida",Toast.LENGTH_LONG).show();
+        }
+
+
     }
 
     public void getAdvertImage(Integer advertId, String photoId, final Context context, final ImageView image) throws JSONException {

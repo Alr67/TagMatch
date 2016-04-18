@@ -13,7 +13,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -118,14 +117,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
         String url = Constants.IP_SERVER+"/ads?idGreaterThan="+Constants.SERVER_IdGreaterThan+"&limit="+Constants.SERVER_limitAdverts;
-        Log.i(Constants.DebugTAG,"Vaig a fer el get a: "+ url);
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());
             new TagMatchGetAsyncTask(url,this) {
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
-                    Log.i(Constants.DebugTAG,"onPostExecute, JSON: "+jsonObject.toString());
                     if(jsonObject.has("arrayResponse")) {
                         try {
                             JSONArray jsonArray = jsonObject.getJSONArray("arrayResponse");
@@ -153,7 +150,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 }
             }.execute(jObject);
         } catch (JSONException e) {
-            Log.i(Constants.DebugTAG,"HA PETAT JAVA");
             e.printStackTrace();
         }
     }
@@ -184,7 +180,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
-        Log.i("DEBUG","item selected");
         return NavigationController.onItemSelected(item.getItemId(),this);
     }
 
@@ -193,9 +188,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-            Log.i("DEBUG","Drawer is open");
         } else {
-            Log.i("DEBUG","Drawer is NOT open");
             super.onBackPressed();
         }
     }
