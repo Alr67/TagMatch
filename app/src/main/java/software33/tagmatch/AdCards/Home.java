@@ -134,7 +134,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
                                 advertisements.add(newAdvert);
                                 //TODO : afegir les cards!
-                                items.add(CardCreator.createCard(getApplicationContext(),newAdvert.getTitle(),newAdvert.getImagesIDs()[0], Constants.card_sell /*, newAdvert.getPrice()*/));
+                                String imageId;
+                                if(newAdvert.getImagesIDs().length>0) imageId = newAdvert.getImagesIDs()[0];
+                                else imageId = "";
+                                items.add(new AdvertContent(getApplicationContext(),newAdvert.getTitle(),imageId, newAdvert.getTypeDescription() , newAdvert.getPrice(), newAdvert.getID()));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

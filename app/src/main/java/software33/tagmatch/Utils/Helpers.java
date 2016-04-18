@@ -2,6 +2,9 @@ package software33.tagmatch.Utils;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -105,6 +108,18 @@ public class Helpers {
         }
         Log.i(Constants.DebugTAG,"User name from covnert func: "+advert.getUser().getAlias());
         return advert;
+    }
+
+
+    public static Bitmap stringToBitMap(String encodedString){
+        try {
+            byte [] encodeByte= Base64.decode(encodedString,Base64.DEFAULT);
+            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch(Exception e) {
+            e.getMessage();
+            return null;
+        }
     }
 
 }

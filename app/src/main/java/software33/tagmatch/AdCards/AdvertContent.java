@@ -1,6 +1,8 @@
 package software33.tagmatch.AdCards;
 
 
+import android.content.Context;
+
 /**
  * Created by Rafa on 25/11/2015.
  */
@@ -8,22 +10,26 @@ public class AdvertContent {
 
     private String ad_name;
     private Integer ad_id;
-    private String ad_img;
-    private Integer ad_type;
-    private Integer ad_price;
+    private String ad_img_id;
+    private String ad_type;
+    private Double ad_price;
+    private Context context;
 
-    public AdvertContent(String s, String img, Integer type) {
+    public AdvertContent(String s, String img, String type) {
         this.ad_name = s;
-        this.ad_img = img;
+        this.ad_img_id = img;
         this.ad_type = type;
-        this.ad_price = -1;
+        this.ad_price = -1.0;
     }
 
-    public AdvertContent(String s, String img, Integer type, Integer price) {
+    public AdvertContent(Context parent, String s, String img, String type, Double price, Integer id) {
         this.ad_name = s;
-        this.ad_img = img;
+        this.ad_img_id = img;
         this.ad_type = type;
         this.ad_price = price;
+        this.ad_id = id;
+        this.context = parent;
+
     }
 
     public String getNom() {
@@ -32,15 +38,15 @@ public class AdvertContent {
 
     public Integer getAd_id() {return ad_id;}
 
-    public String getImg() {
-        return ad_img;
+    public String getImgId() {
+        return ad_img_id;
     }
 
-    public Integer getType() {
+    public String getType() {
         return ad_type;
     }
 
-    public Integer getPrice() {
+    public Double getPrice() {
         return ad_price;
     }
 }

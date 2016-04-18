@@ -1,7 +1,9 @@
 package software33.tagmatch.AdCards;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,11 +11,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
-import software33.tagmatch.Utils.BitmapWorkerTask;
+import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetImgurImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
+import software33.tagmatch.Utils.Helpers;
 
 /**
  * Created by Rafa on 25/11/2015.
@@ -63,26 +71,73 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
     @Override
     public void onBindViewHolder(ReceptesViewHolder viewHolder, int i) {
         viewHolder.nombre.setText(items.get(i).getNom());
-        Integer typeaux = items.get(i).getType();
-        if(typeaux == Constants.card_giveaway) {
+        String typeaux = items.get(i).getType();
+        if(typeaux == Constants.typeServerGIFT) {
             viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.image0));
             viewHolder.preu.setVisibility(View.INVISIBLE);
         }
-        else if(typeaux == Constants.card_exchange) {
+        else if(typeaux == Constants.typeServerEXCHANGE) {
             viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.image_placeholder));
             viewHolder.preu.setVisibility(View.INVISIBLE);
         }
-        else if(typeaux == Constants.card_sell) {
+        else if(typeaux == Constants.typeSell) {
             viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.bar_bg));
             viewHolder.preu.setText(items.get(i).getPrice().toString() + "€");
         }
         else {
             Toast.makeText(context,"Estas fent servir una opcio no valida",Toast.LENGTH_LONG).show();
         }
-        BitmapWorkerTask task = new BitmapWorkerTask(viewHolder.imagen);
-        task.execute(items.get(i).getImg(),height.toString(),width.toString());
+
+        getAdvertImage(items.get(i).getAd_id(),items.get(i).getImgId());
     }
 
+    public void getAdvertImage(Integer advertId, String photoId) {
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(context);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
+            e.printStackTrace();
+        }
+        Log.i(Constants.DebugTAG,"Vaig a demanar la foto amb id: "+photoId);
+        String url = Constants.IP_SERVER+"/ads/"+ advertId.toString()+"/photo/";
+        final AdapterAdvert parent = this;
+        new TagMatchGetAsyncTask(url+photoId,context) {
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
+                if(jsonObject.has("302")) {
+                    try {
+                        new TagMatchGetImgurImageAsyncTask(jsonObject.getString("302"),context) {
+                            @Override
+                            protected void onPostExecute(JSONObject jsonObject) {
+                                Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
+                                try {
+                                    if(jsonObject.has("image")) {
+                                        Bitmap image = Helpers.stringToBitMap(jsonObject.getString("image"));
+
+                                      //  BitmapWorkerTaskFromBitmap task = new BitmapWorkerTaskFromBitmap(parent);
+                                      //  task.execute(image,height.toString(),width.toString());
+                                    }
+                                    else {
+                                        Toast.makeText(context,jsonObject.getString("error"),Toast.LENGTH_SHORT);
+                                    }
+                                    //  adv = convertJSONToAdvertisement(jsonObject);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                            }
+                        }.execute();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+                //  adv = convertJSONToAdvertisement(jsonObject);
+            }
+        }.execute(jObject);
+    }
 
     public void setOnClickListener (View.OnClickListener listener) {
         this.listener = listener;

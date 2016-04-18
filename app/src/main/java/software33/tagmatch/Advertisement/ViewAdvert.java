@@ -3,12 +3,10 @@ package software33.tagmatch.Advertisement;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -171,7 +169,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                                         Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
                                         try {
                                         if(jsonObject.has("image")) {
-                                            Bitmap image = stringToBitMap(jsonObject.getString("image"));
+                                            Bitmap image = Helpers.stringToBitMap(jsonObject.getString("image"));
                                             mCustomPagerAdapterViewAdvert.addImage(image);
                                             Log.i(Constants.DebugTAG,"image added");
                                         }
@@ -195,16 +193,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         getUserImage();
     }
 
-    private Bitmap stringToBitMap(String encodedString){
-        try {
-            byte [] encodeByte= Base64.decode(encodedString,Base64.DEFAULT);
-            Bitmap bitmap= BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
-            return bitmap;
-        } catch(Exception e) {
-            e.getMessage();
-            return null;
-        }
-    }
+
 
     private void getUserImage() {
         JSONObject jObject = new JSONObject();
@@ -231,7 +220,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                                     Log.i(Constants.DebugTAG,"onPostExecute de la imatge de l'user JSON: "+jsonObject.toString());
                                     try {
                                         if(jsonObject.has("image")) {
-                                            Bitmap image = stringToBitMap(jsonObject.getString("image"));
+                                            Bitmap image = Helpers.stringToBitMap(jsonObject.getString("image"));
                                             userImage.setImageBitmap(image);
                                             Log.i(Constants.DebugTAG,"USER image added");
                                         }

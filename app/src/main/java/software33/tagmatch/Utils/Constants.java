@@ -39,9 +39,9 @@ public abstract class Constants {
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 14;
 
     /* CODI DE CARDS*/
-    public static final Integer card_giveaway = 0;
-    public static final Integer card_exchange = 1;
-    public static final Integer card_sell = 2;
+ //   public static final Integer card_giveaway = 0;
+ //   public static final Integer card_exchange = 1;
+ //   public static final Integer card_sell = 2;
 
     /* Bundle TAGS */
     public static final String TAG_BUNDLE_IDVIEWADVERTISEMENT = "AdvertisementId";
