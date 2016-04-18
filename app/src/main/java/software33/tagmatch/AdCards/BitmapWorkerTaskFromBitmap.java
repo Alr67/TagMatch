@@ -18,6 +18,7 @@ public class BitmapWorkerTaskFromBitmap extends AsyncTask<String, Void, Bitmap> 
         this.path = inputStream;
     }
 
+
     // Decode image in background.
     @Override
     protected Bitmap doInBackground(String... params) {
