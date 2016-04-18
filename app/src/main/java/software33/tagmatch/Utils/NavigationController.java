@@ -11,6 +11,7 @@ import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Chat.MainChatActivity;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
+import software33.tagmatch.Users.MyAdverts;
 import software33.tagmatch.Users.ViewProfile;
 
 /**
@@ -32,6 +33,10 @@ public final class NavigationController {
             parent.finish();
         } else if (id == R.id.nav_main) {
             Intent intent = new Intent(parent, Home.class);
+            parent.startActivity(intent);
+            parent.finish();
+        }  else if (id == R.id.nav_my_adverts) {
+            Intent intent = new Intent(parent, MyAdverts.class);
             parent.startActivity(intent);
             parent.finish();
         }  else if (id == R.id.nav_logout) {
