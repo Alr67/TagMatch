@@ -75,16 +75,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         });
 
 
-
-        //final ArrayList<Receptes> items = new DBController().loadLlistaReceptes(this);
         items = new ArrayList<>();
-
-        /*for(int q = 0; q < items.size(); ++q) { FOR PARA TRATAR COSAS QUE NOS LLEGARAN DEL SERVER. TENDREMOS QUE PILLAR NAME Y EL PATH DEL IMGUR
-            items.add(new CardCreator(getApplicationContext(),items.get(q)));
-        }*/
-                                                                            //0-> GiveAway 1-> Exchange 2-> Sell
-      //  items.add(CardCreator.createCard(getApplicationContext(),"Espaguetis 2 Caca A ver que Ostia Que Esto Ha Hecho Algo Muy Guay","espaguetis.jpg", Constants.card_exchange ,0)); // primer cero es opcion, el segundo precio
-      //  items.add(CardCreator.createCard(getApplicationContext(),"Espaguetis 2 Caca A ver que Ostia Que Esto Ha Hecho Algo Muy Guay","espaguetis.jpg", Constants.card_sell , 33));
 
         downloadAdvertsFromServer();
 
@@ -144,9 +135,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                             e.printStackTrace();
                         }
                     }
-                    //adv = Helpers.convertJSONToAdvertisement(jsonObject);
-                    //fillComponents();
-                    //String error = jsonObject.get("error").toString();
                 }
             }.execute(jObject);
         } catch (JSONException e) {
