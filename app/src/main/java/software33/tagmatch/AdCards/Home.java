@@ -18,17 +18,11 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.util.ArrayList;
-
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.NavigationController;
-
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
