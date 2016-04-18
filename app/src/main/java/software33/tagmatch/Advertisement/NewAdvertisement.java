@@ -14,18 +14,13 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -47,6 +42,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Domain.AdvChange;
 import software33.tagmatch.Domain.AdvGift;
 import software33.tagmatch.Domain.AdvSell;
@@ -57,9 +53,8 @@ import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.DialogError;
-import software33.tagmatch.Utils.NavigationController;
 
-public class NewAdvertisement extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class NewAdvertisement extends AppCompatActivity implements View.OnClickListener {
 
     private Button createButton, newImage;
     private EditText title,description, tag, wantedTags;
@@ -72,7 +67,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.nav_new_advert);
+        setContentView(R.layout.activity_new_advertisement);
         initElements();
 
         String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE};
@@ -85,16 +80,17 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     private void initElements(){
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_new_advert);
         setSupportActionBar(toolbar);
+      /*
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this); */
 
         typeSpinner = (Spinner) findViewById(R.id.typeSpinner);
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item, Constants.typeList);
@@ -209,6 +205,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     private void updateAdvertToServer(Advertisement adv) {
         final Context context = this.getApplicationContext();
+        Toast.makeText(this,"Uploading Image, please whait",Toast.LENGTH_LONG);
         new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true){
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
@@ -253,6 +250,9 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                         }
                         else {
                             Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
+                            Intent intent = new Intent(getApplicationContext(), Home.class);
+                            startActivity(intent);
+                            finish();
                         }
                     } catch (JSONException ignored) {
                         ignored.printStackTrace();
@@ -361,7 +361,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
         String[] parts = selectedPic.split("\\.");
         imgExtension = parts[parts.length - 1];
-        if (imgExtension.equals("jpg")) imgExtension = "jpeg";
         Log.i(DebugTag, imgExtension);
         return selectedPic;
     }
@@ -377,12 +376,13 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                 if(resultCode == RESULT_OK){
                     Uri selectedImage = imageReturnedIntent.getData();
                     String selectedPic = getImagePathFromUri(selectedImage);
+                    Log.i(Constants.DebugTAG,"Result gallery path: "+selectedPic);
                     mCustomPagerAdapterNewAdvert.addImage(selectedPic);
                 }
                 break;
             case Constants.codeCameraPicker:
                 if(resultCode == RESULT_OK) {
-                    Log.v(DebugTag,"Path: "+pathfoto);
+                    Log.i(Constants.DebugTAG,"Result gallery path: "+pathfoto);
                     mCustomPagerAdapterNewAdvert.addImage(pathfoto);
                 }
                 break;
@@ -393,19 +393,9 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        return  NavigationController.onItemSelected(item.getItemId(),this);
-    }
-
-    @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-            Log.i("DEBUG","Drawer is open");
-        } else {
-            Log.i("DEBUG","Drawer is NOT open");
-            super.onBackPressed();
-        }
+        Intent intent = new Intent(this, Home.class);
+        startActivity(intent);
+        finish();
     }
 }

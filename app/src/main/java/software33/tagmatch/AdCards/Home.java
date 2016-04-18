@@ -25,6 +25,7 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
@@ -68,12 +69,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                /*Intent novaRecepta = new Intent(getApplicationContext(), NovaRecepta.class);
+                Intent novaRecepta = new Intent(getApplicationContext(), NewAdvertisement.class);
                 startActivity(novaRecepta);
-                finish();*/
+                finish();
             }
         });
-
 
         items = new ArrayList<>();
 
@@ -92,16 +92,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         adapter.setOnClickListener(new View.OnClickListener() {
             @Override  //recView.getChildPosition(v)
             public void onClick(View v) {
-                //String temp = items.get(v.getTag().hashCode()).getNom();
-                // TODO: Integer id = items.get();
-                Integer id = Constants.idTEST;
+                Integer id = items.get(v.getTag().hashCode()).getAd_id();
                 Intent viewRecepta = new Intent(getApplicationContext(), ViewAdvert.class).putExtra(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT, id);
                 startActivity(viewRecepta);
                 finish();
             }
         });
         recycler.setAdapter(adapter);
-
     }
 
     private void downloadAdvertsFromServer() {
@@ -122,14 +119,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 JSONObject object = jsonArray.getJSONObject(n);
                                 Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
                                 advertisements.add(newAdvert);
-                                //TODO : afegir les cards!
                                 String imageId;
                                 if(newAdvert.getImagesIDs().length>0) imageId = newAdvert.getImagesIDs()[0];
                                 else imageId = "";
-                                items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription() , newAdvert.getPrice(), newAdvert.getID()));
+                                items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getID()));
                             }
                             adapter.notifyDataSetChanged();
-
 
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -7,10 +7,6 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/nav_mainPage" />
         <item
-            android:id="@+id/nav_newAdvert"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/nav_newAdvert" />
-        <item
             android:id="@+id/nav_viewUser"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/nav_viewUser" />

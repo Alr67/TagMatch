@@ -70,12 +70,14 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
     public void onBindViewHolder(ReceptesViewHolder viewHolder, int i) {
         viewHolder.nombre.setText(items.get(i).getNom());
         String typeaux = items.get(i).getType();
-
-        try {
-            getAdvertImage(items.get(i).getAd_id(),items.get(i).getImgId(),context,viewHolder.imagen);
-        } catch (JSONException e) {
-            e.printStackTrace();
+        if(items.get(i).getImgId()!="") {
+            try {
+                getAdvertImage(items.get(i).getAd_id(), items.get(i).getImgId(), context, viewHolder.imagen);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
         }
+        else viewHolder.imagen.setImageDrawable(context.getDrawable(R.drawable.image_placeholder));
 
         if(typeaux == Constants.typeServerGIFT) {
             viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.advert_gift));

@@ -8,7 +8,6 @@ import android.util.Log;
 import android.widget.Toast;
 
 import software33.tagmatch.AdCards.Home;
-import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Chat.MainChatActivity;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
@@ -33,10 +32,6 @@ public final class NavigationController {
             parent.finish();
         } else if (id == R.id.nav_main) {
             Intent intent = new Intent(parent, Home.class);
-            parent.startActivity(intent);
-            parent.finish();
-        } else if (id == R.id.nav_newAdvert) {
-            Intent intent = new Intent(parent, NewAdvertisement.class);
             parent.startActivity(intent);
             parent.finish();
         }  else if (id == R.id.nav_logout) {

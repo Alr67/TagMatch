@@ -5,7 +5,6 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
-import android.util.Log;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +49,6 @@ public class Helpers {
 
 
     public static Advertisement convertJSONToAdvertisement(JSONObject jsonObject) {
-        Log.i(Constants.DebugTAG,"Lets convert to JSON");
         Advertisement advert = new Advertisement();
         String title,description,type,ownerName,category, userPhotoId, city;
         title = description = type = ownerName = category = userPhotoId = city = "";
@@ -67,7 +65,6 @@ public class Helpers {
             if(jsonObject.has("userPhotoId")) userPhotoId = jsonObject.getString("userPhotoId");
             if(jsonObject.has("city")) city = jsonObject.getString("city");
             User owner = new User(ownerName,userPhotoId,city);
-            Log.i(Constants.DebugTAG,"User name from owner: " +owner.getAlias());
             if(jsonObject.has("tags")) {
                 JSONArray array = jsonObject.getJSONArray("tags");
                 tags = new String[array.length()];
@@ -106,7 +103,6 @@ public class Helpers {
         } catch (JSONException e) {
             e.printStackTrace();
         }
-        Log.i(Constants.DebugTAG,"User name from covnert func: "+advert.getUser().getAlias());
         return advert;
     }
 

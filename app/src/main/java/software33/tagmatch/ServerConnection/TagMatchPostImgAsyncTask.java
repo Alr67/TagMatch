@@ -21,6 +21,7 @@ import java.util.Map;
 
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
 public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, JSONObject> {
@@ -35,6 +36,7 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
             this.url = new URL(url);
             this.context = context;
             this.imgExtension = imgExtension;
+            if (this.imgExtension.equals("jpg")) this.imgExtension = "jpeg";
             this.img = img;
         } catch (MalformedURLException e) {
             Log.e("TagMatchPostAsyncTask", "", e);
@@ -49,10 +51,10 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
             con.setDoInput(true);
             con.setRequestMethod("POST");
             connectUser(con);
+            Log.i(Constants.DebugTAG,"Envio Content-Type->image/"+imgExtension);
             con.setRequestProperty("Content-Type", "image/" + imgExtension);
 
-            DataOutputStream wr = new DataOutputStream(
-                    con.getOutputStream());
+            DataOutputStream wr = new DataOutputStream(con.getOutputStream());
             wr.write(img);
             //wr.write(new String(img, Charset.forName("US-ASCII")));
             wr.flush();
@@ -61,12 +63,9 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
             con.getOutputStream().close();
             con.connect();
 
-            /*>=400 errorStream
-            else inputStream*/
-
             JSONObject aux;
 
-            Log.i("post img status code", Integer.toString(con.getResponseCode()));
+            Log.i(Constants.DebugTAG,"PostImg responseCode: "+ Integer.toString(con.getResponseCode()));
 
             if (con.getResponseCode() >= 400)
                 aux = new JSONObject(iStreamToString(con.getErrorStream()));
