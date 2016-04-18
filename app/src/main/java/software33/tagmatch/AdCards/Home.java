@@ -137,7 +137,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 String imageId;
                                 if(newAdvert.getImagesIDs().length>0) imageId = newAdvert.getImagesIDs()[0];
                                 else imageId = "";
-                                items.add(new AdvertContent(getApplicationContext(),newAdvert.getTitle(),imageId, newAdvert.getTypeDescription() , newAdvert.getPrice(), newAdvert.getID()));
+                                items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription() , newAdvert.getPrice(), newAdvert.getID()));
                             }
                         } catch (JSONException e) {
                             e.printStackTrace();

@@ -3,27 +3,31 @@ package software33.tagmatch.AdCards;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
+import android.widget.ImageView;
 
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 
 public class BitmapWorkerTaskFromBitmap extends AsyncTask<String, Void, Bitmap> {
-    private final WeakReference<AdapterAdvert> adapterAdvert;
+    private final WeakReference<ImageView> imageViewReference;
+    private InputStream path;
 
-    public BitmapWorkerTaskFromBitmap(AdapterAdvert parent) {
+    public BitmapWorkerTaskFromBitmap(ImageView imageView, InputStream inputStream) {
         // Use a WeakReference to ensure the ImageView can be garbage collected
-        adapterAdvert = new WeakReference<AdapterAdvert>(parent);
+        imageViewReference = new WeakReference<ImageView>(imageView);
+        this.path = inputStream;
     }
 
     // Decode image in background.
     @Override
     protected Bitmap doInBackground(String... params) {
-        String path = params[0];
+      //  String path = params[0];
         int wp, hp;
-        hp = Integer.parseInt(params[1]);
-        wp = Integer.parseInt(params[2]);
+        hp = Integer.parseInt(params[0]);
+        wp = Integer.parseInt(params[1]);
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path,options);
+        BitmapFactory.decodeStream(path,null,options);
 
         final int height = options.outHeight;
         final int width = options.outWidth;
@@ -40,16 +44,18 @@ public class BitmapWorkerTaskFromBitmap extends AsyncTask<String, Void, Bitmap> 
         options.inSampleSize = inSampleSize;
         options.inPreferredConfig = Bitmap.Config.RGB_565;
         options.inDither = true;
-        return BitmapFactory.decodeFile(path, options);
+        return BitmapFactory.decodeStream(path,null,options);
     }
 
     // Once complete, see if ImageView is still around and set bitmap.
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-        if (adapterAdvert != null && bitmap != null) {
-            final AdapterAdvert imageView = adapterAdvert.get();
-           // if (imageView != null) {imageView.newImageConverted(bitmap);
-     //       }
+        if (imageViewReference != null && bitmap != null) {
+            final ImageView imageView = imageViewReference.get();
+            if (imageView != null) {
+                imageView.setImageBitmap(bitmap);
+            }
         }
     }
+
 }

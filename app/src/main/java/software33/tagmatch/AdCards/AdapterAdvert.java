@@ -1,7 +1,6 @@
 package software33.tagmatch.AdCards;
 
 import android.content.Context;
-import android.graphics.Bitmap;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,12 +13,13 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
-import software33.tagmatch.ServerConnection.TagMatchGetImgurImageAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetImgurImageAsyncTaskAdvert;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
@@ -88,10 +88,11 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
             Toast.makeText(context,"Estas fent servir una opcio no valida",Toast.LENGTH_LONG).show();
         }
 
-        getAdvertImage(items.get(i).getAd_id(),items.get(i).getImgId());
+        getAdvertImage(items.get(i).getAd_id(),items.get(i).getImgId(),context,viewHolder.imagen);
+
     }
 
-    public void getAdvertImage(Integer advertId, String photoId) {
+    public void getAdvertImage(Integer advertId, String photoId, Context context, final ImageView image) {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(context);
         try {
@@ -103,26 +104,25 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
         }
         Log.i(Constants.DebugTAG,"Vaig a demanar la foto amb id: "+photoId);
         String url = Constants.IP_SERVER+"/ads/"+ advertId.toString()+"/photo/";
-        final AdapterAdvert parent = this;
+        final Context auxContext = context;
         new TagMatchGetAsyncTask(url+photoId,context) {
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
                 if(jsonObject.has("302")) {
                     try {
-                        new TagMatchGetImgurImageAsyncTask(jsonObject.getString("302"),context) {
+                        new TagMatchGetImgurImageAsyncTaskAdvert(jsonObject.getString("302"),auxContext) {
                             @Override
                             protected void onPostExecute(JSONObject jsonObject) {
                                 Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
                                 try {
                                     if(jsonObject.has("image")) {
-                                        Bitmap image = Helpers.stringToBitMap(jsonObject.getString("image"));
-
-                                      //  BitmapWorkerTaskFromBitmap task = new BitmapWorkerTaskFromBitmap(parent);
-                                      //  task.execute(image,height.toString(),width.toString());
+                                        InputStream inputStream = (InputStream) jsonObject.get("inputStream");
+                                        BitmapWorkerTaskFromBitmap task = new BitmapWorkerTaskFromBitmap(image,inputStream);
+                                        task.execute(height.toString(),width.toString());
                                     }
                                     else {
-                                        Toast.makeText(context,jsonObject.getString("error"),Toast.LENGTH_SHORT);
+                                        Toast.makeText(auxContext,jsonObject.getString("error"),Toast.LENGTH_SHORT);
                                     }
                                     //  adv = convertJSONToAdvertisement(jsonObject);
                                 } catch (JSONException e) {
@@ -138,6 +138,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
             }
         }.execute(jObject);
     }
+
 
     public void setOnClickListener (View.OnClickListener listener) {
         this.listener = listener;
