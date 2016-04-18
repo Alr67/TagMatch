@@ -71,16 +71,5 @@
             android:textSize="16dip"
             android:textColor="@color/reg_color" />
 
-        <android.support.v7.widget.AppCompatButton
-            android:id="@+id/btn_debug_newAdvert"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:layout_marginBottom="24dp"
-            android:padding="12dp"
-            android:text="NewAdvert"
-            android:background="@color/login_button_color"
-            android:textColor="@color/app_header_color" />
-
     </LinearLayout>
 </ScrollView>

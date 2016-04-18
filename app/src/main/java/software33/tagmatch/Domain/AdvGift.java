@@ -11,12 +11,13 @@ import software33.tagmatch.Utils.Constants;
  */
 public class AdvGift extends Advertisement{
 
-    public AdvGift(Integer aid, User owner, String title, List<Bitmap> images, List<String> imagesIDs, String desc, String[] tags, String category){
-        super(aid, owner, title, images,imagesIDs, desc, tags, category);
+
+    public AdvGift(Integer id, String title, String[] photoIds, String description, String[] tags, String category) {
+        super(id, title,photoIds, description, tags, category);
     }
 
-    public AdvGift(User owner, String title, List<Bitmap> images, String desc, String[] tags, String category){
-        super(owner, title, images, desc, tags, category);
+    public AdvGift(User owner, String title, List<Bitmap> images, String description, String[] tags, String category) {
+        super(owner,title,images,description,tags,category);
     }
 
     @Override

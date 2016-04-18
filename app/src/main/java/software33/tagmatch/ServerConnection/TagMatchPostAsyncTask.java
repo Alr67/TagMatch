@@ -1,9 +1,7 @@
 package software33.tagmatch.ServerConnection;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
-import android.preference.PreferenceManager;
 import android.util.Base64;
 import android.util.Log;
 
@@ -15,17 +13,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
-import java.net.Authenticator;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
-import java.net.PasswordAuthentication;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
-
 import javax.net.ssl.HttpsURLConnection;
-
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.Helpers;
 
 public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
 
@@ -52,9 +48,7 @@ public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, 
                 con.setDoInput(true);
                 con.setRequestMethod("POST");
 
-                if (needLogin) {
-                    connectUser(con);
-                }
+                if (needLogin) { connectUser(con); }
                 con.setRequestProperty("Content-Type", "application/json");
 
                 OutputStreamWriter wr = new OutputStreamWriter(con.getOutputStream());
@@ -72,13 +66,10 @@ public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, 
 
                 Log.i("post status code", Integer.toString(con.getResponseCode()));
 
-                if (con.getResponseCode() >= 400)
-                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
-                else
-                    aux = new JSONObject(iStreamToString(con.getInputStream()));
+                if (con.getResponseCode() >= 400)  aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                else  aux = new JSONObject(iStreamToString(con.getInputStream()));
 
                 con.disconnect();
-
                 return aux;
             } else {
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -86,7 +77,7 @@ public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, 
                 con.setReadTimeout(5000);
                 con.setDoInput(true);
                 con.setRequestMethod("POST");
-
+            Log.i("DEBUG post status code", Integer.toString(con.getResponseCode()));
                 if (needLogin) {
                     connectUser(con);
                 }
@@ -117,7 +108,7 @@ public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, 
                 return aux;
             }
         } catch (IOException | JSONException e) {
-            Log.e("error", e.getMessage());
+            Log.e("DEBUGERROR", e.getMessage());
             Map<String, String> map = new HashMap<>();
             if (e.getMessage().contains("failed to connect to")) {
                 if (e.getMessage().contains("Network is unreachable"))
@@ -132,13 +123,8 @@ public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, 
     }
 
     private void connectUser(HttpURLConnection c) {
-        SharedPreferences prefs = context.getSharedPreferences("TagMatch_pref", Context.MODE_PRIVATE);
-        final String user = prefs.getString("name", "");
-        final String password = prefs.getString("password", "");
-
-        Log.i("userPost", user);
-        Log.i("passPost", password);
-        String userPass = user + ":" + password;
+        User actualUser = Helpers.getActualUser(context);
+        String userPass = actualUser.getAlias() + ":" + actualUser.getPassword();
         c.setRequestProperty("Authorization", "Basic " +
                 new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT)));
     }

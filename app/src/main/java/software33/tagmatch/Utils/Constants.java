@@ -1,9 +1,13 @@
 package software33.tagmatch.Utils;
 
+import android.graphics.Bitmap;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import software33.tagmatch.Domain.AdvGift;
+import software33.tagmatch.Domain.AdvSell;
 import software33.tagmatch.Domain.User;
 
 public abstract class Constants {
@@ -24,9 +28,10 @@ public abstract class Constants {
     public static final String typeGift = "Gift";
     public static final List<String> typeList = new ArrayList<>(Arrays.asList(typeSell,typeExchange,typeGift));
 
-    public static final String IP_ALEJANDRO = "192.168.1.129:8080";
     public static final String IP_HEROKU = "tagmatch.herokuapp.com";
-    public static final String IP_SERVER = "http://" + IP_ALEJANDRO;
+
+    public static final String IP_SERVER_DEVELOP = "tagmatchdevelop.herokuapp.com";
+    public static final String IP_SERVER = "https://" + IP_SERVER_DEVELOP;
 
     /* INTENTS CODES*/
     public static final int codeImagePicker = 012;
@@ -38,5 +43,16 @@ public abstract class Constants {
     public static final Integer card_exchange = 1;
     public static final Integer card_sell = 2;
 
+    /* Bundle TAGS */
+    public static final String TAG_BUNDLE_IDVIEWADVERTISEMENT = "AdvertisementId";
 
+
+    /** A ELIMINAR */
+    public static final User testUser = new User("test","test");
+    public static final List<Bitmap> testImages = new ArrayList(0);
+    public static final String testTags[]= new String[] {"Ankit","Bohra","Xyz"};
+    public static final AdvGift testAdvertGift = new AdvGift(testUser,"REGAL 1",testImages,"TExtmolt llarg",testTags,"Categoria");
+    public static final AdvSell testAdvertSell = new AdvSell(testUser,"REGAL 1",testImages,"TExtmolt llarg",testTags,"Categoria",32.2);
+    public static final Integer idTEST = 4;
+    public static final String DebugTAG = "DEBUG";
 }

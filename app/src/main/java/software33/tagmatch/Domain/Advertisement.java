@@ -10,20 +10,22 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import software33.tagmatch.Utils.Constants;
+
 /**
  * Created by Cristina on 03/04/2016.
  */
 public class Advertisement {
 
-    Integer aID;
-    String title;
-    User owner;
-    String description;
-    List<Bitmap> images;
-    List<String> imagesIDs;
-    String[] tags;
-    Boolean done;
-    String category;
+    private Integer aID;
+    private String title;
+    private  User owner;
+    private String description;
+    private List<Bitmap> images;
+    private String[] imagesIDs;
+    private String[] tags;
+    private Boolean done;
+    private String category;
 
     public Advertisement(){
         this.aID = 0;
@@ -34,20 +36,30 @@ public class Advertisement {
         this.tags =  new String[0];
         this.done = false;
         this.category = "";
-        this.imagesIDs = new ArrayList<>();
+        this.imagesIDs = new String[0];
     }
 
-    public Advertisement(Integer aid, User owner, String title, List<Bitmap> images, List<String> imagesIDs, String desc, String[] tags, String category){
+    public Advertisement(Integer aid,  String title, List<Bitmap> images, String[] imagesIDs, String desc, String[] tags, String category){
         this.aID = aid;
         this.title = title;
-        this.owner = owner;
+        this.owner = new User();
         this.images = images;
         this.description = desc;
         this.tags = tags;
         this.done = false;
         this.category = category;
         this.imagesIDs = imagesIDs;
-        clearHashTag();
+    }
+
+    public Advertisement(Integer aid,User owner, String title,String[] imagesIDs, String desc, String[] tags, String category){
+        this.aID = aid;
+        this.title = title;
+        this.owner = owner;
+        this.description = desc;
+        this.tags = tags;
+        this.done = false;
+        this.category = category;
+        this.imagesIDs = imagesIDs;
     }
 
     public Advertisement(User owner, String title, List<Bitmap> images, String desc, String[] tags, String category){
@@ -59,15 +71,18 @@ public class Advertisement {
         this.tags = tags;
         this.done = false;
         this.category = category;
-        this.imagesIDs = new ArrayList<>();
-        clearHashTag();
+        this.imagesIDs = new String[0];
     }
 
-    protected void clearHashTag() {
-        for (int i=0; i<tags.length; ++i) {
-            if(tags[i].startsWith("#"))
-                tags[i] = tags[i].replaceFirst("#", "");
-        }
+    public Advertisement(Integer aid, String title, String[] imagesIDs, String desc, String[] tags, String category) {
+        this.aID = aid;
+        this.title = title;
+        this.owner = new User();
+        this.description = desc;
+        this.tags = tags;
+        this.done = false;
+        this.category = category;
+        this.imagesIDs = imagesIDs;
     }
 
     public String getTypeImageName() {
@@ -100,4 +115,50 @@ public class Advertisement {
         }
         return jsonObject;
     }
+
+    public User getUser() {
+        Log.i(Constants.DebugTAG,"getUser, username: "+owner.getAlias());
+        return owner;
+    }
+
+    public Integer getID() {
+        return aID;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public User getOwner() {
+        return owner;
+    }
+
+    public void setOwner(User advOwner) {
+         owner = advOwner;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<Bitmap> getImages() {
+        return images;
+    }
+
+    public String[] getImagesIDs() {
+        return imagesIDs;
+    }
+
+    public String[] getTags() {
+        return tags;
+    }
+
+    public Boolean getDone() {
+        return done;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
 }

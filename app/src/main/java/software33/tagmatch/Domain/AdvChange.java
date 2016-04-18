@@ -18,15 +18,11 @@ public class AdvChange extends Advertisement{
 
     String[] wanted;
 
-    public AdvChange(Integer aid, User owner, String title, List<Bitmap> images, List<String> imagesIDs, String desc, String[] tags, String category, String[] wanted){
-        super(aid, owner, title, images,imagesIDs, desc, tags, category);
-        this.wanted = wanted;
-    }
 
     public AdvChange(User owner, String title, List<Bitmap> images, String desc, String[] tags, String category, String[] wanted){
         super(owner, title, images, desc, tags, category);
         this.wanted = wanted;
-        clearWantedTag();
+
     }
 
     protected void clearWantedTag() {
@@ -34,6 +30,11 @@ public class AdvChange extends Advertisement{
             if(wanted[i].startsWith("#"))
                 wanted[i] = wanted[i].replaceFirst("#", "");
         }
+    }
+
+    public AdvChange(Integer id, String title, String[] photoIds, String description, String[] tags, String category, String[] tagsWanted) {
+        super(id,title,photoIds,description,tags,category);
+        this.wanted = tagsWanted;
     }
 
     @Override

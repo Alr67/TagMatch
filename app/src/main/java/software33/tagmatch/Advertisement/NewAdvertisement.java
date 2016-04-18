@@ -39,6 +39,7 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -53,6 +54,7 @@ import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.DialogError;
 import software33.tagmatch.Utils.NavigationController;
@@ -62,7 +64,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private Button createButton, newImage;
     private EditText title,description, tag, wantedTags;
     private TextInputLayout wantedTagsLayout;
-    private CustomPagerAdapter mCustomPagerAdapter;
+    private CustomPagerAdapterNewAdvert mCustomPagerAdapterNewAdvert;
     private ViewPager mViewPager;
     private String imgExtension;
     private final String DebugTag = "DEBUG ADVERT";
@@ -132,8 +134,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         ViewGroup.LayoutParams params = mViewPager.getLayoutParams();
         params.height = deviceHeight/3;
         mViewPager.setLayoutParams(params);
-        mCustomPagerAdapter = new CustomPagerAdapter(this,params.height,params.width);
-        mViewPager.setAdapter(mCustomPagerAdapter);
+        mCustomPagerAdapterNewAdvert = new CustomPagerAdapterNewAdvert(this,params.height,params.width);
+        mViewPager.setAdapter(mCustomPagerAdapterNewAdvert);
 
     }
 
@@ -170,22 +172,21 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             showBasicErrorMessage(getResources().getString(R.string.noTag));
         }
         else {
-            String[] tags = tag.getText().toString().split(" ");
+            String tagLine = tag.getText().toString().replace("#","");
+            String[] tags = tagLine.split(" ");
             Advertisement adv = new Advertisement();
             Log.v(DebugTag,"Tipus seleccionat: " + typeSpinner.getSelectedItem());
-
             //TODO sujeto a cambios cuando implementemos los usuarios
             User owner = new User(getSharedPreferences("TagMatch_pref", Context.MODE_PRIVATE).getString("name", ""));
 
             if(typeSpinner.getSelectedItem().equals(Constants.typeGift)) {
                 //owner, title, images, desc, tags, category
                 adv = new AdvGift(owner,title.getText().toString(),images,description.getText().toString(),tags,categorySpinner.getSelectedItem().toString());
-                Toast.makeText(this,"Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
             }
             else if(typeSpinner.getSelectedItem().equals(Constants.typeExchange)) {
-                String[] wantedTag =  wantedTags.getText().toString().split(" ");
+                String wantedTagLine = wantedTags.getText().toString().replace("#","");
+                String[] wantedTag =  wantedTagLine.split(" ");
                 adv = new AdvChange(owner,title.getText().toString(),images,description.getText().toString(),tags,categorySpinner.getSelectedItem().toString(),wantedTag);
-                Toast.makeText(this,"Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
             }
             else if(typeSpinner.getSelectedItem().equals(Constants.typeSell)) {
                 String text = wantedTags.getText().toString();
@@ -195,7 +196,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                     else {
                         Log.v(DebugTag, "Price: " + price);
                         adv = new AdvSell(owner, title.getText().toString(), images, description.getText().toString(), tags, categorySpinner.getSelectedItem().toString(), price);
-                        Toast.makeText(this, "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
                     }
                 }
                 else showBasicErrorMessage(getResources().getString(R.string.emptyPrice));
@@ -203,26 +203,69 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             else {
                 Toast.makeText(this,"ERROR DE TIPUUUUUS", Toast.LENGTH_SHORT).show();
             }
-
-            final Context context = this.getApplicationContext();
-
-            new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true){
-                @Override
-                protected void onPostExecute(JSONObject jsonObject) {
-                    try {
-                        String error = jsonObject.get("error").toString();
-                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-                    } catch (JSONException ignored){
-                        //TODO coger id para hacer el post imagen
-                    }
-                }
-            }.execute(adv.toJSON());
-            Log.i("jsonAdvert", adv.toJSON().toString());
-            //TODO post para foto anuncio
+            updateAdvertToServer(adv);
         }
     }
 
- /** MARK: Spinner type manager*/
+    private void updateAdvertToServer(Advertisement adv) {
+        final Context context = this.getApplicationContext();
+        new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true){
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    if (jsonObject.has("status"))  Log.i(Constants.DebugTAG,"status: "+jsonObject.getInt("status"));
+                    Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        if(jsonObject.has("id")) {
+                            Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
+                            postImagesToServer(jsonObject.getInt("id"));
+                        }
+                    }
+                } catch (JSONException ignored){
+
+                }
+            }
+        }.execute(adv.toJSON());
+        Log.i(Constants.DebugTAG, adv.toJSON().toString());
+    }
+
+    private void postImagesToServer(Integer advId) {
+        String url = Constants.IP_SERVER + "/ads/"+advId+"/photos";
+        for(Bitmap bm: images) {
+            ByteArrayOutputStream stream = new ByteArrayOutputStream();
+            bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
+            byte[] byteArray = stream.toByteArray();
+
+            JSONObject jObject = new JSONObject();
+            try {
+                jObject.put("profilePhotoId", byteArray);
+            new TagMatchPostImgAsyncTask(url, this, byteArray, imgExtension) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Toast.makeText(getApplicationContext(),error, Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (JSONException ignored) {
+                        ignored.printStackTrace();
+                    }
+                }
+            }.execute();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+    /** MARK: Spinner type manager*/
     private Spinner categorySpinner, typeSpinner;
 
     public void onTypeSpinnerChanged(String newType) {
@@ -300,6 +343,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
         File image = File.createTempFile( imageFileName, ".jpg",storageDir);
         pathfoto = image.getAbsolutePath();
+        imgExtension = "jpg";
         return image;
     }
 
@@ -333,13 +377,13 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                 if(resultCode == RESULT_OK){
                     Uri selectedImage = imageReturnedIntent.getData();
                     String selectedPic = getImagePathFromUri(selectedImage);
-                    mCustomPagerAdapter.addImage(selectedPic);
+                    mCustomPagerAdapterNewAdvert.addImage(selectedPic);
                 }
                 break;
             case Constants.codeCameraPicker:
                 if(resultCode == RESULT_OK) {
                     Log.v(DebugTag,"Path: "+pathfoto);
-                    mCustomPagerAdapter.addImage(pathfoto);
+                    mCustomPagerAdapterNewAdvert.addImage(pathfoto);
                 }
                 break;
             default:

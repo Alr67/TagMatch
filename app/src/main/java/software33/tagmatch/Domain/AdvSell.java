@@ -16,13 +16,22 @@ public class AdvSell extends Advertisement {
 
     private Double price;
 
-    public AdvSell(Integer aid, User owner, String title, List<Bitmap> images, List<String> imagesIDs, String desc, String[] tags, String category, Double price){
-        super(aid, owner, title, images,imagesIDs, desc, tags, category);
+    public AdvSell(Integer aid, String title, List<Bitmap> images, String[] imagesIDs, String desc, String[] tags, String category, Double price){
+        super(aid, title, images,imagesIDs, desc, tags, category);
         this.price = price;
     }
 
     public AdvSell( User owner, String title, List<Bitmap> images, String desc, String[] tags, String category,Double price){
         super(owner, title, images, desc, tags, category);
+        this.price = price;
+    }
+
+    public AdvSell(Integer aid, String title,String[] imagesIDs, String desc, String[] tags, String category, Double price){
+        super(aid,title,imagesIDs,desc,tags,category);
+        this.price = price;
+    }
+    public AdvSell(Integer aid,User owner, String title,String[] imagesIDs, String desc, String[] tags, String category, Double price){
+        super(aid,title,imagesIDs,desc,tags,category);
         this.price = price;
     }
 
