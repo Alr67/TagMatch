@@ -19,6 +19,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 import java.util.ArrayList;
+
+import software33.tagmatch.Advertisement.ViewAdvert;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.Utils.Constants;
@@ -86,10 +88,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         adapter.setOnClickListener(new View.OnClickListener() {
             @Override  //recView.getChildPosition(v)
             public void onClick(View v) {
-                /*String temp = items.get(v.getTag().hashCode()).getNom();
-                Intent viewRecepta = new Intent(getApplicationContext(), ViewRecepta.class).putExtra("NomRecepta", temp).putExtra("direct", true);
+                //String temp = items.get(v.getTag().hashCode()).getNom();
+                // TODO: Integer id = items.get();
+                Integer id = Constants.idTEST;
+                Intent viewRecepta = new Intent(getApplicationContext(), ViewAdvert.class).putExtra(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT, id);
                 startActivity(viewRecepta);
-                finish();*/
+                finish();
             }
         });
 

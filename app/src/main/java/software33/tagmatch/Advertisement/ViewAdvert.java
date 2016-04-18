@@ -6,8 +6,6 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
@@ -26,13 +24,9 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.MarkerOptions;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import software33.tagmatch.Domain.AdvChange;
-import software33.tagmatch.Domain.AdvGift;
-import software33.tagmatch.Domain.AdvSell;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
@@ -52,14 +46,10 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private GoogleMap map;
     Advertisement adv;
 
-    public ViewAdvert(){
-        adv = new Advertisement();
-    }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.nav_view_advert);
+        setContentView(R.layout.activity_view_advert);
         initComponents();
         Bundle b = getIntent().getExtras();
         if(b != null) {
@@ -82,7 +72,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                 protected void onPostExecute(JSONObject jsonObject) {
                     Log.i(Constants.DebugTAG,"onPostExecute");
                         Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
-                        adv = convertJSONToAdvertisement(jsonObject);
+                        adv = Helpers.convertJSONToAdvertisement(jsonObject);
                         fillComponents();
                         //String error = jsonObject.get("error").toString();
                 }
@@ -91,67 +81,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             Log.i(Constants.DebugTAG,"HA PETAT JAVA");
             e.printStackTrace();
         }
-    }
-
-    private Advertisement convertJSONToAdvertisement(JSONObject jsonObject) {
-        Log.i(Constants.DebugTAG,"Lets convert to JSON");
-        Advertisement advert = new Advertisement();
-        String title,description,type,ownerName,category, userPhotoId, city;
-        title = description = type = ownerName = category = userPhotoId = city = "";
-        Integer id = 0;
-        String[] tags = new String[0];
-        String[] photoIds = new String[0];
-        try {
-            if(jsonObject.has("id")) id = jsonObject.getInt("id");
-            if(jsonObject.has("type")) type = jsonObject.getString("type");
-            if(jsonObject.has("name")) title = jsonObject.getString("name");
-            if(jsonObject.has("owner")) ownerName = jsonObject.getString("owner");
-            if(jsonObject.has("category")) category = jsonObject.getString("category");
-            if(jsonObject.has("description")) description = jsonObject.getString("description");
-            if(jsonObject.has("userPhotoId")) userPhotoId = jsonObject.getString("userPhotoId");
-            if(jsonObject.has("city")) city = jsonObject.getString("city");
-            User owner = new User(ownerName,userPhotoId,city);
-            Log.i(Constants.DebugTAG,"User name from owner: " +owner.getAlias());
-            if(jsonObject.has("tags")) {
-                JSONArray array = jsonObject.getJSONArray("tags");
-                tags = new String[array.length()];
-                for(int i = 0; i < array.length();++i) {
-                    tags[i] = array.getString(i);
-                }
-            }
-            if(jsonObject.has("photoIds")) {
-                JSONArray array = jsonObject.getJSONArray("photoIds");
-                photoIds = new String[array.length()];
-                for(int i = 0; i < array.length();++i) {
-                    photoIds[i] = array.getString(i);
-                }
-            }
-            if(Constants.typeServerSELL.contains(type)) {
-                Double price = 0.0;
-                if(jsonObject.has("price")) price = jsonObject.getDouble("price");
-                advert = new AdvSell(id,title,photoIds,description,tags,category,price);
-            }
-            else if(Constants.typeServerEXCHANGE.contains(type)) {
-                String[] tagsWanted = new String[0];
-                if(jsonObject.has("wantedTags"))  {
-                    JSONArray array = jsonObject.getJSONArray("wantedTags");
-                    tagsWanted = new String[array.length()];
-                    for(int i = 0; i < array.length();++i) {
-                        tagsWanted[i] = array.getString(i);
-                    }
-                }
-                advert = new AdvChange(id,title,photoIds,description,tags,category,tagsWanted);
-            }
-            else {
-                advert = new AdvGift(id,title,photoIds,description,tags,category);
-            }
-            advert.setOwner(owner);
-            return advert;
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        Log.i(Constants.DebugTAG,"User name from covnert func: "+advert.getUser().getAlias());
-        return advert;
     }
 
     @Override
@@ -163,14 +92,14 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view_advert);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+  /*      DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
+        navigationView.setNavigationItemSelectedListener(this); */
         userImage = (ImageView) findViewById(R.id.advert_user_image);
         imageType = (ImageView) findViewById(R.id.advert_image_type);
         valoration = (TextView) findViewById(R.id.advert_valoration);
