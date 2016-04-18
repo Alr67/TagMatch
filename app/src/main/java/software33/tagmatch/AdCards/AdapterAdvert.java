@@ -10,16 +10,15 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 
-import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
-import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
-import software33.tagmatch.ServerConnection.TagMatchGetImgurImageAsyncTaskAdvert;
+import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
@@ -89,55 +88,25 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
             Toast.makeText(context,"Estas fent servir una opcio no valida",Toast.LENGTH_LONG).show();
         }
         Log.i(Constants.DebugTAG,"Abans de cridar la funcio de buscar les imatges, id: " + items);
-        getAdvertImage(items.get(i).getAd_id(),items.get(i).getImgId(),context,viewHolder.imagen);
-    }
 
-    public void getAdvertImage(Integer advertId, String photoId, Context context, final ImageView image) {
-        JSONObject jObject = new JSONObject();
-        User actualUser = Helpers.getActualUser(context);
         try {
-            jObject.put("username", actualUser.getAlias());
-            jObject.put("password", actualUser.getPassword());
+            getAdvertImage(items.get(i).getAd_id(),items.get(i).getImgId(),context,viewHolder.imagen);
         } catch (JSONException e) {
-            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
             e.printStackTrace();
         }
-        String url = Constants.IP_SERVER+"/ads/"+ advertId.toString()+"/photo/"+photoId;
-        Log.i(Constants.DebugTAG,"Vaig a demanar la foto amb id: "+photoId + ", amb url: "+url);
-        final Context auxContext = context;
-        new TagMatchGetAsyncTask(url,context) {
+    }
+
+    public void getAdvertImage(Integer advertId, String photoId, final Context context, final ImageView image) throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("username", Helpers.getActualUser(context).getAlias());
+        jsonObject.put("password", Helpers.getActualUser(context).getPassword());
+        new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/ads/" + advertId + "/photo/" + photoId, context) {
             @Override
-            protected void onPostExecute(JSONObject jsonObject) {
-                Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
-                if(jsonObject.has("302")) {
-                    try {
-                        Log.i(Constants.DebugTAG,"Vaig a cridar a imgur amb la url: "+jsonObject.getString("302"));
-                        new TagMatchGetImgurImageAsyncTaskAdvert(jsonObject.getString("302"),auxContext) {
-                            @Override
-                            protected void onPostExecute(JSONObject jsonObject) {
-                                Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
-                                try {
-                                    if(jsonObject.has("inputStream")) {
-                                        InputStream inputStream = (InputStream) jsonObject.get("inputStream");
-                                        BitmapWorkerTaskFromBitmap task = new BitmapWorkerTaskFromBitmap(image,inputStream);
-                                        task.execute(height.toString(),width.toString());
-                                    }
-                                    else {
-                                        Toast.makeText(auxContext,jsonObject.getString("error"),Toast.LENGTH_SHORT);
-                                    }
-                                    //  adv = convertJSONToAdvertisement(jsonObject);
-                                } catch (JSONException e) {
-                                    e.printStackTrace();
-                                }
-                            }
-                        }.execute();
-                    } catch (JSONException e) {
-                        e.printStackTrace();
-                    }
-                }
-                //  adv = convertJSONToAdvertisement(jsonObject);
+            protected void onPostExecute(String url) {
+                Picasso.with(context).load(url).error(R.drawable.image0).into(image);
             }
-        }.execute(jObject);
+        }.execute(jsonObject);
+
     }
 
 

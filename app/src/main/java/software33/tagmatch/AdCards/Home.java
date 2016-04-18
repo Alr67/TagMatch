@@ -110,12 +110,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 finish();
             }
         });
-
-          synchronized (items) {
-            items.notify();
-            recycler.setAdapter(adapter);
-        }
-
+        recycler.setAdapter(adapter);
 
     }
 
