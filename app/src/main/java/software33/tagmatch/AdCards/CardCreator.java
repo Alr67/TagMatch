@@ -7,12 +7,12 @@ import java.io.FileOutputStream;
 import java.io.InputStream;
 
 /**
- * Created by rafax on 15/04/2016.
+ * Created by rafa on 15/04/2016.
  */
 public class CardCreator {
 
 
-    public AdvertContent createCard(Context context, String name, String path, Integer option, Integer price) {
+    public static AdvertContent createCard(Context context, String name, String path, Integer option, Integer price) {
         File f = new File(context.getCacheDir()+"/"+path); // Això haruà de ser algo de bitmaps?? Será diferent amb Heroku
         if (!f.exists()) try {
 
@@ -30,7 +30,7 @@ public class CardCreator {
         return new AdvertContent(name,f.getPath(),option,price);
     }
 
-    public AdvertContent createCard(Context context, String name, String path, Integer option) {
+    public static AdvertContent createCard(Context context, String name, String path, Integer option) {
         File f = new File(context.getCacheDir()+"/"+path); // Això haruà de ser algo de bitmaps?? Será diferent amb Heroku
         if (!f.exists()) try {
 

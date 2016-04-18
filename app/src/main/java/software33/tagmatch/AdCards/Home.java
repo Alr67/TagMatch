@@ -18,12 +18,22 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
+import java.util.List;
 
 import software33.tagmatch.Advertisement.ViewAdvert;
+import software33.tagmatch.Domain.Advertisement;
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.Utils.Constants;
+import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
 
 public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -31,6 +41,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private RecyclerView recycler;
     private AdapterAdvert adapter;
     private RecyclerView.LayoutManager lManager;
+    private List<Advertisement> advertisements;
+    private ArrayList<AdvertContent> items;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,14 +78,14 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
 
         //final ArrayList<Receptes> items = new DBController().loadLlistaReceptes(this);
-        final ArrayList<AdvertContent> items = new ArrayList<>();
+        items = new ArrayList<>();
 
         /*for(int q = 0; q < items.size(); ++q) { FOR PARA TRATAR COSAS QUE NOS LLEGARAN DEL SERVER. TENDREMOS QUE PILLAR NAME Y EL PATH DEL IMGUR
             items.add(new CardCreator(getApplicationContext(),items.get(q)));
         }*/
                                                                             //0-> GiveAway 1-> Exchange 2-> Sell
-        items.add(new CardCreator().createCard(getApplicationContext(),"Espaguetis 2 Caca A ver que Ostia Que Esto Ha Hecho Algo Muy Guay","espaguetis.jpg", Constants.card_exchange ,0)); // primer cero es opcion, el segundo precio
-        items.add(new CardCreator().createCard(getApplicationContext(),"Espaguetis 2 Caca A ver que Ostia Que Esto Ha Hecho Algo Muy Guay","espaguetis.jpg", Constants.card_sell , 33));
+      //  items.add(CardCreator.createCard(getApplicationContext(),"Espaguetis 2 Caca A ver que Ostia Que Esto Ha Hecho Algo Muy Guay","espaguetis.jpg", Constants.card_exchange ,0)); // primer cero es opcion, el segundo precio
+      //  items.add(CardCreator.createCard(getApplicationContext(),"Espaguetis 2 Caca A ver que Ostia Que Esto Ha Hecho Algo Muy Guay","espaguetis.jpg", Constants.card_sell , 33));
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
 
@@ -98,7 +110,45 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         });
 
         recycler.setAdapter(adapter);
+        downloadAdvertsFromServer();
+    }
 
+    private void downloadAdvertsFromServer() {
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        String url = Constants.IP_SERVER+"/ads?idGreaterThan="+Constants.SERVER_IdGreaterThan+"&idSmallerThan="+Constants.SERVER_IdSmallerThan+"&limit="+Constants.SERVER_limitAdverts;
+        Log.i(Constants.DebugTAG,"Vaig a fer el get a: "+ url);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+            new TagMatchGetAsyncTask(url,this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    Log.i(Constants.DebugTAG,"onPostExecute, JSON: "+jsonObject.toString());
+                    if(jsonObject.has("arrayResponse")) {
+                        try {
+                            JSONArray jsonArray = jsonObject.getJSONArray("arrayResponse");
+                            advertisements = new ArrayList<>();
+                            for (int n = 0; n < jsonArray.length(); n++) {
+                                JSONObject object = jsonArray.getJSONObject(n);
+                                Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
+                                advertisements.add(newAdvert);
+                                //TODO : afegir les cards!
+                                items.add(CardCreator.createCard(getApplicationContext(),newAdvert.getTitle(),newAdvert.getImagesIDs()[0], Constants.card_sell /*, newAdvert.getPrice()*/));
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    //adv = Helpers.convertJSONToAdvertisement(jsonObject);
+                    //fillComponents();
+                    //String error = jsonObject.get("error").toString();
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA");
+            e.printStackTrace();
+        }
     }
 
     @Override

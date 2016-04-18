@@ -55,6 +55,7 @@ public class AdvSell extends Advertisement {
         return Constants.typeServerSELL;
     }
 
+    @Override
     public Double getPrice()  {
         return price;
     }

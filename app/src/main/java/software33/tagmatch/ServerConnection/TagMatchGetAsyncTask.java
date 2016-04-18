@@ -5,6 +5,7 @@ import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -24,7 +25,6 @@ import javax.net.ssl.HttpsURLConnection;
 import software33.tagmatch.R;
 import software33.tagmatch.Utils.Constants;
 
-
 public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
     private URL url;
     private Context context;
@@ -39,8 +39,6 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
     }
 
     protected JSONObject doInBackground(final JSONObject... params) {
-        Integer statusCode = -1;
-
         try {
             HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
@@ -58,23 +56,23 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
             JSONObject aux;
             Log.i(Constants.DebugTAG,"responseCode: "+con.getResponseCode());
             if (con.getResponseCode() >= 400){
-                statusCode = con.getResponseCode();
                 aux = new JSONObject(iStreamToString(con.getErrorStream()));
-                Log.i(Constants.DebugTAG,"error: "+aux);
              }
             else if(con.getResponseCode() == 302) {
-                Log.i(Constants.DebugTAG,"ATENCIO, RESPONSE CODE  302: "+con.getURL());
                 aux = new JSONObject();
                 aux.put("302",con.getURL());
             }
             else {
-                aux = new JSONObject(iStreamToString(con.getInputStream()));
-                Log.i(Constants.DebugTAG,"input: "+aux);
+                String response = iStreamToString(con.getInputStream());
+                if(response.startsWith("[{")){
+                    aux = new JSONObject();
+                    aux.put("arrayResponse", new JSONArray(response));
+                }
+                else {
+                    aux = new JSONObject(response);
+                }
             }
-
             con.disconnect();
-            Log.i(Constants.DebugTAG,"Ja he desconnectat");
-
             return aux;
 
         } catch (IOException | JSONException e) {
@@ -91,7 +89,6 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
             }
             return new JSONObject(map);
         }
-
     }
 
     public String iStreamToString(InputStream is1) {
@@ -103,7 +100,6 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
                 sb.append(line);
             }
             rd.close();
-
         } catch (IOException e) {
             // TODO Auto-generated catch block
             e.printStackTrace();

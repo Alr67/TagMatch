@@ -1,14 +1,13 @@
 package software33.tagmatch.AdCards;
 
 
-import java.util.ArrayList;
-
 /**
  * Created by Rafa on 25/11/2015.
  */
 public class AdvertContent {
 
     private String ad_name;
+    private Integer ad_id;
     private String ad_img;
     private Integer ad_type;
     private Integer ad_price;
@@ -31,6 +30,7 @@ public class AdvertContent {
         return ad_name;
     }
 
+    public Integer getAd_id() {return ad_id;}
 
     public String getImg() {
         return ad_img;

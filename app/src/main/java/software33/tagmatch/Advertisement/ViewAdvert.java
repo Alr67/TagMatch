@@ -1,17 +1,16 @@
 package software33.tagmatch.Advertisement;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -27,6 +26,7 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
@@ -34,9 +34,8 @@ import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImgurImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
-import software33.tagmatch.Utils.NavigationController;
 
-public class ViewAdvert extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener  {
+public class ViewAdvert extends AppCompatActivity implements View.OnClickListener {
 
     private Button chatButton,favouriteButton;
     private ImageView imageType, userImage;
@@ -101,6 +100,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this); */
         userImage = (ImageView) findViewById(R.id.advert_user_image);
+        userImage.setImageDrawable(getDrawable(R.drawable.loading));
         imageType = (ImageView) findViewById(R.id.advert_image_type);
         valoration = (TextView) findViewById(R.id.advert_valoration);
         username = (TextView) findViewById(R.id.advert_name_user);
@@ -253,15 +253,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             }.execute(jObject);
     }
 
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        return  NavigationController.onItemSelected(item.getItemId(),this);
-    }
-
-    /** MARK: images */
-    public void newImageConverted(Bitmap bitmap) {
-    }
-
     public void prepareImages() {
         mViewPager = (ViewPager) findViewById(R.id.pager_view_advert);
         DisplayMetrics displayMetrics = new DisplayMetrics();
@@ -284,5 +275,12 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
         imageType.getLayoutParams().height=params.height/5;
         imageType.getLayoutParams().width=params.height/5;
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(this, Home.class);
+        startActivity(intent);
+        finish();
     }
 }
