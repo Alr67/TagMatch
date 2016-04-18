@@ -111,9 +111,15 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
 
+        recycler.setAdapter(adapter);
         synchronized (items) {
             items.notify();
-            recycler.setAdapter(adapter);
+            adapter.notifyDataSetChanged();
+
+        }
+        synchronized (adapter) {
+            adapter.notify();
+            adapter.notifyDataSetChanged();
         }
 
 
@@ -141,11 +147,12 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 advertisements.add(newAdvert);
                                 //TODO : afegir les cards!
                                 String imageId;
+                                System.out.println("VAMOS A VEEEEEEEEER "+jsonArray);
                                 if(newAdvert.getImagesIDs().length>0) imageId = newAdvert.getImagesIDs()[0];
                                 else imageId = "";
                                 items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription() , newAdvert.getPrice(), newAdvert.getID()));
                             }
-
+                            adapter.notifyDataSetChanged();
 
                         } catch (JSONException e) {
                             e.printStackTrace();

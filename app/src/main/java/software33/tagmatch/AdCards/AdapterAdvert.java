@@ -103,7 +103,8 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
             e.printStackTrace();
         }
         Log.i(Constants.DebugTAG,"Vaig a demanar la foto amb id: "+photoId);
-        String url = Constants.IP_SERVER+"/ads/"+ advertId.toString()+"/photo/";
+        String url = Constants.IP_SERVER+"/ads/"+ advertId.toString()+"/photo/"+photoId;
+        System.out.println("QUIERO VER " + url);
         final Context auxContext = context;
         new TagMatchGetAsyncTask(url+photoId,context) {
             @Override
@@ -124,6 +125,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
                                     else {
                                         Toast.makeText(auxContext,jsonObject.getString("error"),Toast.LENGTH_SHORT);
                                     }
+                                    //notifyDataSetChanged();
                                     //  adv = convertJSONToAdvertisement(jsonObject);
                                 } catch (JSONException e) {
                                     e.printStackTrace();

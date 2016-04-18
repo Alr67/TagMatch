@@ -47,8 +47,8 @@ public abstract class Constants {
     public static final String TAG_BUNDLE_IDVIEWADVERTISEMENT = "AdvertisementId";
 
     /* Home advert server preferences */
-    public static final Integer SERVER_IdGreaterThan = 1;
-    public static final Integer SERVER_IdSmallerThan = 4;
+    public static final Integer SERVER_IdGreaterThan = 3;
+    public static final Integer SERVER_IdSmallerThan = 5;
     public static final Integer SERVER_limitAdverts = 4;
 
     /** A ELIMINAR */

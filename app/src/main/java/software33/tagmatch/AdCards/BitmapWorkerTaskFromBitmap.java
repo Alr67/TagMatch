@@ -56,6 +56,7 @@ public class BitmapWorkerTaskFromBitmap extends AsyncTask<String, Void, Bitmap> 
                 imageView.setImageBitmap(bitmap);
             }
         }
+
     }
 
 }
