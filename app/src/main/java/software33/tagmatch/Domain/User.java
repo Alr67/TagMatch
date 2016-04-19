@@ -11,7 +11,6 @@ import java.util.List;
  * Created by Cristina on 03/04/2016.
  */
 public class User {
-
     private String UID;
     private String userPhotoId;
     private String city;

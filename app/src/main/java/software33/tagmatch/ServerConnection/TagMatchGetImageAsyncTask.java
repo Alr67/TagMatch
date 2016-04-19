@@ -1,9 +1,13 @@
 package software33.tagmatch.ServerConnection;
 
 import android.content.Context;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
+import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -15,7 +19,23 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
+import java.io.UnsupportedEncodingException;
+import java.net.Authenticator;
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.PasswordAuthentication;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
+import javax.net.ssl.HttpsURLConnection;
+
+import software33.tagmatch.R;
 
 public class TagMatchGetImageAsyncTask extends AsyncTask<JSONObject, Void, String> {
     private URL url;
@@ -79,6 +99,7 @@ public class TagMatchGetImageAsyncTask extends AsyncTask<JSONObject, Void, Strin
                 return con.getHeaderField("Location");
             }
         } catch (IOException | JSONException e) {
+            Log.e("error", e.getMessage());
             return null;
         }
     }

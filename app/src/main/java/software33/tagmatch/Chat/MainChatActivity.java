@@ -52,6 +52,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
 
     //Identified by IdProduct, UserName and have the id of the chat and it's user
     public Map<Pair<String, String>, Pair<String, String>> idChatsUser = new HashMap<>();
+    public Map<Pair<String, String>, String> imageChatsUser = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,7 +82,10 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         usersRef = myFirebaseRef.child("users");
 
         //createUser("correu1@xd.com", "contra123");
-        myId = "aec6538a-bde2-4ea8-98bf-6fdc3f95127e";
+        //TODO: set correctly the my uid
+        FirebaseUtils.setMyId("56d3f1d3-6b50-473a-9aa3-ff0007b3df29",this);
+
+        myId = FirebaseUtils.getMyId(this);
 
         //Accessing to the chats of my user
         mListener = this.usersRef.child(myId).child("chats").addChildEventListener(new ChildEventListener() {
@@ -286,30 +290,19 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     }
 
     //Set data in the array
-    public void setListData(String idProduct, Map<String, Object> users, String idChat) {
-        String userName = "";
-        for (Object o : users.values()){
-            if (!o.toString().equals("My User Name")) {
-                userName = o.toString();
-            }
-        }
-        String idUser = "";
-        for (String s : users.keySet()){
-            if (!s.equals(myId)) {
-                idUser = s;
-            }
-        }
+    public void setListData(String idUser, String idProduct, String userName, String idChat, String img){
         final ListChatModel sched = new ListChatModel();
 
         sched.setUserName(userName);
-        //TODO: get image
-        sched.setImage("image" + 0);
+
+        sched.setImage(img);
         sched.setTitleProduct(idProduct);
 
         CustomListViewValuesArr.add(sched);
 
         //Save the id
         idChatsUser.put(new Pair<String, String>(idProduct,userName),new Pair<String, String>(idChat,idUser));
+        imageChatsUser.put(new Pair<String, String>(idProduct,userName), img);
 
         Resources res =getResources();
         adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
@@ -322,7 +315,22 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 ChatInfo c = snapshot.getValue(ChatInfo.class);
-                setListData(c.getIdProduct(), c.getUsers(), idChat);
+
+                //Get Correct User Between two
+                String userName = "";
+                for (Object o : c.getUsers().values()) {
+                    if (!o.toString().equals("My User Name")) {
+                        userName = o.toString();
+                    }
+                }
+                String idUser = "";
+                for (String s : c.getUsers().keySet()) {
+                    if (!s.equals(myId)) {
+                        idUser = s;
+                    }
+                }
+
+                getUser(idUser, c.getIdProduct(), userName, idChat);
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {
@@ -330,6 +338,18 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         });
     }
 
+    public void getUser(final String idUser, final String idProduct, final String userName, final String idChat) {
+        usersRef.child(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                User u = snapshot.getValue(User.class);
+                setListData(idUser, idProduct, userName, idChat, u.getImg());
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+            }
+        });
+    }
 
     public void onItemClick(int mPosition) {
         ListChatModel tempValues;
@@ -337,6 +357,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         else tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
 
         Pair<String,String> ids = idChatsUser.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
+        String img = imageChatsUser.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
 
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
@@ -344,6 +365,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         b.putString("TitleProduct", tempValues.getTitleProduct());
         b.putString("IdChat", ids.first);
         b.putString("IdUser", ids.second);
+        b.putString("ImageChat", img);
         intent.putExtras(b);
 
         startActivity(intent);

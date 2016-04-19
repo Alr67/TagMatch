@@ -15,6 +15,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -40,41 +41,83 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
 
     protected JSONObject doInBackground(final JSONObject... params) {
         try {
-            HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
 
             final String user = params[0].getString("username").toString();
             final String password = params[0].getString("password").toString();
 
             String userPass = user + ":" + password;
 
-            String basicAuth = "Basic "+ new String(Base64.encode(userPass.getBytes(),Base64.NO_WRAP));
-            con.setRequestProperty("Authorization", basicAuth);
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
-            con.setRequestMethod("GET");
+            String basicAuth;
+            if (url.getHost().contains("heroku")) {
+                basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.NO_WRAP));
+                HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
+                con.setConnectTimeout(5000);
+                con.setReadTimeout(5000);
+                con.setRequestMethod("GET");
+                con.setInstanceFollowRedirects(true);
 
-            JSONObject aux;
-            Log.i(Constants.DebugTAG,"responseCode: "+con.getResponseCode());
-            if (con.getResponseCode() >= 400){
-                aux = new JSONObject(iStreamToString(con.getErrorStream()));
-             }
-            else if(con.getResponseCode() == 302) {
-                aux = new JSONObject();
-                Log.i(Constants.DebugTAG,con.getURL().toString());
-                aux.put("302",con.getURL().toString());
-            }
-            else {
-                String response = iStreamToString(con.getInputStream());
-                if(response.startsWith("[{")){
+                con.setRequestProperty("Authorization", basicAuth);
+
+                JSONObject aux;
+
+                if (con.getResponseCode() >= 400){
+                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                }
+                else if(con.getResponseCode() == 302) {
                     aux = new JSONObject();
-                    aux.put("arrayResponse", new JSONArray(response));
+                    Log.i(Constants.DebugTAG,con.getURL().toString());
+                    aux.put("302",con.getURL().toString());
                 }
                 else {
-                    aux = new JSONObject(response);
+                    String response = iStreamToString(con.getInputStream());
+                    if(response.startsWith("[{")){
+                        aux = new JSONObject();
+                        aux.put("arrayResponse", new JSONArray(response));
+                    }
+                    else {
+                        aux = new JSONObject(response);
+                    }
                 }
+
+                con.disconnect();
+
+                return aux;
             }
-            con.disconnect();
-            return aux;
+            else {
+                basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT));
+                HttpURLConnection con = (HttpURLConnection) url.openConnection();
+                con.setConnectTimeout(5000);
+                con.setReadTimeout(5000);
+                con.setRequestMethod("GET");
+                con.setInstanceFollowRedirects(true);
+
+                con.setRequestProperty("Authorization", basicAuth);
+
+                JSONObject aux;
+
+                if (con.getResponseCode() >= 400){
+                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                }
+                else if(con.getResponseCode() == 302) {
+                    aux = new JSONObject();
+                    Log.i(Constants.DebugTAG,con.getURL().toString());
+                    aux.put("302",con.getURL().toString());
+                }
+                else {
+                    String response = iStreamToString(con.getInputStream());
+                    if(response.startsWith("[{")){
+                        aux = new JSONObject();
+                        aux.put("arrayResponse", new JSONArray(response));
+                    }
+                    else {
+                        aux = new JSONObject(response);
+                    }
+                }
+
+                con.disconnect();
+
+                return aux;
+            }
 
         } catch (IOException | JSONException e) {
             Log.e(Constants.DebugTAG, e.getMessage());
