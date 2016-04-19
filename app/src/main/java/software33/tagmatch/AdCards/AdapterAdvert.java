@@ -63,6 +63,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
     @Override
     public void onBindViewHolder(ReceptesViewHolder viewHolder, int i) {
         viewHolder.nombre.setText(items.get(i).getNom());
+        viewHolder.imagen.setImageDrawable(context.getDrawable(R.drawable.advert_gift));
         Integer typeaux = items.get(i).getType();
         if(typeaux == Constants.card_giveaway) {
             viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.image0));
