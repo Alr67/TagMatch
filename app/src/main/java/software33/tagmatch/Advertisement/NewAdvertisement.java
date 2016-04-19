@@ -117,7 +117,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         description = (EditText) findViewById(R.id.input_description);
         tag  = (EditText) findViewById(R.id.input_hashtags);
         wantedTags  = (EditText) findViewById(R.id.input_price);
-        wantedTags.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+        wantedTags.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         images = new ArrayList<>();
 

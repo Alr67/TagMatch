@@ -1,17 +1,14 @@
 package software33.tagmatch.Advertisement;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -244,13 +241,10 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
     public void prepareImages() {
         mViewPager = (ViewPager) findViewById(R.id.pager_view_advert);
-        DisplayMetrics displayMetrics = new DisplayMetrics();
-        WindowManager windowmanager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
-        windowmanager.getDefaultDisplay().getMetrics(displayMetrics);
-        int deviceHeight = displayMetrics.heightPixels;
+
 // Changes the height and width to the specified *pixels*
         ViewGroup.LayoutParams params = mViewPager.getLayoutParams();
-        params.height = deviceHeight/3;
+        params.height = Helpers.getDisplayHeight(this)/3;
         mViewPager.setLayoutParams(params);
         mCustomPagerAdapterViewAdvert = new CustomPagerAdapterViewAdvert(this,params.height,params.width);
         mViewPager.setAdapter(mCustomPagerAdapterViewAdvert);

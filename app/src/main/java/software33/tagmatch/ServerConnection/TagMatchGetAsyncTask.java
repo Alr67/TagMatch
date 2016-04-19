@@ -60,6 +60,7 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
 
                 JSONObject aux;
 
+                String response = iStreamToString(con.getInputStream());
                 if (con.getResponseCode() >= 400){
                     aux = new JSONObject(iStreamToString(con.getErrorStream()));
                 }
@@ -68,8 +69,11 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
                     Log.i(Constants.DebugTAG,con.getURL().toString());
                     aux.put("302",con.getURL().toString());
                 }
+                else if (response.equals("[]")) {
+                    aux = new JSONObject();
+                    aux.put("arrayResponse",new JSONArray());
+                }
                 else {
-                    String response = iStreamToString(con.getInputStream());
                     if(response.startsWith("[{")){
                         aux = new JSONObject();
                         aux.put("arrayResponse", new JSONArray(response));
@@ -86,8 +90,8 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
             else {
                 basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT));
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
+           //     con.setConnectTimeout(5000);
+         //       con.setReadTimeout(5000);
                 con.setRequestMethod("GET");
                 con.setInstanceFollowRedirects(true);
 
@@ -96,20 +100,27 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
                 JSONObject aux;
 
                 if (con.getResponseCode() >= 400){
+                    Log.i(Constants.DebugTAG,"response code: "+con.getResponseCode());
                     aux = new JSONObject(iStreamToString(con.getErrorStream()));
                 }
                 else if(con.getResponseCode() == 302) {
                     aux = new JSONObject();
-                    Log.i(Constants.DebugTAG,con.getURL().toString());
+                    Log.i(Constants.DebugTAG,"302 redirect: "+con.getURL().toString());
                     aux.put("302",con.getURL().toString());
                 }
                 else {
                     String response = iStreamToString(con.getInputStream());
                     if(response.startsWith("[{")){
                         aux = new JSONObject();
+                        Log.i(Constants.DebugTAG,"Array JSON REBUT");
                         aux.put("arrayResponse", new JSONArray(response));
                     }
+                    else if (response.equals("[]")) {
+                        aux = new JSONObject();
+                        aux.put("arrayResponse",new JSONArray());
+                    }
                     else {
+                        Log.i(Constants.DebugTAG,"Objecte JSON REBUT");
                         aux = new JSONObject(response);
                     }
                 }

@@ -13,8 +13,11 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -46,6 +49,7 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
     private RecyclerView.LayoutManager lManager;
     private List<Advertisement> advertisements;
     private ArrayList<AdvertContent> items;
+    private TextView loading;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +70,12 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
     }
 
     private void initComponents() {
+   /*     loading = (TextView) findViewById(R.id.text_loading);
+        ViewGroup.LayoutParams params = loading.getLayoutParams();
+        params.height = Helpers.getDisplayHeight(this)/2;
+        loading.setGravity(Gravity.BOTTOM|Gravity.FILL_VERTICAL);
+        loading.setLayoutParams(params);
+*/
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_my_adverts);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -106,10 +116,11 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
     private void downloadAdvertsFromServer() {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
-        String url = Constants.IP_SERVER+"/ads?idGreaterThan="+Constants.SERVER_IdGreaterThan+"&limit="+Constants.SERVER_limitAdverts;
+        String url = Constants.IP_SERVER+"/users/"+actualUser.getAlias()+"/ads?limit="+Constants.SERVER_limitAdverts;
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());
+            Log.i(Constants.DebugTAG,"Vaig a demanar un get a la url: "+url);
             new TagMatchGetAsyncTask(url,this) {
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
@@ -117,16 +128,23 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
                         try {
                             JSONArray jsonArray = jsonObject.getJSONArray("arrayResponse");
                             advertisements = new ArrayList<>();
-                            for (int n = 0; n < jsonArray.length(); n++) {
-                                JSONObject object = jsonArray.getJSONObject(n);
-                                Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
-                                advertisements.add(newAdvert);
-                                String imageId;
-                                if(newAdvert.getImagesIDs().length>0) imageId = newAdvert.getImagesIDs()[0];
-                                else imageId = "";
-                                items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getID()));
+                            if(jsonArray.length()>0) {
+                              //  hideLoading();
+                                for (int n = 0; n < jsonArray.length(); n++) {
+                                    JSONObject object = jsonArray.getJSONObject(n);
+                                    Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
+                                    advertisements.add(newAdvert);
+                                    String imageId;
+                                    if (newAdvert.getImagesIDs().length > 0)
+                                        imageId = newAdvert.getImagesIDs()[0];
+                                    else imageId = "";
+                                    items.add(new AdvertContent(newAdvert.getTitle(), imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getID()));
+                                }
+                                adapter.notifyDataSetChanged();
                             }
-                            adapter.notifyDataSetChanged();
+                            else {
+                                showNotAdvertsMessage();
+                            }
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -139,6 +157,21 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
         }
     }
 
+    private void showNotAdvertsMessage() {
+        loading = (TextView) findViewById(R.id.text_loading);
+        ViewGroup.LayoutParams params = loading.getLayoutParams();
+        params.height = Helpers.getDisplayHeight(this)/2;
+        loading.setGravity(Gravity.BOTTOM|Gravity.FILL_VERTICAL);
+        loading.setLayoutParams(params);
+        loading.setText(getString(R.string.hint_no_adverts));
+    }
+
+    /*   private void hideLoading() {
+           ViewGroup.LayoutParams params = loading.getLayoutParams();
+           params.height = 0;
+           loading.setLayoutParams(params);
+       }
+   */
     @Override
     public void onClick(View v) {
         Toast.makeText(this,"NOT IMPLEMENTED YET",Toast.LENGTH_SHORT).show();

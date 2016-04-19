@@ -68,7 +68,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
 
     @Override
     public void onBindViewHolder(ReceptesViewHolder viewHolder, int i) {
-        viewHolder.imagen.setImageDrawable(context.getDrawable(R.drawable.loadinggif));
+        viewHolder.imagen.setImageDrawable(context.getDrawable(R.drawable.loading_gif));
         viewHolder.nombre.setText(items.get(i).getNom());
         //Picasso.with(context).load(R.drawable.loading).into(viewHolder.imagen);
 

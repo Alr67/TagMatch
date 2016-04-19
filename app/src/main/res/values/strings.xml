@@ -51,6 +51,8 @@
     <string name="no_network_connection">No hi ha connexió a internet</string>
     <string name="connection_timeout">No ha sigut possible conectarse amb el servidor</string>
     <string name="hint_single_chat">Escriu el teu missatge…</string>
+    <string name="hint_loading_adverts">Loading advertisements from server, please wait</string>
+    <string name="hint_no_adverts">You don\'t have any advert, create one!</string>
 
     <!-- Login -->
     <string name="login">Login</string>
