@@ -253,7 +253,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         Map<String, Object> img = new HashMap<>();
         img.put("img",encodedImage);
-        FirebaseUtils.getUsersRef().child(userId).updateChildren(img);
+        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).updateChildren(img);
 
         imageChat = encodedImage;
     }

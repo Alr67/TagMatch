@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -38,7 +39,10 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
+import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
@@ -175,6 +179,9 @@ public class RegistrationActivity2 extends AppCompatActivity implements
                         showError(error);
 
                     } catch (JSONException ignored) {
+                        /*** Firebase create user ***/
+                        FirebaseUtils.createUser(email, password, username, getApplicationContext());
+
                         updateIMGLocation();
                     }
                 }
@@ -204,6 +211,16 @@ public class RegistrationActivity2 extends AppCompatActivity implements
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
+
+            /**** Update the image in firebase ****/
+
+            String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+
+            Map<String, Object> img = new HashMap<>();
+            img.put("img",encodedImage);
+            FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).updateChildren(img);
+
+            /*************************************/
 
             JSONObject jObject = new JSONObject();
             jObject.put("profilePhotoId", byteArray);
