@@ -25,7 +25,6 @@ public class BitmapWorkerTask extends AsyncTask<String, Void, Bitmap> {
         wp = Integer.parseInt(params[2]);
         BitmapFactory.Options options = new BitmapFactory.Options();
         options.inJustDecodeBounds = true;
-        BitmapFactory.decodeFile(path,options);
 
         final int height = options.outHeight;
         final int width = options.outWidth;

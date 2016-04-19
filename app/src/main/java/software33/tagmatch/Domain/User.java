@@ -1,20 +1,16 @@
 package software33.tagmatch.Domain;
 
 import android.media.Image;
-import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import software33.tagmatch.Utils.Constants;
-
 /**
  * Created by Cristina on 03/04/2016.
  */
 public class User {
-
     private String UID;
     private String userPhotoId;
     private String city;
@@ -137,7 +133,6 @@ public class User {
     }
 
     public String getAlias() {
-        Log.i(Constants.DebugTAG,"User getAlias called, username: "+alias);
         return alias;
     }
 

@@ -157,6 +157,10 @@ public class Advertisement {
         return done;
     }
 
+    public Double getPrice()  {
+        return -1.0;
+    }
+
     public String getCategory() {
         return category;
     }

@@ -9,11 +9,17 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.squareup.picasso.Picasso;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 
 import software33.tagmatch.R;
-import software33.tagmatch.Utils.BitmapWorkerTask;
+import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
+import software33.tagmatch.Utils.Helpers;
 
 /**
  * Created by Rafa on 25/11/2015.
@@ -63,25 +69,48 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
     @Override
     public void onBindViewHolder(ReceptesViewHolder viewHolder, int i) {
         viewHolder.nombre.setText(items.get(i).getNom());
-        viewHolder.imagen.setImageDrawable(context.getDrawable(R.drawable.advert_gift));
-        Integer typeaux = items.get(i).getType();
-        if(typeaux == Constants.card_giveaway) {
-            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.image0));
+        //Picasso.with(context).load(R.drawable.loading).into(viewHolder.imagen);
+        viewHolder.imagen.setImageDrawable(context.getDrawable(R.drawable.loadinggif));
+        String typeaux = items.get(i).getType();
+        if(items.get(i).getImgId()!="") {
+            try {
+                getAdvertImage(items.get(i).getAd_id(), items.get(i).getImgId(), context, viewHolder.imagen);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+        }
+        else viewHolder.imagen.setImageDrawable(context.getDrawable(R.drawable.image_placeholder));
+
+        if(typeaux == Constants.typeServerGIFT) {
+            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.advert_gift));
             viewHolder.preu.setVisibility(View.INVISIBLE);
         }
-        else if(typeaux == Constants.card_exchange) {
-            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.image_placeholder));
+        else if(typeaux == Constants.typeServerEXCHANGE) {
+            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.advert_exchange));
             viewHolder.preu.setVisibility(View.INVISIBLE);
         }
-        else if(typeaux == Constants.card_sell) {
-            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.bar_bg));
+        else if(typeaux == Constants.typeServerSELL) {
+            viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.advert_sell));
             viewHolder.preu.setText(items.get(i).getPrice().toString() + "€");
         }
         else {
             Toast.makeText(context,"Estas fent servir una opcio no valida",Toast.LENGTH_LONG).show();
         }
-        BitmapWorkerTask task = new BitmapWorkerTask(viewHolder.imagen);
-        task.execute(items.get(i).getImg(),height.toString(),width.toString());
+
+
+    }
+
+    public void getAdvertImage(Integer advertId, String photoId, final Context context, final ImageView image) throws JSONException {
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("username", Helpers.getActualUser(context).getAlias());
+        jsonObject.put("password", Helpers.getActualUser(context).getPassword());
+        new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/ads/" + advertId + "/photo/" + photoId, context) {
+            @Override
+            protected void onPostExecute(String url) {
+                Picasso.with(context).load(url).error(R.drawable.image0).into(image);
+            }
+        }.execute(jsonObject);
+
     }
 
 

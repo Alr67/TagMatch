@@ -7,17 +7,13 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/nav_mainPage" />
         <item
-            android:id="@+id/nav_newAdvert"
-            android:icon="@drawable/ic_menu_camera"
-            android:title="@string/nav_newAdvert" />
-        <item
-            android:id="@+id/nav_viewAdvert"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/nav_viewAdvert" />
-        <item
             android:id="@+id/nav_viewUser"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/nav_viewUser" />
+        <item
+            android:id="@+id/nav_my_adverts"
+            android:icon="@drawable/ic_menu_gallery"
+            android:title="@string/nav_myAdverts" />
         <item
             android:id="@+id/nav_xats"
             android:icon="@drawable/ic_menu_gallery"

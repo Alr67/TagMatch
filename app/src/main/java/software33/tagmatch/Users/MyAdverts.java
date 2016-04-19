@@ -1,8 +1,7 @@
-package software33.tagmatch.AdCards;
+package software33.tagmatch.Users;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -13,10 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -25,18 +24,22 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+import software33.tagmatch.AdCards.AdapterAdvert;
+import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
-import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
 
-public class Home extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+/**
+ * Created by Cristina on 18/04/2016.
+ */
+public class MyAdverts extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recycler;
     private AdapterAdvert adapter;
@@ -47,8 +50,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.nav_activity_main);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_pg_principal);
+        setContentView(R.layout.nav_my_adverts);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_my_adverts);
         setSupportActionBar(toolbar);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
@@ -57,15 +60,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
-        getSupportActionBar().setDisplayShowTitleEnabled(false); //Esconder titulo HAMBURGUER
-        TextView app_header = (TextView) toolbar.findViewById(R.id.toolbar_title); //cogemos el textview de la toolbar
-        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/LobsterTwo-BoldItalic.ttf");//aplicamos el diseño
-        app_header.setTypeface(face);
-
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        initComponents();
+    }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+    private void initComponents() {
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_my_adverts);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -101,6 +102,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         recycler.setAdapter(adapter);
     }
 
+    //TODO: POSAR ANUNCIS DEL USER
     private void downloadAdvertsFromServer() {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
@@ -138,41 +140,25 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
+    public void onClick(View v) {
+        Toast.makeText(this,"NOT IMPLEMENTED YET",Toast.LENGTH_SHORT).show();
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, Login.class);
-            startActivity(intent);
-            finish();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        return NavigationController.onItemSelected(item.getItemId(),this);
-    }
 
     @Override
     public void onBackPressed() {
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
+            Log.i("DEBUG","Drawer is open");
         } else {
+            Log.i("DEBUG","Drawer is NOT open");
             super.onBackPressed();
         }
+    }
+
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        return  NavigationController.onItemSelected(item.getItemId(),this);
     }
 }

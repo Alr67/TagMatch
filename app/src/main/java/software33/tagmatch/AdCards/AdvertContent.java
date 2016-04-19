@@ -1,7 +1,9 @@
 package software33.tagmatch.AdCards;
 
 
-import java.util.ArrayList;
+import android.util.Log;
+
+import software33.tagmatch.Utils.Constants;
 
 /**
  * Created by Rafa on 25/11/2015.
@@ -9,38 +11,43 @@ import java.util.ArrayList;
 public class AdvertContent {
 
     private String ad_name;
-    private String ad_img;
-    private Integer ad_type;
-    private Integer ad_price;
+    private Integer ad_id;
+    private String ad_img_id;
 
-    public AdvertContent(String s, String img, Integer type) {
+    private String ad_type;
+    private Double ad_price;
+
+    public AdvertContent(String s, String img, String type) {
         this.ad_name = s;
-        this.ad_img = img;
+        this.ad_img_id = img;
         this.ad_type = type;
-        this.ad_price = -1;
+        this.ad_price = -1.0;
     }
 
-    public AdvertContent(String s, String img, Integer type, Integer price) {
+    public AdvertContent( String s, String img, String type, Double price, Integer id) {
+        Log.i(Constants.DebugTAG,"Creo un item");
         this.ad_name = s;
-        this.ad_img = img;
+        this.ad_img_id = img;
         this.ad_type = type;
         this.ad_price = price;
+        this.ad_id = id;
     }
 
     public String getNom() {
         return ad_name;
     }
 
+    public Integer getAd_id() {return ad_id;}
 
-    public String getImg() {
-        return ad_img;
+    public String getImgId() {
+        return ad_img_id;
     }
 
-    public Integer getType() {
+    public String getType() {
         return ad_type;
     }
 
-    public Integer getPrice() {
+    public Double getPrice() {
         return ad_price;
     }
 }

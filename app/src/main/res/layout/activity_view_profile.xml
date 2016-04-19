@@ -34,15 +34,56 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
         tools:context=".AdCards.Home"
         tools:showIn="@layout/nav_activity_main">
+        android:orientation="vertical">
 
         <Button
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="TODO"
-            android:id="@+id/xat_profile"
-            android:layout_below="@+id/textView"
-            android:layout_centerHorizontal="true"
-            android:onClick="startMainChatActivity" />
+            android:text="Xat"
+            android:id="@+id/bStartXat"
+            android:layout_alignParentTop="true"
+            android:layout_alignParentEnd="true"
+            android:onClick="buttonStartXat" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="User Name"
+            android:id="@+id/tvUserName"
+            android:layout_gravity="center"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true" />
+
+        <ImageView
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:id="@+id/ivUserImage"
+            android:layout_gravity="center"
+            android:scaleType="centerCrop"
+            android:layout_below="@+id/tvUserName"
+            android:layout_centerHorizontal="true" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:text="Location"
+            android:id="@+id/tvLocation"
+            android:layout_gravity="center"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:layout_below="@+id/ivUserImage"
+            android:layout_centerHorizontal="true" />
+
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:id="@+id/profileMap"
+            android:layout_width="match_parent"
+            android:layout_height="325dp"
+            android:layout_gravity="center"
+            android:layout_below="@+id/tvLocation"
+            android:layout_alignParentEnd="true" />
 
     </RelativeLayout>
 </android.support.design.widget.CoordinatorLayout>

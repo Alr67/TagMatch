@@ -75,7 +75,7 @@ public class CustomPagerAdapter extends PagerAdapter {
     public void newImageConverted(Bitmap bitmap) {
         mResources.add(bitmap);
         this.notifyDataSetChanged();
-        ((ViewPager)privateContainer).setCurrentItem(mResources.size()-1);
+        if (privateContainer != null)((ViewPager)privateContainer).setCurrentItem(mResources.size()-1);
      //   parent.newImageConverted(bitmap);
     }
 

@@ -28,10 +28,14 @@ public abstract class Constants {
     public static final String typeGift = "Gift";
     public static final List<String> typeList = new ArrayList<>(Arrays.asList(typeSell,typeExchange,typeGift));
 
+    public static final String IP_ALEJANDRO = "192.168.1.129:8080";
+    public static final String IP_ALEIX = "192.168.1.41:8080";
     public static final String IP_HEROKU = "tagmatch.herokuapp.com";
-
     public static final String IP_SERVER_DEVELOP = "tagmatchdevelop.herokuapp.com";
+    public static final String IP_LOCAL = "localhost:8080";
     public static final String IP_SERVER = "https://" + IP_SERVER_DEVELOP;
+
+    public static final String defaultImage = "image0";
 
     /* INTENTS CODES*/
     public static final int codeImagePicker = 012;
@@ -39,13 +43,17 @@ public abstract class Constants {
     public static final int REQUEST_ID_MULTIPLE_PERMISSIONS = 14;
 
     /* CODI DE CARDS*/
-    public static final Integer card_giveaway = 0;
-    public static final Integer card_exchange = 1;
-    public static final Integer card_sell = 2;
+ //   public static final Integer card_giveaway = 0;
+ //   public static final Integer card_exchange = 1;
+ //   public static final Integer card_sell = 2;
 
     /* Bundle TAGS */
     public static final String TAG_BUNDLE_IDVIEWADVERTISEMENT = "AdvertisementId";
 
+    /* Home advert server preferences */
+    public static final Integer SERVER_IdGreaterThan = 1;
+    public static final Integer SERVER_IdSmallerThan = 5;
+    public static final Integer SERVER_limitAdverts = 40;
 
     /** A ELIMINAR */
     public static final User testUser = new User("test","test");
