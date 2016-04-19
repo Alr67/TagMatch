@@ -69,6 +69,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
     @Override
     public void onBindViewHolder(ReceptesViewHolder viewHolder, int i) {
         viewHolder.nombre.setText(items.get(i).getNom());
+        viewHolder.imagen.setImageDrawable(context.getDrawable(R.drawable.loading));
         String typeaux = items.get(i).getType();
         if(items.get(i).getImgId()!="") {
             try {
