@@ -64,6 +64,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     private String email;
     private String username;
     private String password;
+    private Map<String, Object> img = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -87,6 +88,8 @@ public class RegistrationActivity2 extends AppCompatActivity implements
 
         iv = (ImageView) findViewById(R.id.imageView);
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.registrationMap)).getMap();
+
+        img.put("img","");
 
         new GoogleApiClient.Builder(this)
                 .addApi(LocationServices.API)
@@ -179,9 +182,6 @@ public class RegistrationActivity2 extends AppCompatActivity implements
                         showError(error);
 
                     } catch (JSONException ignored) {
-                        /*** Firebase create user ***/
-                        FirebaseUtils.createUser(email, password, username, getApplicationContext());
-
                         updateIMGLocation();
                     }
                 }
@@ -197,9 +197,14 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         editor.putString("password", password);
         editor.commit();
 
-        if (imgExtension != null)
+        if (imgExtension != null) {
             updateIMG();
+        }
         updateLocation();
+
+        /*** Firebase create user ***/
+        FirebaseUtils.createUser(email, password, username, img, getApplicationContext());
+
         backToLogin();
     }
 
@@ -213,12 +218,8 @@ public class RegistrationActivity2 extends AppCompatActivity implements
             byte[] byteArray = stream.toByteArray();
 
             /**** Update the image in firebase ****/
-
             String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
-
-            Map<String, Object> img = new HashMap<>();
             img.put("img",encodedImage);
-            FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).updateChildren(img);
 
             /*************************************/
 

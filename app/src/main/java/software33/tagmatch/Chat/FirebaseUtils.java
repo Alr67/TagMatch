@@ -93,7 +93,7 @@ public abstract class FirebaseUtils {
         }
     }
 
-    public static void createUser(final String email, final String password, final String name, final Context context) {
+    public static void createUser(final String email, final String password, final String name, final Map<String, Object> img, final Context context) {
         myFirebaseRef.createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
             @Override
             public void onSuccess(Map<String, Object> result) {
@@ -105,6 +105,8 @@ public abstract class FirebaseUtils {
                             public void onAuthenticated(AuthData authData) {
                                 usersRef.child(authData.getUid()).setValue
                                         (new User(name,"",new HashMap<String, Object>(),new HashMap<String, Object>()));
+                                setMyId(authData.getUid(),context);
+                                FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(context)).updateChildren(img);
                             }
 
                             @Override
@@ -113,12 +115,12 @@ public abstract class FirebaseUtils {
                             }
                         }
                 );
-                setMyId(result.get("uid").toString(), context);
+                //setMyId(result.get("uid").toString(), context);
             }
 
             @Override
             public void onError(FirebaseError firebaseError) {
-                Log.i("Debug-Firebase","error creating user in firebase");
+                Log.i("Debug-Firebase", firebaseError.getMessage());
             }
         });
     }
