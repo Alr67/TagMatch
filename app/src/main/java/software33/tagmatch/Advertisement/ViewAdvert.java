@@ -3,10 +3,13 @@ package software33.tagmatch.Advertisement;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
@@ -17,6 +20,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.MarkerOptions;
@@ -24,7 +32,13 @@ import com.google.android.gms.maps.model.MarkerOptions;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 import software33.tagmatch.AdCards.Home;
+import software33.tagmatch.Chat.FirebaseUtils;
+import software33.tagmatch.Chat.SingleChatActivity;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
@@ -43,6 +57,12 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private GoogleMap map;
     Advertisement adv;
 
+    private ChildEventListener mListener;
+    private String idChat = "Not exists";
+    //TODO: hardcoded userId
+    private String userId = "aec6538a-bde2-4ea8-98bf-6fdc3f95127e";
+    private String imageChat;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -54,6 +74,45 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             getAdvertisement(b.getInt(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT));
         }
         else Log.i(Constants.DebugTAG,"Bundle EMPTY");
+
+        FirebaseUtils.getChatsRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (dataSnapshot.getChildrenCount() == 0){
+                    Log.i("DEBUG-Chat", "No xats");
+                    chatButton.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
+
+        mListener = FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
+                getChat(dataSnapshot.getKey());
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
+            }
+
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+                Log.e("FirebaseListAdapter", "Listen was cancelled, no more updates will occur");
+            }
+
+        });
+
     }
 
     public void getAdvertisement(Integer id) {
@@ -107,8 +166,9 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         title = (TextView) findViewById(R.id.advert_title);
         favouriteButton = (Button) findViewById(R.id.advert_but_favourites);
         favouriteButton.setOnClickListener(this);
-        chatButton = (Button) findViewById(R.id.advert_but_chat);
-        chatButton.setOnClickListener(this);
+
+        chatButton = (Button) findViewById(R.id.bStartXat);
+
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.advert_map)).getMap();
         prepareImages();
     }
@@ -271,5 +331,102 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Intent intent = new Intent(this, Home.class);
         startActivity(intent);
         finish();
+    }
+
+    public void buttonStartXat(View view) {
+        //TODO: Get userName and TitleProduct
+        Intent intent = new Intent(this, SingleChatActivity.class);
+        Bundle b = new Bundle();
+        b.putString("UserName", username.getText().toString());
+        b.putString("TitleProduct", title.getText().toString());
+
+        if (idChat.equals("Not exists")) {
+            b.putString("IdChat", createChat());
+        }
+        else b.putString("IdChat", idChat);
+        b.putString("IdUser", userId);
+        b.putString("ImageChat", imageChat);
+        intent.putExtras(b);
+
+        startActivity(intent);
+    }
+
+    private String createChat() {
+        Firebase id = FirebaseUtils.getChatsRef().push();
+
+        String id1 = FirebaseUtils.getMyId(this);
+        String id2 = userId;
+
+        Map<String, Object> users = new HashMap<>();
+        users.put(id1, Helpers.getActualUser(this).getAlias());
+        users.put(id2, username.getText().toString());
+
+        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(title.getText().toString(), users);
+        id.child("info").setValue(chatInfo);
+
+        //Set the chats to each user
+
+        Map<String, Object> chats1 = new HashMap<>();
+        chats1.put(id.getKey(),"");
+        FirebaseUtils.getUsersRef().child(id1).child("chats").updateChildren(chats1);
+
+        //Get user Image
+        Drawable drawable = userImage.getDrawable();
+
+        BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
+        Bitmap bitmap = bitmapDrawable .getBitmap();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] imageInByte = stream.toByteArray();
+
+        String encodedImage = Base64.encodeToString(imageInByte, Base64.DEFAULT);
+
+        imageChat = encodedImage;
+
+        return id.getKey();
+    }
+
+    private void getChat(final String idChat) {
+        //Accessing to the chat with idChat ONCE
+        FirebaseUtils.getChatsRef().child(idChat).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                FirebaseUtils.ChatInfo c = snapshot.getValue(FirebaseUtils.ChatInfo.class);
+                setButtonXat(c.getIdProduct(), c.getUsers(), idChat);
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+            }
+        });
+    }
+
+    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat) {
+        String userName = "";
+        for (Object o : users.values()){
+            if (!o.toString().equals(Helpers.getActualUser(this).getAlias())) {
+                userName = o.toString();
+            }
+        }
+        String userId = "";
+        for (String s : users.keySet()){
+            if (!s.equals(FirebaseUtils.getMyId(this))) {
+                userId = s;
+            }
+        }
+
+        //Restriccions de obrir xat:
+        //      No mateix titul de producte ni id de usuari que ho ha publicat
+        if (idProduct.equals(title.getText().toString()) && userId.equals(this.userId)){
+            chatButton.setText("Xatejant");
+            this.idChat = idChat;
+        }
+        else this.idChat = "Not exists";
+
+        Log.i("Debug-Chat","idProd " +idProduct);
+        Log.i("Debug-Chat","title.getText().toString() " +title.getText().toString());
+        Log.i("Debug-Chat","userId " +userId);
+        Log.i("Debug-Chat","this.userId " +this.userId);
+
+        chatButton.setEnabled(true);
     }
 }

@@ -18,6 +18,8 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.firebase.client.Firebase;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -27,6 +29,7 @@ import java.util.List;
 
 import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
+import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.Login_Register.Login;
@@ -99,6 +102,11 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
         recycler.setAdapter(adapter);
+
+        //TODO: Arreglar com aconseguir el Uid
+        Firebase.setAndroidContext(this);
+        String myId = "b514d66d-0780-4531-8d7e-55130d801af4";
+        FirebaseUtils.setMyId(myId,this);
     }
 
     private void downloadAdvertsFromServer() {

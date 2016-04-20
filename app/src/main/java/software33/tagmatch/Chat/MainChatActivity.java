@@ -82,8 +82,6 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         usersRef = myFirebaseRef.child("users");
 
         //createUser("correu1@xd.com", "contra123");
-        //TODO: set correctly the my uid
-        FirebaseUtils.setMyId("56d3f1d3-6b50-473a-9aa3-ff0007b3df29",this);
 
         myId = FirebaseUtils.getMyId(this);
 

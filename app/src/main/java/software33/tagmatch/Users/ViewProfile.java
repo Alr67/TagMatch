@@ -65,10 +65,8 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     Button bStartXat;
     private GoogleMap map;
     private String myId, userId;
-    private String idChat = "Not exists";
     private String userName, titleProduct;
     private String imageChat;
-    private ChildEventListener mListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -88,7 +86,6 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         tvUserName = (TextView) findViewById(R.id.tvUserName);
         tvLocation = (TextView) findViewById(R.id.tvLocation);
-        bStartXat = (Button) findViewById(R.id.bStartXat);
         ivUserImage = (ImageView) findViewById(R.id.ivUserImage);
 
         Firebase.setAndroidContext(this);
@@ -98,15 +95,13 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         titleProduct = "ProductExample";
         userId = "aec6538a-bde2-4ea8-98bf-6fdc3f95127e";
 
-        //ivUserImage.setImageURI(Uri.parse("http://i.imgur.com/VN6Zhot.jpg"));
-
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
-            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users", this) {
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -116,11 +111,11 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                         }
                         else if (jsonObject.has("username")){
                             tvUserName.setText(jsonObject.get("username").toString());
-                            tvLocation.setText(jsonObject.get("email").toString());
-                            //TODO: Do coords to the map
+                            tvLocation.setText(jsonObject.get("city").toString());
+
+                            LatLng latLng = new LatLng(jsonObject.getInt("latitude"),jsonObject.getInt("longitude"));
                             CameraUpdate center=
-                                    CameraUpdateFactory.newLatLng(new LatLng(40.76793169992044,
-                                            -73.98180484771729));
+                                    CameraUpdateFactory.newLatLng(latLng);
                             CameraUpdate zoom=CameraUpdateFactory.zoomTo(15);
 
                             map.moveCamera(center);
@@ -141,31 +136,6 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         } catch (JSONException e) {
             e.printStackTrace();
         }
-
-        mListener = FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                getChat(dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                Log.e("FirebaseListAdapter", "Listen was cancelled, no more updates will occur");
-            }
-
-        });
     }
 
     @Override
@@ -193,103 +163,5 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
         return;
-    }
-
-    public void buttonStartXat(View view) {
-        //TODO: Get userName and TitleProduct
-        Intent intent = new Intent(this, SingleChatActivity.class);
-        Bundle b = new Bundle();
-        b.putString("UserName", userName);
-        b.putString("TitleProduct", titleProduct);
-
-        if (idChat.equals("Not exists")) {
-            b.putString("IdChat", createChat());
-        }
-        else b.putString("IdChat", idChat);
-        b.putString("IdUser", userId);
-        b.putString("ImageChat", imageChat);
-        intent.putExtras(b);
-
-        startActivity(intent);
-    }
-
-    private String createChat() {
-        Firebase id = FirebaseUtils.getChatsRef().push();
-
-        //TODO: hardcoded userId
-        userId = "aec6538a-bde2-4ea8-98bf-6fdc3f95127e";
-        FirebaseUtils firebaseUtils = new FirebaseUtils() {};
-        String id1 = firebaseUtils.getMyId(this);
-        String id2 = userId;
-
-        Map<String, Object> users = new HashMap<>();
-        users.put(id1, "My User Name");
-        users.put(id2, userName);
-
-        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(titleProduct, users);
-        id.child("info").setValue(chatInfo);
-
-        //Set the chats to each user
-
-        Map<String, Object> chats1 = new HashMap<>();
-        chats1.put(id.getKey(),"");
-        FirebaseUtils.getUsersRef().child(id1).child("chats").updateChildren(chats1);
-
-        setUserImage(id2);
-
-        return id.getKey();
-    }
-
-    private void setUserImage(String userId){
-        Drawable drawable = ivUserImage.getDrawable();
-
-        BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
-        Bitmap bitmap = bitmapDrawable .getBitmap();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] imageInByte = stream.toByteArray();
-
-        String encodedImage = Base64.encodeToString(imageInByte, Base64.DEFAULT);
-
-        Map<String, Object> img = new HashMap<>();
-        img.put("img",encodedImage);
-        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).updateChildren(img);
-
-        imageChat = encodedImage;
-    }
-
-    private void getChat(final String idChat) {
-        //Accessing to the chat with idChat ONCE
-        FirebaseUtils.getChatsRef().child(idChat).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot snapshot) {
-                FirebaseUtils.ChatInfo c = snapshot.getValue(FirebaseUtils.ChatInfo.class);
-                setButtonXat(c.getIdProduct(), c.getUsers(), idChat);
-            }
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-            }
-        });
-    }
-
-    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat) {
-        String userName = "";
-        for (Object o : users.values()){
-            if (!o.toString().equals("My User Name")) {
-                userName = o.toString();
-            }
-        }
-        String userId = "";
-        for (String s : users.keySet()){
-            if (!s.equals(myId)) {
-                userId = s;
-            }
-        }
-
-        if (idProduct.equals(titleProduct) && userId.equals(this.userId)){
-            bStartXat.setText("Xatejant");
-            this.idChat = idChat;
-        }
-        else this.idChat = "Not exists";
     }
 }
