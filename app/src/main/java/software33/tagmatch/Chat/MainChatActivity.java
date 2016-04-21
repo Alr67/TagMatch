@@ -86,6 +86,8 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         myId = FirebaseUtils.getMyId(this);
 
         //Accessing to the chats of my user
+        getChats();
+        /*
         mListener = this.usersRef.child(myId).child("chats").addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
@@ -106,10 +108,28 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                 Log.e("FirebaseListAdapter", "Listen was cancelled, no more updates will occur");
             }
 
+        });*/
+
+    }
+
+    private void getChats(){
+        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChildren()){
+                    Resources res =getResources();
+                    adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+                    list.setAdapter( adapter );
+                }
+                else {
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                        getChat(dataSnapshot1.getKey());
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
         });
-        Resources res =getResources();
-        adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
-        list.setAdapter( adapter );
     }
 
     @Override

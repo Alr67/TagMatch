@@ -130,6 +130,9 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                 @Override
                 protected void onPostExecute(String url) {
                     Picasso.with(ViewProfile.this).load(url).error(R.drawable.image0).into(ivUserImage);
+                    if (url == null){
+                        Picasso.with(ViewProfile.this).load(R.drawable.image0).into(ivUserImage);
+                    }
                 }
             }.execute(jsonObject);
 

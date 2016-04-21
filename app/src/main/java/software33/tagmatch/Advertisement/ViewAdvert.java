@@ -28,6 +28,7 @@ import com.firebase.client.ValueEventListener;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -43,6 +44,7 @@ import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImgurImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
@@ -74,45 +76,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             getAdvertisement(b.getInt(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT));
         }
         else Log.i(Constants.DebugTAG,"Bundle EMPTY");
-
-        FirebaseUtils.getChatsRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.getChildrenCount() == 0){
-                    Log.i("DEBUG-Chat", "No xats");
-                    chatButton.setEnabled(true);
-                }
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {}
-        });
-
-        mListener = FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                getChat(dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {
-            }
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                Log.e("FirebaseListAdapter", "Listen was cancelled, no more updates will occur");
-            }
-
-        });
-
     }
 
     public void getAdvertisement(Integer id) {
@@ -267,39 +230,36 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         }
         String url = Constants.IP_SERVER+"/users/"+ adv.getUser().getAlias()+"/photo";
 
-        Log.i(Constants.DebugTAG,"Let's get User image amb url "+url);
-            new TagMatchGetAsyncTask(url,this) {
-                @Override
-                protected void onPostExecute(JSONObject jsonObject) {
-                    Log.i(Constants.DebugTAG,"onPostExecute de la imatge de l'user JSON: "+jsonObject.toString());
-                    if(jsonObject.has("302")) {
-                        try {
-                            new TagMatchGetImgurImageAsyncTask(jsonObject.getString("302"),getApplicationContext()) {
-                                @Override
-                                protected void onPostExecute(JSONObject jsonObject) {
-                                    Log.i(Constants.DebugTAG,"onPostExecute de la imatge de l'user JSON: "+jsonObject.toString());
-                                    try {
-                                        if(jsonObject.has("image")) {
-                                            Bitmap image = Helpers.stringToBitMap(jsonObject.getString("image"));
-                                            userImage.setImageBitmap(image);
-                                            Log.i(Constants.DebugTAG,"USER image added");
-                                        }
-                                        else {
-                                            Toast.makeText(getApplicationContext(),jsonObject.getString("error"),Toast.LENGTH_SHORT);
-                                        }
-                                        //  adv = convertJSONToAdvertisement(jsonObject);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }.execute();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                    //  adv = convertJSONToAdvertisement(jsonObject);
+        new TagMatchGetImageAsyncTask(url, this) {
+            @Override
+            protected void onPostExecute(String url) {
+                Picasso.with(ViewAdvert.this).load(url).error(R.drawable.image0).into(userImage);
+                if (url == null){
+                    Picasso.with(ViewAdvert.this).load(R.drawable.image0).into(userImage);
                 }
-            }.execute(jObject);
+                getChats();
+            }
+        }.execute(jObject);
+    }
+
+    private void getChats(){
+        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChildren()){
+                    chatButton.setEnabled(true);
+                }
+                else {
+                    long numChats = dataSnapshot.getChildrenCount();
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                        getChat(dataSnapshot1.getKey(), numChats);
+                        --numChats;
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
     }
 
     public void prepareImages() {
@@ -386,13 +346,13 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         return id.getKey();
     }
 
-    private void getChat(final String idChat) {
+    private void getChat(final String idChat, final long numChats) {
         //Accessing to the chat with idChat ONCE
         FirebaseUtils.getChatsRef().child(idChat).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 FirebaseUtils.ChatInfo c = snapshot.getValue(FirebaseUtils.ChatInfo.class);
-                setButtonXat(c.getIdProduct(), c.getUsers(), idChat);
+                setButtonXat(c.getIdProduct(), c.getUsers(), idChat, numChats);
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {
@@ -400,7 +360,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat) {
+    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat, long numChats) {
         String userName = "";
         for (Object o : users.values()){
             if (!o.toString().equals(Helpers.getActualUser(this).getAlias())) {
@@ -419,14 +379,18 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         if (idProduct.equals(title.getText().toString()) && userId.equals(this.userId)){
             chatButton.setText("Xatejant");
             this.idChat = idChat;
+            chatButton.setEnabled(true);
         }
-        else this.idChat = "Not exists";
+        else {
+            this.idChat = "Not exists";
+            if (numChats == 1) chatButton.setEnabled(true);
+        }
 
         Log.i("Debug-Chat","idProd " +idProduct);
         Log.i("Debug-Chat","title.getText().toString() " +title.getText().toString());
         Log.i("Debug-Chat","userId " +userId);
         Log.i("Debug-Chat","this.userId " +this.userId);
 
-        chatButton.setEnabled(true);
+
     }
 }
