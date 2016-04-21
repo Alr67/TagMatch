@@ -17,10 +17,12 @@ import java.io.OutputStreamWriter;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.Helpers;
 
 public abstract class TagMatchPutAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
 
@@ -87,9 +89,10 @@ public abstract class TagMatchPutAsyncTask extends AsyncTask<JSONObject, Void, J
     }
 
     private void connectUser(HttpURLConnection c) {
-        SharedPreferences prefs = context.getSharedPreferences("TagMatch_pref", Context.MODE_PRIVATE);
-        final String user = prefs.getString("name", "");
-        final String password = prefs.getString("password", "");
+        ArrayList<String> personalData = new ArrayList<String>();
+        personalData = new Helpers().getPersonalData(context);
+        final String user = personalData.get(0);
+        final String password = personalData.get(1);
 
         String userPass = user + ":" + password;
         c.setRequestProperty("Authorization", "Basic " +

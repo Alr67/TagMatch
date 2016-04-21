@@ -13,12 +13,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.firebase.client.Firebase;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,6 +40,7 @@ import software33.tagmatch.Domain.User;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
@@ -80,6 +86,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         items = new ArrayList<>();
 
+        downloadUserFromServer();
         downloadAdvertsFromServer();
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
@@ -107,6 +114,43 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         Firebase.setAndroidContext(this);
         String myId = "b514d66d-0780-4531-8d7e-55130d801af4";
         FirebaseUtils.setMyId(myId,this);
+    }
+
+    private void downloadUserFromServer(){
+        JSONObject jObject = new JSONObject();
+        User user = Helpers.getActualUser(this);
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("username", Helpers.getActualUser(this).getAlias());
+            jsonObject.put("password", Helpers.getActualUser(this).getPassword());
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Helpers.showError(error,getApplicationContext());
+                        }
+                        else if (jsonObject.has("username")){
+                            Log.i("Debug-GetUser",jsonObject.toString());
+                            Helpers.saveActualUser(Helpers.getActualUser(getApplicationContext()).getAlias(),
+                                    Helpers.getActualUser(getApplicationContext()).getPassword(),
+                                    jsonObject.get("email").toString(),
+                                    jsonObject.get("profilePhotoId").toString(),
+                                    jsonObject.get("city").toString(),
+                                    jsonObject.getInt("lattitude"),
+                                    jsonObject.getInt("longitude"),
+                                    getApplicationContext());
+                        }
+                    } catch (JSONException ignored) {
+                        Log.i("DEBUG","XD");
+                    }
+                }
+            }.execute(jsonObject);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void downloadAdvertsFromServer() {

@@ -49,6 +49,7 @@ import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.BitmapWorkerTask;
 import software33.tagmatch.Utils.Constants;
+import software33.tagmatch.Utils.Helpers;
 
 public class RegistrationActivity2 extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -192,10 +193,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     }
 
     private void updateIMGLocation() {
-        SharedPreferences.Editor editor = getSharedPreferences(SH_PREF_NAME, MODE_PRIVATE).edit();
-        editor.putString("name", username);
-        editor.putString("password", password);
-        editor.commit();
+        Helpers.setPersonalData(username, password, this);
 
         if (imgExtension != null) {
             updateIMG();

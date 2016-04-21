@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.util.Base64;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,10 +31,36 @@ public class Helpers {
         return data;
     }
 
+    public static void setPersonalData(String username, String password, Context context){
+        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        editor.putString("name", username);
+        editor.putString("password",password);
+        editor.commit();
+    }
+
     public static User getActualUser(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE);
-        return new User(prefs.getString("name", null),prefs.getString("password", null));
+        User user = new User(prefs.getString("name", null),
+                                prefs.getString("password", null),
+                                prefs.getString("email", null),
+                                prefs.getString("photoId", null),
+                                prefs.getString("city", null),
+                                prefs.getInt("lattitude",0),
+                                prefs.getInt("longitude",0));
+        return user;
+    }
 
+    public static void saveActualUser(String name, String password, String email,
+                                      String photoId, String city, int lattitude, int longitude, Context context){
+        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        editor.putString("name", name);
+        editor.putString("password", password);
+        editor.putString("email", email);
+        editor.putString("photoId", photoId);
+        editor.putString("city", city);
+        editor.putInt("lattitude", lattitude);
+        editor.putInt("longitude", longitude);
+        editor.commit();
     }
 
     public static void logout(Context context) {
@@ -116,6 +143,15 @@ public class Helpers {
             e.getMessage();
             return null;
         }
+    }
+
+    public static void showError (String msg, Context context){
+        CharSequence text = msg;
+        int duration = Toast.LENGTH_SHORT;
+
+        Toast toast = Toast.makeText(context, text, duration);
+        toast.show();
+        return;
     }
 
 }

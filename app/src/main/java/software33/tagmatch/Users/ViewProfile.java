@@ -51,6 +51,7 @@ import java.util.Map;
 
 import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.SingleChatActivity;
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
@@ -97,35 +98,28 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
+        User user = Helpers.getActualUser(this);
+        tvUserName.setText(user.getAlias());
+        tvLocation.setText(user.getCity());
+
+        try {
+            LatLng latLng = new LatLng(user.getLattitude(), user.getLongitude());
+            CameraUpdate center =
+                    CameraUpdateFactory.newLatLng(latLng);
+            CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+
+            map.moveCamera(center);
+            map.animateCamera(zoom);
+        }
+        catch (Exception e){
+            e.printStackTrace();
+        }
+
+
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
-            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
-                @Override
-                protected void onPostExecute(JSONObject jsonObject) {
-                    try {
-                        if(jsonObject.has("error")) {
-                            String error = jsonObject.get("error").toString();
-                            showError(error);
-                        }
-                        else if (jsonObject.has("username")){
-                            tvUserName.setText(jsonObject.get("username").toString());
-                            tvLocation.setText(jsonObject.get("city").toString());
-
-                            LatLng latLng = new LatLng(jsonObject.getInt("latitude"),jsonObject.getInt("longitude"));
-                            CameraUpdate center=
-                                    CameraUpdateFactory.newLatLng(latLng);
-                            CameraUpdate zoom=CameraUpdateFactory.zoomTo(15);
-
-                            map.moveCamera(center);
-                            map.animateCamera(zoom);
-                        }
-                    } catch (JSONException ignored) {
-                        Log.i("DEBUG","XD");
-                    }
-                }
-            }.execute(jsonObject);
             new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias() + "/photo", this) {
                 @Override
                 protected void onPostExecute(String url) {
@@ -156,15 +150,5 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         return  NavigationController.onItemSelected(item.getItemId(),this);
-    }
-
-    private void showError (String msg){
-        Context context = getApplicationContext();
-        CharSequence text = msg;
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-        return;
     }
 }
