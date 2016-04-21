@@ -92,5 +92,9 @@
 
     <!-- Profile -->
     <string name="profile_button_advertisement">Anuncis</string>
+    <string name="title_activity_filter">Filter</string>
+
+    <!-- Filters -->
+    <string name="filter_title">Filtres de cerca</string>
 
 </resources>

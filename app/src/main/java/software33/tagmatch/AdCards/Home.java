@@ -29,6 +29,7 @@ import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
+import software33.tagmatch.Filter.Filter;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
@@ -69,7 +70,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent novaRecepta = new Intent(getApplicationContext(), NewAdvertisement.class);
+                Intent novaRecepta = new Intent(getApplicationContext(), Filter.class);
                 startActivity(novaRecepta);
                 finish();
             }
