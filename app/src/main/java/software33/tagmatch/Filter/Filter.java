@@ -1,5 +1,6 @@
 package software33.tagmatch.Filter;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -7,13 +8,16 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.R;
 
 public class Filter extends AppCompatActivity implements View.OnClickListener {
 
     private CheckBox ch1,ch2,ch3,ch4;
+    private ImageView search_button;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +42,8 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
         ch3.setOnClickListener(this);
         ch4 = (CheckBox) findViewById(R.id.checkBox4);
         ch4.setOnClickListener(this);
+        search_button = (ImageView) findViewById(R.id.search_image);
+        search_button.setOnClickListener(this);
     }
 
     @Override
@@ -63,6 +69,15 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
                     Toast.makeText(getApplicationContext(), "Bro, try Android :)", Toast.LENGTH_LONG).show();
                 }
                 break;
+            case (R.id.search_image):
+                Toast.makeText(getApplicationContext(), "Bro, try Android :)", Toast.LENGTH_LONG).show();
+                break;
         }
+    }
+    @Override
+    public void onBackPressed() {
+        Intent novaRecepta = new Intent(getApplicationContext(), Home.class);
+        startActivity(novaRecepta);
+        finish();
     }
 }
