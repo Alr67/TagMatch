@@ -17,6 +17,7 @@ import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -53,6 +54,7 @@ import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.DialogError;
+import software33.tagmatch.Utils.Helpers;
 
 public class NewAdvertisement extends AppCompatActivity implements View.OnClickListener {
 
@@ -173,7 +175,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             Advertisement adv = new Advertisement();
             Log.v(DebugTag,"Tipus seleccionat: " + typeSpinner.getSelectedItem());
             //TODO sujeto a cambios cuando implementemos los usuarios
-            User owner = new User(getSharedPreferences("TagMatch_pref", Context.MODE_PRIVATE).getString("name", ""));
+            User owner = Helpers.getActualUser(this);
 
             if(typeSpinner.getSelectedItem().equals(Constants.typeGift)) {
                 //owner, title, images, desc, tags, category

@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
@@ -23,6 +24,8 @@ import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import software33.tagmatch.AdCards.Home;
+import software33.tagmatch.Chat.FirebaseUtils;
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.Utils.Constants;
@@ -45,6 +48,8 @@ public class Login extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this); //Necessari per a q funcioni tot lo de ButterKnife
+
+        Firebase.setAndroidContext(this);
 
         ArrayList<String> existing_login = new ArrayList<String>();
         existing_login = new Helpers().getPersonalData(getApplicationContext());
@@ -133,13 +138,48 @@ public class Login extends AppCompatActivity {
     }*/
 
     private void continueLogin() {
-        SharedPreferences.Editor editor = getSharedPreferences(SH_PREF_NAME, MODE_PRIVATE).edit();
-        editor.putString("name", username.getText().toString()); //Fem l'acces dsd aqui perq aqui només s'entra si tot estava OK, aixi q no estarà mai buit
-        editor.putString("password",passw.getText().toString());
-        editor.commit();
-        Intent success = new Intent(this, Home.class); //FAlta guardar en algun puesto l'usuari
+        Firebase.setAndroidContext(this);
+
+        //Guardem les dades de login
+        Helpers.setPersonalData(username.getText().toString(), passw.getText().toString(),this);
+        downloadUserFromServer();
+
+    }
+
+    private void endLogin() {
+        Intent success = new Intent(this, Home.class);
         startActivity(success);
         finish();
+    }
+
+    private void downloadUserFromServer(){
+        JSONObject jObject = new JSONObject();
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("username", Helpers.getActualUser(this).getAlias());
+            jsonObject.put("password", Helpers.getActualUser(this).getPassword());
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Helpers.showError(error,getApplicationContext());
+                        }
+                        else if (jsonObject.has("username")){
+                            Log.i("Debug-GetUser",jsonObject.toString());
+                            FirebaseUtils.setMyId(jsonObject.get("firebaseID").toString(),getApplicationContext());
+                            endLogin();
+                        }
+                    } catch (JSONException ignored) {
+                        Log.i("DEBUG","error al get user");
+                    }
+                }
+            }.execute(jsonObject);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override

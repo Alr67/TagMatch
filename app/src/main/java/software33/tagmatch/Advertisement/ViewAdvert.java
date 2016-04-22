@@ -2,10 +2,14 @@ package software33.tagmatch.Advertisement;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,18 +18,31 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.firebase.client.ChildEventListener;
+import com.firebase.client.DataSnapshot;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
+import com.firebase.client.ValueEventListener;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
+
 import software33.tagmatch.AdCards.Home;
+import software33.tagmatch.Chat.FirebaseUtils;
+import software33.tagmatch.Chat.SingleChatActivity;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImgurImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
@@ -40,10 +57,18 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private GoogleMap map;
     Advertisement adv;
 
+    private ChildEventListener mListener;
+    private String idChat = "Not exists";
+    //TODO: hardcoded userId
+    private String userId;
+    private String imageChat;
+    private String myName;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_advert);
+        myName = Helpers.getActualUser(this).getAlias();
         initComponents();
         Bundle b = getIntent().getExtras();
         if(b != null) {
@@ -104,8 +129,9 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         title = (TextView) findViewById(R.id.advert_title);
         favouriteButton = (Button) findViewById(R.id.advert_but_favourites);
         favouriteButton.setOnClickListener(this);
-        chatButton = (Button) findViewById(R.id.advert_but_chat);
-        chatButton.setOnClickListener(this);
+
+        chatButton = (Button) findViewById(R.id.bStartXat);
+
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.advert_map)).getMap();
         prepareImages();
     }
@@ -187,12 +213,12 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     }
                 }.execute(jObject);
         }
-        getUserImage();
+        getUserImageAndFirebaseID();
     }
 
 
 
-    private void getUserImage() {
+    private void getUserImageAndFirebaseID() {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
         try {
@@ -204,39 +230,55 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         }
         String url = Constants.IP_SERVER+"/users/"+ adv.getUser().getAlias()+"/photo";
 
-        Log.i(Constants.DebugTAG,"Let's get User image amb url "+url);
-            new TagMatchGetAsyncTask(url,this) {
-                @Override
-                protected void onPostExecute(JSONObject jsonObject) {
-                    Log.i(Constants.DebugTAG,"onPostExecute de la imatge de l'user JSON: "+jsonObject.toString());
-                    if(jsonObject.has("302")) {
-                        try {
-                            new TagMatchGetImgurImageAsyncTask(jsonObject.getString("302"),getApplicationContext()) {
-                                @Override
-                                protected void onPostExecute(JSONObject jsonObject) {
-                                    Log.i(Constants.DebugTAG,"onPostExecute de la imatge de l'user JSON: "+jsonObject.toString());
-                                    try {
-                                        if(jsonObject.has("image")) {
-                                            Bitmap image = Helpers.stringToBitMap(jsonObject.getString("image"));
-                                            userImage.setImageBitmap(image);
-                                            Log.i(Constants.DebugTAG,"USER image added");
-                                        }
-                                        else {
-                                            Toast.makeText(getApplicationContext(),jsonObject.getString("error"),Toast.LENGTH_SHORT);
-                                        }
-                                        //  adv = convertJSONToAdvertisement(jsonObject);
-                                    } catch (JSONException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            }.execute();
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+        new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + adv.getUser().getAlias(), this) {
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Helpers.showError(error,getApplicationContext());
                     }
-                    //  adv = convertJSONToAdvertisement(jsonObject);
+                    else if (jsonObject.has("username")){
+                        Log.i("Debug-GetUser",jsonObject.toString());
+                        userId = jsonObject.get("firebaseID").toString();
+                    }
+                } catch (JSONException ignored) {
+                    Log.i("DEBUG","error al get user");
                 }
-            }.execute(jObject);
+            }
+        }.execute(jObject);
+
+        new TagMatchGetImageAsyncTask(url, this) {
+            @Override
+            protected void onPostExecute(String url) {
+                Picasso.with(ViewAdvert.this).load(url).error(R.drawable.image0).into(userImage);
+                if (url == null){
+                    Picasso.with(ViewAdvert.this).load(R.drawable.image0).into(userImage);
+                }
+                getChats();
+            }
+        }.execute(jObject);
+    }
+
+    private void getChats(){
+        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                if (!dataSnapshot.hasChildren()){
+                    if (!adv.getOwner().getAlias().equals(myName))
+                        chatButton.setEnabled(true);
+                }
+                else {
+                    long numChats = dataSnapshot.getChildrenCount();
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+                        getChat(dataSnapshot1.getKey(), numChats);
+                        --numChats;
+                    }
+                }
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
     }
 
     public void prepareImages() {
@@ -265,5 +307,106 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Intent intent = new Intent(this, Home.class);
         startActivity(intent);
         finish();
+    }
+
+    public void buttonStartXat(View view) {
+        Intent intent = new Intent(this, SingleChatActivity.class);
+        Bundle b = new Bundle();
+        b.putString("UserName", username.getText().toString());
+        b.putString("TitleProduct", title.getText().toString());
+
+        if (idChat.equals("Not exists")) {
+            b.putString("IdChat", createChat());
+        }
+        else b.putString("IdChat", idChat);
+        b.putString("IdUser", userId);
+
+        //Get user Image
+        Drawable drawable = userImage.getDrawable();
+
+        BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
+        Bitmap bitmap = bitmapDrawable .getBitmap();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] imageInByte = stream.toByteArray();
+
+        String encodedImage = Base64.encodeToString(imageInByte, Base64.DEFAULT);
+
+        imageChat = encodedImage;
+
+        FirebaseUtils.setChatImage(imageChat,this);
+        intent.putExtras(b);
+
+        startActivity(intent);
+    }
+
+    private String createChat() {
+        Firebase id = FirebaseUtils.getChatsRef().push();
+
+        String id1 = FirebaseUtils.getMyId(this);
+        String id2 = userId;
+
+        Map<String, Object> users = new HashMap<>();
+        users.put(id1, Helpers.getActualUser(this).getAlias());
+        users.put(id2, username.getText().toString());
+
+        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(title.getText().toString(), users);
+        id.child("info").setValue(chatInfo);
+
+        //Set the chats to each user
+
+        Map<String, Object> chats1 = new HashMap<>();
+        chats1.put(id.getKey(),"");
+        FirebaseUtils.getUsersRef().child(id1).child("chats").updateChildren(chats1);
+
+        return id.getKey();
+    }
+
+    private void getChat(final String idChat, final long numChats) {
+        //Accessing to the chat with idChat ONCE
+        FirebaseUtils.getChatsRef().child(idChat).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot snapshot) {
+                FirebaseUtils.ChatInfo c = snapshot.getValue(FirebaseUtils.ChatInfo.class);
+                setButtonXat(c.getIdProduct(), c.getUsers(), idChat, numChats);
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {
+            }
+        });
+    }
+
+    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat, long numChats) {
+        String userName = "";
+        for (Object o : users.values()){
+            if (!o.toString().equals(Helpers.getActualUser(this).getAlias())) {
+                userName = o.toString();
+            }
+        }
+        String userId = "";
+        for (String s : users.keySet()){
+            if (!s.equals(FirebaseUtils.getMyId(this))) {
+                userId = s;
+            }
+        }
+
+        //Restriccions de obrir xat:
+        //      No mateix titul de producte ni id de usuari que ho ha publicat
+        if (idProduct.equals(title.getText().toString()) && userId.equals(this.userId)){
+            chatButton.setText("Xatejant");
+            this.idChat = idChat;
+            chatButton.setEnabled(true);
+        }
+        else {
+            this.idChat = "Not exists";
+            if (numChats == 1 && !this.username.getText().toString().equals(myName)) chatButton.setEnabled(true);
+        }
+
+        Log.i("Debug-Chat","idProd " +idProduct);
+        Log.i("Debug-Chat","title.getText().toString() " +title.getText().toString());
+        Log.i("Debug-Chat","userId " +userId);
+        Log.i("Debug-Chat","this.userId " +this.userId);
+
+
     }
 }

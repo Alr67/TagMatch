@@ -14,11 +14,13 @@ public class User {
     private String UID;
     private String userPhotoId;
     private String city;
+    private int latitude;
+    private int longitude;
     private String alias;
     private String descripcion;
     private String password;
     private Image imgPerfil;
-    private String mail;
+    private String email;
     private Integer valoration;
     private LatLng coord;
     ///Listado de usuarios que tienen bloqueado al usuario
@@ -35,7 +37,7 @@ public class User {
         this.descripcion = "";
         this.password = "";
         this.valoration = 5;
-        this.mail = "";
+        this.email = "";
         this.userPhotoId = userPhotoId;
         this.city = city;
     }
@@ -56,12 +58,30 @@ public class User {
         return imgPerfil;
     }
 
-    public String getMail() {
-        return mail;
+    public String getEmail() {
+        return email;
     }
 
     public Integer getValoration() {
         return valoration;
+    }
+
+    public String getCity() {return city;}
+
+    public String getUserPhotoId(){return userPhotoId;}
+
+    public int getLongitude(){return longitude;}
+
+    public int getLatitude(){return latitude;}
+
+    public User(String username, String password, String email, String userPhotoId, String city, int latitude, int longitude){
+        this.alias = username;
+        this.password = password;
+        this.email = email;
+        this.userPhotoId = userPhotoId;
+        this.city = city;
+        this.latitude = latitude;
+        this.longitude = longitude;
     }
 
     public User(){
@@ -71,7 +91,7 @@ public class User {
         this.descripcion = "";
         this.password = "";
         this.valoration = 5;
-        this.mail = "";
+        this.email = "";
         this.userPhotoId = "";
         this.city = "";
     }
@@ -83,7 +103,7 @@ public class User {
         this.descripcion = "";
         this.password = "";
         this.valoration = 5;
-        this.mail = "";
+        this.email = "";
         this.userPhotoId = "";
         this.city = "";
     }
@@ -95,7 +115,7 @@ public class User {
         this.descripcion = "";
         this.password = password;
         this.valoration = 5;
-        this.mail = "";
+        this.email = "";
         this.userPhotoId = "";
         this.city = "";
     }
@@ -106,7 +126,7 @@ public class User {
         this.imgPerfil = imgPerfil;
         this.descripcion = desc;
         this.password = password;
-        this.mail = mail;
+        this.email = mail;
         this.valoration = 5;
         this.userPhotoId = "";
         this.city = "";

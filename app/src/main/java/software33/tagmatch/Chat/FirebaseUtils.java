@@ -3,7 +3,9 @@ package software33.tagmatch.Chat;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.util.Log;
+import android.widget.Toast;
 
+import com.firebase.client.AuthData;
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
@@ -35,6 +37,33 @@ public abstract class FirebaseUtils {
         editor.commit();
     }
 
+    public static void removeMyId(Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE).edit();
+        editor.remove("uid");
+        editor.commit();
+    }
+
+    public static String getChatImage(Context context){
+        String data;
+        SharedPreferences prefs = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE);
+        data = (prefs.getString("img", null));
+        return data;
+    }
+
+    public static void setChatImage(String img, Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE).edit();
+        editor.putString("img",img);
+        editor.commit();
+    }
+
+    public static void removeChatImage(Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE).edit();
+        editor.remove("img");
+        editor.commit();
+    }
+
+    public static Firebase getMyFirebaseRef() { return myFirebaseRef; }
+
     public static Firebase getChatsRef() {
         return chatsRef;
     }
@@ -63,6 +92,64 @@ public abstract class FirebaseUtils {
         public Map<String, Object> getUsers(){
             return users;
         }
+    }
+
+    public static class User {
+        String alias;
+        String img;
+        Map<String, Object> blockeds = new HashMap<>();
+        Map<String, Object> chats = new HashMap<>();
+        public User() {}
+        public User(String alias, String img, Map<String, Object> blockeds, Map<String, Object> chats) {
+            this.alias = alias;
+            this.img = img;
+            this.blockeds = blockeds;
+            this.chats = chats;
+        }
+        public String getAlias() {
+            return alias;
+        }
+        public String getImg() {
+            return img;
+        }
+        public Map<String, Object> getBloqueados(){
+            return blockeds;
+        }
+        public Map<String, Object> getChats(){
+            return chats;
+        }
+    }
+
+    public static void createUser(final String email, final String password, final String name, final Map<String, Object> img, final Context context) {
+        myFirebaseRef.createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
+            @Override
+            public void onSuccess(Map<String, Object> result) {
+                myFirebaseRef.authWithPassword(
+                        email,
+                        password,
+                        new Firebase.AuthResultHandler() {
+                            @Override
+                            public void onAuthenticated(AuthData authData) {
+                                usersRef.child(authData.getUid()).setValue
+                                        (new User(name,"",new HashMap<String, Object>(),new HashMap<String, Object>()));
+                                setMyId(authData.getUid(),context);
+                                FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(context)).updateChildren(img);
+                            }
+
+                            @Override
+                            public void onAuthenticationError(FirebaseError error) {
+                                Log.i("Debug-Firebase","error auth user in firebase");
+                            }
+                        }
+                );
+                //setMyId(result.get("uid").toString(), context);
+            }
+
+            @Override
+            public void onError(FirebaseError firebaseError) {
+                Log.i("Debug-Firebase", firebaseError.getMessage());
+            }
+        });
     }
 
 }
