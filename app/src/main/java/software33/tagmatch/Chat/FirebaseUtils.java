@@ -37,6 +37,33 @@ public abstract class FirebaseUtils {
         editor.commit();
     }
 
+    public static void removeMyId(Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE).edit();
+        editor.remove("uid");
+        editor.commit();
+    }
+
+    public static String getChatImage(Context context){
+        String data;
+        SharedPreferences prefs = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE);
+        data = (prefs.getString("img", null));
+        return data;
+    }
+
+    public static void setChatImage(String img, Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE).edit();
+        editor.putString("img",img);
+        editor.commit();
+    }
+
+    public static void removeChatImage(Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE).edit();
+        editor.remove("img");
+        editor.commit();
+    }
+
+    public static Firebase getMyFirebaseRef() { return myFirebaseRef; }
+
     public static Firebase getChatsRef() {
         return chatsRef;
     }
@@ -67,7 +94,7 @@ public abstract class FirebaseUtils {
         }
     }
 
-    private static class User {
+    public static class User {
         String alias;
         String img;
         Map<String, Object> blockeds = new HashMap<>();

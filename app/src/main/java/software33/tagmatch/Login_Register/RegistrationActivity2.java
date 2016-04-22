@@ -23,6 +23,9 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.firebase.client.AuthData;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
@@ -43,6 +46,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import software33.tagmatch.Chat.FirebaseUtils;
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
@@ -92,20 +96,25 @@ public class RegistrationActivity2 extends AppCompatActivity implements
 
         img.put("img","");
 
-        new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+        try {
+            new GoogleApiClient.Builder(this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
 
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                map.clear();
-                userMarker = latLng;
-                map.addMarker(new MarkerOptions().position(userMarker));
-            }
-        });
+            map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    map.clear();
+                    userMarker = latLng;
+                    map.addMarker(new MarkerOptions().position(userMarker));
+                }
+            });
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (mGoogleApiClient == null) {
             // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
@@ -198,12 +207,9 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         if (imgExtension != null) {
             updateIMG();
         }
-        updateLocation();
 
         /*** Firebase create user ***/
-        FirebaseUtils.createUser(email, password, username, img, getApplicationContext());
-
-        backToLogin();
+        createUser(email, password, username, img, this);
     }
 
     private void updateIMG() {
@@ -241,11 +247,12 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         }
     }
 
-    private void updateLocation() {
+    private void updateUser() {
         try {
             JSONObject jObject = new JSONObject();
             jObject.put("latitude", userMarker.latitude);
             jObject.put("longitude", userMarker.longitude);
+            jObject.put("firebaseID", FirebaseUtils.getMyId(this));
 
             Log.i("updateLoc", "he entrado");
 
@@ -268,6 +275,42 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         Intent act = new Intent(this, Login.class);
         startActivity(act);
         finish();
+    }
+
+    public void createUser(final String email, final String password, final String name, final Map<String, Object> img, final Context context) {
+        FirebaseUtils.getMyFirebaseRef().createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
+            @Override
+            public void onSuccess(Map<String, Object> result) {
+                FirebaseUtils.getMyFirebaseRef().authWithPassword(
+                        email,
+                        password,
+                        new Firebase.AuthResultHandler() {
+                            @Override
+                            public void onAuthenticated(AuthData authData) {
+                                FirebaseUtils.getUsersRef().child(authData.getUid()).setValue
+                                        (new FirebaseUtils.User(name,"",new HashMap<String, Object>(),new HashMap<String, Object>()));
+                                FirebaseUtils.setMyId(authData.getUid(),context);
+                                FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(context)).updateChildren(img);
+
+                                updateUser();
+
+                                backToLogin();
+                            }
+
+                            @Override
+                            public void onAuthenticationError(FirebaseError error) {
+                                Log.i("Debug-Firebase","error auth user in firebase");
+                            }
+                        }
+                );
+                //setMyId(result.get("uid").toString(), context);
+            }
+
+            @Override
+            public void onError(FirebaseError firebaseError) {
+                Log.i("Debug-Firebase", firebaseError.getMessage());
+            }
+        });
     }
 
     @Override

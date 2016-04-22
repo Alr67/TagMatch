@@ -38,6 +38,7 @@ import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -46,11 +47,14 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.SingleChatActivity;
+import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
@@ -63,11 +67,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
     TextView tvUserName, tvLocation;
     ImageView ivUserImage;
-    Button bStartXat;
     private GoogleMap map;
-    private String myId, userId;
-    private String userName, titleProduct;
-    private String imageChat;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,35 +91,45 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         Firebase.setAndroidContext(this);
 
-        //TODO:Get user and product
-        userName = "Usuario0";
-        titleProduct = "ProductExample";
-        userId = "aec6538a-bde2-4ea8-98bf-6fdc3f95127e";
-
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
         User user = Helpers.getActualUser(this);
         tvUserName.setText(user.getAlias());
-        tvLocation.setText(user.getCity());
-
-        try {
-            LatLng latLng = new LatLng(user.getLattitude(), user.getLongitude());
-            CameraUpdate center =
-                    CameraUpdateFactory.newLatLng(latLng);
-            CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
-
-            map.moveCamera(center);
-            map.animateCamera(zoom);
-        }
-        catch (Exception e){
-            e.printStackTrace();
-        }
-
 
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
+
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Helpers.showError(error,getApplicationContext());
+                        }
+                        else if (jsonObject.has("username")){
+                            Log.i("Debug-GetUser",jsonObject.toString());
+                            tvLocation.setText(jsonObject.get("city").toString());
+
+                            LatLng latLng = new LatLng(jsonObject.getInt("latitude"), jsonObject.getInt("longitude"));
+                            try {
+                                CameraUpdate center =
+                                        CameraUpdateFactory.newLatLng(latLng);
+                                CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+
+                                map.moveCamera(center);
+                                map.animateCamera(zoom);
+                            }
+                            catch (Exception e) {}
+                        }
+                    } catch (JSONException ignored) {
+                        Log.i("DEBUG","error al get user");
+                    }
+                }
+            }.execute(jsonObject);
+
             new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias() + "/photo", this) {
                 @Override
                 protected void onPostExecute(String url) {

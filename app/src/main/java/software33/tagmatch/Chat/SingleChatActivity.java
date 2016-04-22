@@ -59,7 +59,8 @@ public class SingleChatActivity extends AppCompatActivity {
         titleProduct = b.getString("TitleProduct");
         idChat = b.getString("IdChat");
         idUser = b.getString("IdUser");
-        imageChat = b.getString("ImageChat");
+        imageChat = FirebaseUtils.getChatImage(this);
+        FirebaseUtils.removeChatImage(this);
         myId = FirebaseUtils.getMyId(this);
 
         //Get Firebase Reference

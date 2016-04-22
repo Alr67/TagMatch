@@ -86,7 +86,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         items = new ArrayList<>();
 
-        downloadUserFromServer();
         downloadAdvertsFromServer();
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
@@ -110,47 +109,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         });
         recycler.setAdapter(adapter);
 
-        //TODO: Arreglar com aconseguir el Uid
-        Firebase.setAndroidContext(this);
-        String myId = "b514d66d-0780-4531-8d7e-55130d801af4";
-        FirebaseUtils.setMyId(myId,this);
-    }
-
-    private void downloadUserFromServer(){
-        JSONObject jObject = new JSONObject();
-        User user = Helpers.getActualUser(this);
-        try {
-            JSONObject jsonObject = new JSONObject();
-            jsonObject.put("username", Helpers.getActualUser(this).getAlias());
-            jsonObject.put("password", Helpers.getActualUser(this).getPassword());
-            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
-                @Override
-                protected void onPostExecute(JSONObject jsonObject) {
-                    try {
-                        if(jsonObject.has("error")) {
-                            String error = jsonObject.get("error").toString();
-                            Helpers.showError(error,getApplicationContext());
-                        }
-                        else if (jsonObject.has("username")){
-                            Log.i("Debug-GetUser",jsonObject.toString());
-                            Helpers.saveActualUser(Helpers.getActualUser(getApplicationContext()).getAlias(),
-                                    Helpers.getActualUser(getApplicationContext()).getPassword(),
-                                    jsonObject.get("email").toString(),
-                                    jsonObject.get("profilePhotoId").toString(),
-                                    jsonObject.get("city").toString(),
-                                    jsonObject.getInt("lattitude"),
-                                    jsonObject.getInt("longitude"),
-                                    getApplicationContext());
-                        }
-                    } catch (JSONException ignored) {
-                        Log.i("DEBUG","XD");
-                    }
-                }
-            }.execute(jsonObject);
-
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
     }
 
     private void downloadAdvertsFromServer() {

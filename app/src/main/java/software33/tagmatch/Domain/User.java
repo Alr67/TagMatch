@@ -14,7 +14,7 @@ public class User {
     private String UID;
     private String userPhotoId;
     private String city;
-    private int lattitude;
+    private int latitude;
     private int longitude;
     private String alias;
     private String descripcion;
@@ -72,15 +72,15 @@ public class User {
 
     public int getLongitude(){return longitude;}
 
-    public int getLattitude(){return lattitude;}
+    public int getLatitude(){return latitude;}
 
-    public User(String username, String password, String email, String userPhotoId, String city, int lattitude, int longitude){
+    public User(String username, String password, String email, String userPhotoId, String city, int latitude, int longitude){
         this.alias = username;
         this.password = password;
         this.email = email;
         this.userPhotoId = userPhotoId;
         this.city = city;
-        this.lattitude = lattitude;
+        this.latitude = latitude;
         this.longitude = longitude;
     }
 

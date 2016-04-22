@@ -3,6 +3,9 @@ package software33.tagmatch.Chat;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.util.Pair;
 import android.support.v4.view.MenuItemCompat;
@@ -13,6 +16,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,11 +31,13 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
 
 public class MainChatActivity extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
@@ -47,6 +53,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     private Firebase usersRef;
 
     private String myId;
+    private String myName;
 
     private ChildEventListener mListener;
 
@@ -84,8 +91,13 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         //createUser("correu1@xd.com", "contra123");
 
         myId = FirebaseUtils.getMyId(this);
+        myName = Helpers.getActualUser(this).getAlias();
 
         //Accessing to the chats of my user
+
+        Resources res =getResources();
+        adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+        list.setAdapter( adapter );
         getChats();
         /*
         mListener = this.usersRef.child(myId).child("chats").addChildEventListener(new ChildEventListener() {
@@ -337,7 +349,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                 //Get Correct User Between two
                 String userName = "";
                 for (Object o : c.getUsers().values()) {
-                    if (!o.toString().equals("My User Name")) {
+                    if (!o.toString().equals(myName)){
                         userName = o.toString();
                     }
                 }
@@ -377,13 +389,27 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         Pair<String,String> ids = idChatsUser.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
         String img = imageChatsUser.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
 
-        Intent intent = new Intent(this, SingleChatActivity.class);
+        /*Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
         b.putString("UserName", tempValues.getUserName());
         b.putString("TitleProduct", tempValues.getTitleProduct());
         b.putString("IdChat", ids.first);
         b.putString("IdUser", ids.second);
         b.putString("ImageChat", img);
+        intent.putExtras(b);
+
+        startActivity(intent);*/
+
+        Intent intent = new Intent(this, SingleChatActivity.class);
+        Bundle b = new Bundle();
+        b.putString("UserName", tempValues.getUserName());
+        b.putString("TitleProduct", tempValues.getTitleProduct());
+
+        b.putString("IdChat", ids.first);
+        b.putString("IdUser", ids.second);
+
+        FirebaseUtils.setChatImage(img,this);
+
         intent.putExtras(b);
 
         startActivity(intent);

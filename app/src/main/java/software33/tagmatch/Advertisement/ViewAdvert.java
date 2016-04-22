@@ -62,13 +62,15 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private ChildEventListener mListener;
     private String idChat = "Not exists";
     //TODO: hardcoded userId
-    private String userId = "aec6538a-bde2-4ea8-98bf-6fdc3f95127e";
+    private String userId;
     private String imageChat;
+    private String myName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_view_advert);
+        myName = Helpers.getActualUser(this).getAlias();
         initComponents();
         Bundle b = getIntent().getExtras();
         if(b != null) {
@@ -213,12 +215,12 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     }
                 }.execute(jObject);
         }
-        getUserImage();
+        getUserImageAndFirebaseID();
     }
 
 
 
-    private void getUserImage() {
+    private void getUserImageAndFirebaseID() {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
         try {
@@ -229,6 +231,24 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             e.printStackTrace();
         }
         String url = Constants.IP_SERVER+"/users/"+ adv.getUser().getAlias()+"/photo";
+
+        new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + adv.getUser().getAlias(), this) {
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Helpers.showError(error,getApplicationContext());
+                    }
+                    else if (jsonObject.has("username")){
+                        Log.i("Debug-GetUser",jsonObject.toString());
+                        userId = jsonObject.get("firebaseID").toString();
+                    }
+                } catch (JSONException ignored) {
+                    Log.i("DEBUG","error al get user");
+                }
+            }
+        }.execute(jObject);
 
         new TagMatchGetImageAsyncTask(url, this) {
             @Override
@@ -247,7 +267,8 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChildren()){
-                    chatButton.setEnabled(true);
+                    if (!adv.getOwner().getAlias().equals(myName))
+                        chatButton.setEnabled(true);
                 }
                 else {
                     long numChats = dataSnapshot.getChildrenCount();
@@ -294,7 +315,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     }
 
     public void buttonStartXat(View view) {
-        //TODO: Get userName and TitleProduct
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
         b.putString("UserName", username.getText().toString());
@@ -305,7 +325,21 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         }
         else b.putString("IdChat", idChat);
         b.putString("IdUser", userId);
-        b.putString("ImageChat", imageChat);
+
+        //Get user Image
+        Drawable drawable = userImage.getDrawable();
+
+        BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
+        Bitmap bitmap = bitmapDrawable .getBitmap();
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] imageInByte = stream.toByteArray();
+
+        String encodedImage = Base64.encodeToString(imageInByte, Base64.DEFAULT);
+
+        imageChat = encodedImage;
+
+        FirebaseUtils.setChatImage(imageChat,this);
         intent.putExtras(b);
 
         startActivity(intent);
@@ -329,19 +363,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Map<String, Object> chats1 = new HashMap<>();
         chats1.put(id.getKey(),"");
         FirebaseUtils.getUsersRef().child(id1).child("chats").updateChildren(chats1);
-
-        //Get user Image
-        Drawable drawable = userImage.getDrawable();
-
-        BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
-        Bitmap bitmap = bitmapDrawable .getBitmap();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] imageInByte = stream.toByteArray();
-
-        String encodedImage = Base64.encodeToString(imageInByte, Base64.DEFAULT);
-
-        imageChat = encodedImage;
 
         return id.getKey();
     }
@@ -383,7 +404,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         }
         else {
             this.idChat = "Not exists";
-            if (numChats == 1) chatButton.setEnabled(true);
+            if (numChats == 1 && !this.username.getText().toString().equals(myName)) chatButton.setEnabled(true);
         }
 
         Log.i("Debug-Chat","idProd " +idProduct);

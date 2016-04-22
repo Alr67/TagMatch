@@ -13,6 +13,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 
+import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Domain.AdvChange;
 import software33.tagmatch.Domain.AdvGift;
 import software33.tagmatch.Domain.AdvSell;
@@ -45,20 +46,20 @@ public class Helpers {
                                 prefs.getString("email", null),
                                 prefs.getString("photoId", null),
                                 prefs.getString("city", null),
-                                prefs.getInt("lattitude",0),
+                                prefs.getInt("latitude",0),
                                 prefs.getInt("longitude",0));
         return user;
     }
 
     public static void saveActualUser(String name, String password, String email,
-                                      String photoId, String city, int lattitude, int longitude, Context context){
+                                      String photoId, String city, int latitude, int longitude, Context context){
         SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.putString("name", name);
         editor.putString("password", password);
         editor.putString("email", email);
         editor.putString("photoId", photoId);
         editor.putString("city", city);
-        editor.putInt("lattitude", lattitude);
+        editor.putInt("latitude", latitude);
         editor.putInt("longitude", longitude);
         editor.commit();
     }
@@ -67,6 +68,7 @@ public class Helpers {
         SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.remove("name");
         editor.remove("password");
+        FirebaseUtils.removeMyId(context);
         editor.commit();
     }
 
