@@ -96,5 +96,15 @@
 
     <!-- Filters -->
     <string name="filter_title">Filtres de cerca</string>
+    <string name="filter_same_city">Mateixa ciutat?</string>
+    <string name="filter_advertisement_type">Tipus d'anunci</string>
+    <string name="filter_change_advertisement">Intercanvi</string>
+    <string name="filter_gift_advertisement">Regal</string>
+    <string name="filter_sell_advertisement">Venda</string>
+    <string name="filter_tv1_price">Desde</string>
+    <string name="filter_tv2_price">€ fins a</string>
+    <string name="filter_tv3_price">€</string>
+
+
 
 </resources>

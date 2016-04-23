@@ -23,8 +23,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/search_field"
-            android:backgroundTint="@android:color/holo_blue_dark"
-            android:layout_weight="400" />
+            android:backgroundTint="@android:color/holo_blue_dark" />
 
         <ImageView
             android:layout_width="35dp"
@@ -76,26 +75,75 @@
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New CheckBox"
-                android:id="@+id/checkBox" />
+                android:text="@string/filter_same_city"
+                android:id="@+id/filter_same_city"
+                android:checked="false" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:text="@string/filter_advertisement_type"
+                android:id="@+id/textView5" />
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New CheckBox"
-                android:id="@+id/checkBox2" />
+                android:text="@string/filter_sell_advertisement"
+                android:id="@+id/filter_sell"
+                android:checked="false" />
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New CheckBox"
-                android:id="@+id/checkBox3" />
+                android:text="@string/filter_change_advertisement"
+                android:id="@+id/filter_change"
+                android:checked="false" />
 
             <CheckBox
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="New CheckBox"
-                android:id="@+id/checkBox4" />
+                android:text="@string/filter_gift_advertisement"
+                android:id="@+id/filter_gift"
+                android:checked="false" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_weight="3"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/filter_tv1_price" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords"
+                    android:id="@+id/filter_price1"
+                    android:layout_weight="0.25" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/filter_tv2_price" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="textCapWords"
+                    android:id="@+id/filter_price2"
+                    android:layout_weight="0.25" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/filter_tv3_price" />
+
+            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
