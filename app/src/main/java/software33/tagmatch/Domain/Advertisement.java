@@ -118,7 +118,6 @@ public class Advertisement {
             jsonObject.put("name", title);
             jsonObject.put("type", getTypeDescription());
             jsonObject.put("owner", owner.getAlias());
-            Log.i("Alias user", owner.getAlias());
             jsonObject.put("category", category);
             jsonObject.put("tags", new JSONArray(tags));
             jsonObject.put("description", description);
@@ -128,7 +127,6 @@ public class Advertisement {
     }
 
     public User getUser() {
-        Log.i(Constants.DebugTAG,"getUser, username: "+owner.getAlias());
         return owner;
     }
 

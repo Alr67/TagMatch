@@ -9,7 +9,6 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,8 +22,11 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
@@ -42,8 +44,8 @@ import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetBitmapAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
-import software33.tagmatch.ServerConnection.TagMatchGetImgurImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
@@ -81,7 +83,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     public void getAdvertisement(Integer id) {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
-        Log.i(Constants.DebugTAG,"Vaig a mostrar l'anunci amb id: "+id);
+        Log.i(Constants.DebugTAG, "Vaig a mostrar l'anunci amb id: " + id);
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());
@@ -156,16 +158,13 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             tagsLine = tagsLine + "#" +advTags[i] + " ";
         }
         Log.i(Constants.DebugTAG,"TAGS: "+tagsLine);
-        Log.i(Constants.DebugTAG,"User name: "+adv.getUser().getAlias());
+        Log.i(Constants.DebugTAG, "User name: " + adv.getUser().getAlias());
         tags.setText(tagsLine);
         if(adv.getUser().getCoord()!=null)map.addMarker(new MarkerOptions().position(adv.getUser().getCoord()));
         getAdvertisementImages();
     }
 
     private void getAdvertisementImages() {
-            /*for(Bitmap image : adv.getImages()) {
-            mCustomPagerAdapterViewAdvert.addImage(image);
-        }*/
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
         try {
@@ -178,45 +177,18 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         String url = Constants.IP_SERVER+"/ads/"+ adv.getID().toString()+"/photo/";
         Log.i(Constants.DebugTAG,"Aquest anunci te "+adv.getImagesIDs().length+" fotos");
         for (String photoId :adv.getImagesIDs()) {
-            Log.i(Constants.DebugTAG,"Vaig a demanar la foto amb id: "+photoId);
+            Log.i(Constants.DebugTAG, "Vaig a demanar la foto amb id: " + photoId);
 
-                new TagMatchGetAsyncTask(url+photoId.toString(),this) {
+                new TagMatchGetBitmapAsyncTask(url+photoId.toString(),getApplicationContext()) {
                     @Override
-                    protected void onPostExecute(JSONObject jsonObject) {
-                        Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
-                        if(jsonObject.has("302")) {
-                            try {
-                                new TagMatchGetImgurImageAsyncTask(jsonObject.getString("302"),getApplicationContext()) {
-                                    @Override
-                                    protected void onPostExecute(JSONObject jsonObject) {
-                                        Log.i(Constants.DebugTAG,"onPostExecute de la imatge JSON: "+jsonObject.toString());
-                                        try {
-                                        if(jsonObject.has("image")) {
-                                            Bitmap image = Helpers.stringToBitMap(jsonObject.getString("image"));
-                                            mCustomPagerAdapterViewAdvert.addImage(image);
-                                            Log.i(Constants.DebugTAG,"image added");
-                                        }
-                                        else {
-                                            Toast.makeText(getApplicationContext(),jsonObject.getString("error"),Toast.LENGTH_SHORT);
-                                        }
-                                        //  adv = convertJSONToAdvertisement(jsonObject);
-                                        } catch (JSONException e) {
-                                            e.printStackTrace();
-                                        }
-                                    }
-                                }.execute();
-                            } catch (JSONException e) {
-                                e.printStackTrace();
-                            }
-                        }
-                          //  adv = convertJSONToAdvertisement(jsonObject);
+                    protected void onPostExecute(Bitmap image) {
+                            mCustomPagerAdapterViewAdvert.addImage(image);
+                            Log.i(Constants.DebugTAG,"image added");
                     }
                 }.execute(jObject);
         }
         getUserImageAndFirebaseID();
     }
-
-
 
     private void getUserImageAndFirebaseID() {
         JSONObject jObject = new JSONObject();
@@ -241,6 +213,12 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     else if (jsonObject.has("username")){
                         Log.i("Debug-GetUser",jsonObject.toString());
                         userId = jsonObject.get("firebaseID").toString();
+                        LatLng latLng = new LatLng(jsonObject.getInt("latitude"), jsonObject.getInt("longitude"));
+                        CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
+                        CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+
+                        map.moveCamera(center);
+                        map.animateCamera(zoom);
                     }
                 } catch (JSONException ignored) {
                     Log.i("DEBUG","error al get user");
