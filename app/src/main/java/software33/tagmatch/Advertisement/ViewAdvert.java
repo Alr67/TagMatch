@@ -211,14 +211,16 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                         Helpers.showError(error,getApplicationContext());
                     }
                     else if (jsonObject.has("username")){
-                        Log.i("Debug-GetUser",jsonObject.toString());
-                        userId = jsonObject.get("firebaseID").toString();
-                        LatLng latLng = new LatLng(jsonObject.getInt("latitude"), jsonObject.getInt("longitude"));
-                        CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
-                        CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+                        try {
+                            Log.i("Debug-GetUser", jsonObject.toString());
+                            userId = jsonObject.get("firebaseID").toString();
+                            LatLng latLng = new LatLng(jsonObject.getInt("latitude"), jsonObject.getInt("longitude"));
+                            CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
+                            CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
 
-                        map.moveCamera(center);
-                        map.animateCamera(zoom);
+                            map.moveCamera(center);
+                            map.animateCamera(zoom);
+                        }catch(Exception e){}
                     }
                 } catch (JSONException ignored) {
                     Log.i("DEBUG","error al get user");
