@@ -97,7 +97,5 @@
     <!-- Filters -->
     <string name="filter_title">Search Filter</string>
     <string name="filter_same_city">Same city?</string>
-    <string name="filter_tv2_price">€ to</string>
-    <string name="filter_tv3_price">€</string>
 
 </resources>

@@ -62,10 +62,6 @@ public class User {
         return email;
     }
 
-    public String getCity() {
-        return city;
-    }
-
     public Integer getValoration() {
         return valoration;
     }

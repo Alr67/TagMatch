@@ -79,38 +79,6 @@
                 android:id="@+id/filter_same_city"
                 android:checked="false" />
 
-            <LinearLayout
-                android:orientation="horizontal"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_weight="3"
-                android:weightSum="1">
-
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="textCapWords"
-                    android:id="@+id/filter_price1"
-                    android:layout_weight="0.25" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/filter_tv2_price" />
-
-                <EditText
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:inputType="textCapWords"
-                    android:id="@+id/filter_price2"
-                    android:layout_weight="0.25" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/filter_tv3_price" />
-
-            </LinearLayout>
         </LinearLayout>
 
     </LinearLayout>
