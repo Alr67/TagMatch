@@ -50,6 +50,8 @@ import software33.tagmatch.Domain.AdvSell;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetBitmapAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.Utils.Constants;
@@ -65,6 +67,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private ViewPager mViewPager;
     private String imgExtension;
     private final String DebugTag = "DEBUG ADVERT";
+    Advertisement adv;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -134,6 +137,14 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         mViewPager.setLayoutParams(params);
         mCustomPagerAdapterNewAdvert = new CustomPagerAdapterNewAdvert(this,params.height,params.width);
         mViewPager.setAdapter(mCustomPagerAdapterNewAdvert);
+
+
+        Intent intent = getIntent();
+
+        if(intent.hasExtra("edit") && intent.getBooleanExtra("edit",false)) { //Si es edit
+            getAdvertisement(intent.getIntExtra("idAnunci",0));
+            getAdvertisementImages();
+        }
 
     }
 
@@ -336,6 +347,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     private String pathfoto;
+
     private File createImageFile() throws IOException {
         Log.v(DebugTag, "Anem a crear el fitxer de la foto");
         //Create an unique name for the new picture
@@ -399,5 +411,59 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         Intent intent = new Intent(this, Home.class);
         startActivity(intent);
         finish();
+    }
+
+
+    //Part només de l'edit
+    public void getAdvertisement(Integer id) {
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        Log.i(Constants.DebugTAG, "Vaig a mostrar l'anunci amb id: " + id);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+            Log.i(Constants.DebugTAG,"Vaig a fer el get a: "+ Constants.IP_SERVER+"/ads/"+id.toString());
+            new TagMatchGetAsyncTask(Constants.IP_SERVER+"/ads/"+id.toString(),this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    Log.i(Constants.DebugTAG,"onPostExecute");
+                    Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
+                    adv = Helpers.convertJSONToAdvertisement(jsonObject);
+                    fillComponents();
+                    //String error = jsonObject.get("error").toString();
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA");
+            e.printStackTrace();
+        }
+    }
+
+    private void fillComponents() {
+    }
+
+    private void getAdvertisementImages() {
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
+            e.printStackTrace();
+        }
+        String url = Constants.IP_SERVER+"/ads/"+ adv.getID().toString()+"/photo/";
+        Log.i(Constants.DebugTAG,"Aquest anunci te "+adv.getImagesIDs().length+" fotos");
+        for (String photoId :adv.getImagesIDs()) {
+            Log.i(Constants.DebugTAG, "Vaig a demanar la foto amb id: " + photoId);
+
+            new TagMatchGetBitmapAsyncTask(url+photoId.toString(),getApplicationContext()) {
+                @Override
+                protected void onPostExecute(Bitmap image) {
+                    mCustomPagerAdapterNewAdvert.addImageBitmap(image);
+                    Log.i(Constants.DebugTAG,"image added");
+                }
+            }.execute(jObject);
+        }
     }
 }

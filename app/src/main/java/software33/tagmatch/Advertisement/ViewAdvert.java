@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -73,6 +74,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String myName;
 
     private boolean myAdv;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -91,6 +93,10 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             getAdvertisement(b.getInt(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT));
         }
         else Log.i(Constants.DebugTAG,"Bundle EMPTY");
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setClickable(false);
+
     }
 
 
@@ -144,7 +150,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(this,"NOT IMPLEMENTED YET",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,R.string.wait_chat,Toast.LENGTH_SHORT).show();
     }
 
     private void initComponents() {
@@ -323,7 +329,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         finish();
     }
 
-    public void buttonStartXat(View view) {
+    public Intent buttonStartXat(View view) {
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
         b.putString("UserName", username.getText().toString());
@@ -351,7 +357,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         FirebaseUtils.setChatImage(imageChat,this);
         intent.putExtras(b);
 
-        startActivity(intent);
+        return intent;
     }
 
     private String createChat() {
@@ -390,7 +396,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat, long numChats) {
+    private void setButtonXat(final String idProduct, final Map<String, Object> users, final String idChat, final long numChats) {
         String userName = "";
         for (Object o : users.values()){
             if (!o.toString().equals(Helpers.getActualUser(this).getAlias())) {
@@ -407,13 +413,29 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         //Restriccions de obrir xat:
         //      No mateix titul de producte ni id de usuari que ho ha publicat
         if (idProduct.equals(title.getText().toString()) && userId.equals(this.userId)){
-            chatButton.setText("Xatejant");
             this.idChat = idChat;
-            chatButton.setEnabled(true);
+            fab.setClickable(true);
+
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent chat = buttonStartXat(view);
+                    startActivity(chat);
+                }
+            });
         }
         else {
             this.idChat = "Not exists";
-            if (numChats == 1 && !this.username.getText().toString().equals(myName)) chatButton.setEnabled(true);
+            if (numChats == 1 && !this.username.getText().toString().equals(myName)){
+                fab.setClickable(true);
+                fab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent chat = buttonStartXat(view);
+                        startActivity(chat);
+                    }
+                });
+            }
         }
 
         Log.i("Debug-Chat","idProd " +idProduct);
