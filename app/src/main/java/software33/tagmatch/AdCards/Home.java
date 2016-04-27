@@ -104,6 +104,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             public void onClick(View v) {
                 Integer id = items.get(v.getTag().hashCode()).getAd_id();
                 Intent viewRecepta = new Intent(getApplicationContext(), ViewAdvert.class).putExtra(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT, id);
+                viewRecepta.putExtra(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT,items.get(v.getTag().hashCode()).getOwner());
                 startActivity(viewRecepta);
                 finish();
             }
@@ -140,7 +141,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 String imageId;
                                 if(newAdvert.getImagesIDs().length>0) imageId = newAdvert.getImagesIDs()[0];
                                 else imageId = "";
-                                items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getID()));
+                                items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getOwner().getAlias(), newAdvert.getID()));
                             }
                             adapter.notifyDataSetChanged();
 

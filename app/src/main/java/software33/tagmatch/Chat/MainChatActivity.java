@@ -82,8 +82,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         list= ( ListView )findViewById( R.id.list_chats );
         Firebase.setAndroidContext(this);
         //Get Firebase Reference
-        myFirebaseRef =
-                new Firebase("https://torrid-torch-42.firebaseio.com/");
+        myFirebaseRef = FirebaseUtils.getMyFirebaseRef();
 
         chatsRef = myFirebaseRef.child("chats");
         usersRef = myFirebaseRef.child("users");

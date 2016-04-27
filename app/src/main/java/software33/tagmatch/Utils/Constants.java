@@ -49,9 +49,10 @@ public abstract class Constants {
 
     /* Bundle TAGS */
     public static final String TAG_BUNDLE_IDVIEWADVERTISEMENT = "AdvertisementId";
+    public static final String TAG_BUNDLE_USERVIEWADVERTISEMENT = "UserAdvertisement";
 
     /* Home advert server preferences */
-    public static final Integer SERVER_IdGreaterThan = 1;
+    public static final Integer SERVER_IdGreaterThan = 0;
     public static final Integer SERVER_IdSmallerThan = 5;
     public static final Integer SERVER_limitAdverts = 40;
 
@@ -63,4 +64,5 @@ public abstract class Constants {
     public static final AdvSell testAdvertSell = new AdvSell(testUser,"REGAL 1",testImages,"TExtmolt llarg",testTags,"Categoria",32.2);
     public static final Integer idTEST = 4;
     public static final String DebugTAG = "DEBUG";
+    public static final String DebugTAGDelete = "DEBUG-DeleteTask";
 }

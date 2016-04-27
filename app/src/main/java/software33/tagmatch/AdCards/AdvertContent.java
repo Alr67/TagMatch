@@ -17,6 +17,8 @@ public class AdvertContent {
     private String ad_type;
     private Double ad_price;
 
+    private String ad_owner;
+
     public AdvertContent(String s, String img, String type) {
         this.ad_name = s;
         this.ad_img_id = img;
@@ -24,11 +26,12 @@ public class AdvertContent {
         this.ad_price = -1.0;
     }
 
-    public AdvertContent( String s, String img, String type, Double price, Integer id) {
+    public AdvertContent( String s, String img, String type, Double price, String ad_owner, Integer id) {
         this.ad_name = s;
         this.ad_img_id = img;
         this.ad_type = type;
         this.ad_price = price;
+        this.ad_owner = ad_owner;
         this.ad_id = id;
     }
 
@@ -48,5 +51,9 @@ public class AdvertContent {
 
     public Double getPrice() {
         return ad_price;
+    }
+
+    public String getOwner() {
+        return ad_owner;
     }
 }
