@@ -442,7 +442,10 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         getAdvertisementImages();
         title.setText(adv.getTitle());
         description.setText(adv.getDescription());
-        typeSpinner.setSelection(Helpers.getIntFromType(adv.getTypeDescription()));
+        int type = Helpers.getIntFromType(adv.getTypeDescription());
+        typeSpinner.setSelection(type);
+        if(type == 0) wantedTags.setText(adv.getPrice().toString());
+        categorySpinner.setSelection(Helpers.getIntFromCategory(adv.getCategory()));
     }
 
     private void getAdvertisementImages() {

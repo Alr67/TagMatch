@@ -179,4 +179,10 @@ public class Helpers {
         return;
     }
 
+    public static int getIntFromCategory(String category) {
+        for (int q = 0; q < Constants.categoryList.size(); ++q) {
+            if(category.equals(Constants.categoryList.get(q))) return q;
+        }
+        return 0;
+    }
 }

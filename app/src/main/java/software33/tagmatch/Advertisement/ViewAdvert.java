@@ -167,8 +167,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         description = (TextView) findViewById(R.id.advert_description);
         title = (TextView) findViewById(R.id.advert_title);
 
-        chatButton = (Button) findViewById(R.id.bStartXat);
-
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.advert_map)).getMap();
         prepareImages();
     }
@@ -322,10 +320,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         mViewPager.setLayoutParams(params);
         mCustomPagerAdapterViewAdvert = new CustomPagerAdapterViewAdvert(this,params.height,params.width);
         mViewPager.setAdapter(mCustomPagerAdapterViewAdvert);
-
-        chatButton.getLayoutParams().height=params.height/5;
-        chatButton.getLayoutParams().width=params.height/5;
-        chatButton.setBackground(getDrawable(R.drawable.adver_chat));
 
         imageType.getLayoutParams().height=params.height/5;
         imageType.getLayoutParams().width=params.height/5;
