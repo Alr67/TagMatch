@@ -96,6 +96,10 @@
 
     <!-- Filters -->
     <string name="filter_title">Search Filter</string>
-    <string name="filter_same_city">Same city?</string>
+    <string name="filter_same_city">Same city</string>
+    <string name="filter_car">Cars</string>
+    <string name="filter_videogames">Videogames</string>
+    <string name="filter_appliance">Appliances</string>
+    <string name="filter_categories">Categories</string>
 
 </resources>

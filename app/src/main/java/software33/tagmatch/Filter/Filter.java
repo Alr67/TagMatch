@@ -59,7 +59,18 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
             }
         }
 
-        //TODO categories
+        CheckBox cb_car = (CheckBox) findViewById(R.id.filter_cb_car);
+        CheckBox cb_games = (CheckBox) findViewById(R.id.filter_cb_videogames);
+        CheckBox cb_appliance = (CheckBox) findViewById(R.id.filter_cb_appliance);
+
+        if(cb_car.isChecked())
+            url += "category=Cotxes";
+
+        if(cb_games.isChecked())
+            url += "category=Videojocs";
+
+        if(cb_appliance.isChecked())
+            url += "category=Electrodomestics";
 
         CheckBox cb = (CheckBox) findViewById(R.id.filter_same_city);
 

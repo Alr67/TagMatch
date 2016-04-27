@@ -79,6 +79,34 @@
                 android:id="@+id/filter_same_city"
                 android:checked="false" />
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/filter_categories"
+                android:id="@+id/textView5" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_car"
+                android:id="@+id/filter_cb_car"
+                android:checked="false" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_videogames"
+                android:id="@+id/filter_cb_videogames"
+                android:checked="false" />
+
+            <CheckBox
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/filter_appliance"
+                android:id="@+id/filter_cb_appliance"
+                android:checked="false" />
+
         </LinearLayout>
 
     </LinearLayout>
