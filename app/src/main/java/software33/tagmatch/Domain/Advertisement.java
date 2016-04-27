@@ -49,6 +49,7 @@ public class Advertisement {
         this.done = false;
         this.category = category;
         this.imagesIDs = imagesIDs;
+        clearHashTag();
     }
 
     public Advertisement(Integer aid,User owner, String title,String[] imagesIDs, String desc, String[] tags, String category){
@@ -60,6 +61,7 @@ public class Advertisement {
         this.done = false;
         this.category = category;
         this.imagesIDs = imagesIDs;
+        clearHashTag();
     }
 
     public Advertisement(User owner, String title, List<Bitmap> images, String desc, String[] tags, String category){
@@ -72,6 +74,7 @@ public class Advertisement {
         this.done = false;
         this.category = category;
         this.imagesIDs = new String[0];
+        clearHashTag();
     }
 
     public Advertisement(Integer aid, String title, String[] imagesIDs, String desc, String[] tags, String category) {
@@ -83,6 +86,14 @@ public class Advertisement {
         this.done = false;
         this.category = category;
         this.imagesIDs = imagesIDs;
+        clearHashTag();
+    }
+
+    protected void clearHashTag() {
+        for (int i=0; i<tags.length; ++i) {
+            if(tags[i].startsWith("#"))
+                tags[i] = tags[i].replaceFirst("#", "");
+        }
     }
 
     public String getTypeImageName() {

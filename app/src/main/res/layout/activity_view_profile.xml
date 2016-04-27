@@ -36,15 +36,6 @@
         tools:showIn="@layout/nav_activity_main">
         android:orientation="vertical">
 
-        <Button
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Xat"
-            android:id="@+id/bStartXat"
-            android:layout_alignParentTop="true"
-            android:layout_alignParentEnd="true"
-            android:onClick="buttonStartXat" />
-
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

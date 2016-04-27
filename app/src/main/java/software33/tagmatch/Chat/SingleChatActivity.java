@@ -59,8 +59,9 @@ public class SingleChatActivity extends AppCompatActivity {
         titleProduct = b.getString("TitleProduct");
         idChat = b.getString("IdChat");
         idUser = b.getString("IdUser");
-        imageChat = b.getString("ImageChat");
-        myId = "56d3f1d3-6b50-473a-9aa3-ff0007b3df29";
+        imageChat = FirebaseUtils.getChatImage(this);
+        FirebaseUtils.removeChatImage(this);
+        myId = FirebaseUtils.getMyId(this);
 
         //Get Firebase Reference
         myFirebaseRef =
@@ -86,7 +87,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
         ImageView image = (ImageView) findViewById(R.id.singleChatImage);
 
-        if (imageChat.equals("")){
+        if (imageChat == null || imageChat.equals("")){
             image.setImageResource(R.drawable.image0);
         }
         else {

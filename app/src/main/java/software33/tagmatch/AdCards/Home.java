@@ -19,6 +19,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
+import com.firebase.client.Firebase;
+import com.google.android.gms.maps.CameraUpdate;
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.model.LatLng;
+import com.squareup.picasso.Picasso;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -28,12 +34,14 @@ import java.util.List;
 
 import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
+import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.Filter.Filter;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
@@ -101,6 +109,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             }
         });
         recycler.setAdapter(adapter);
+
     }
 
     private void downloadAdvertsFromServer(Bundle extras) {

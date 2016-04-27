@@ -84,11 +84,13 @@
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Chat"
-                    android:id="@+id/advert_but_chat"
+                    android:text="Xat"
+                    android:id="@+id/bStartXat"
                     android:layout_alignParentRight="true"
                     android:layout_alignParentTop="true"
-                    android:background="#55676767" />
+                    android:onClick="buttonStartXat"
+                android:background="#55676767"
+                    android:enabled="false" />
 
             </RelativeLayout>
 

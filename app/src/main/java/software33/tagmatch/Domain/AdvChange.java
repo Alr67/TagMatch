@@ -35,6 +35,7 @@ public class AdvChange extends Advertisement{
     public AdvChange(Integer id, String title, String[] photoIds, String description, String[] tags, String category, String[] tagsWanted) {
         super(id,title,photoIds,description,tags,category);
         this.wanted = tagsWanted;
+        clearWantedTag();
     }
 
     @Override

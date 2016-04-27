@@ -15,6 +15,7 @@ import android.provider.MediaStore;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.Window;
@@ -22,6 +23,9 @@ import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.firebase.client.AuthData;
+import com.firebase.client.Firebase;
+import com.firebase.client.FirebaseError;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.ConnectionResult;
@@ -38,13 +42,18 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.Map;
 
+import software33.tagmatch.Chat.FirebaseUtils;
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.BitmapWorkerTask;
 import software33.tagmatch.Utils.Constants;
+import software33.tagmatch.Utils.Helpers;
 
 public class RegistrationActivity2 extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
@@ -60,6 +69,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     private String email;
     private String username;
     private String password;
+    private Map<String, Object> img = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -84,20 +94,27 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         iv = (ImageView) findViewById(R.id.imageView);
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.registrationMap)).getMap();
 
-        new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
+        img.put("img","");
 
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                map.clear();
-                userMarker = latLng;
-                map.addMarker(new MarkerOptions().position(userMarker));
-            }
-        });
+        try {
+            new GoogleApiClient.Builder(this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+
+            map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    map.clear();
+                    userMarker = latLng;
+                    map.addMarker(new MarkerOptions().position(userMarker));
+                }
+            });
+        }
+        catch (Exception e) {
+            e.printStackTrace();
+        }
 
         if (mGoogleApiClient == null) {
             // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
@@ -185,15 +202,14 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     }
 
     private void updateIMGLocation() {
-        SharedPreferences.Editor editor = getSharedPreferences(SH_PREF_NAME, MODE_PRIVATE).edit();
-        editor.putString("name", username);
-        editor.putString("password", password);
-        editor.commit();
+        Helpers.setPersonalData(username, password, this);
 
-        if (imgExtension != null)
+        if (imgExtension != null) {
             updateIMG();
-        updateLocation();
-        backToLogin();
+        }
+
+        /*** Firebase create user ***/
+        createUser(email, password, username, img, this);
     }
 
     private void updateIMG() {
@@ -204,6 +220,12 @@ public class RegistrationActivity2 extends AppCompatActivity implements
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
             byte[] byteArray = stream.toByteArray();
+
+            /**** Update the image in firebase ****/
+            String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+            img.put("img",encodedImage);
+
+            /*************************************/
 
             JSONObject jObject = new JSONObject();
             jObject.put("profilePhotoId", byteArray);
@@ -225,11 +247,12 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         }
     }
 
-    private void updateLocation() {
+    private void updateUser() {
         try {
             JSONObject jObject = new JSONObject();
             jObject.put("latitude", userMarker.latitude);
             jObject.put("longitude", userMarker.longitude);
+            jObject.put("firebaseID", FirebaseUtils.getMyId(this));
 
             Log.i("updateLoc", "he entrado");
 
@@ -252,6 +275,42 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         Intent act = new Intent(this, Login.class);
         startActivity(act);
         finish();
+    }
+
+    public void createUser(final String email, final String password, final String name, final Map<String, Object> img, final Context context) {
+        FirebaseUtils.getMyFirebaseRef().createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
+            @Override
+            public void onSuccess(Map<String, Object> result) {
+                FirebaseUtils.getMyFirebaseRef().authWithPassword(
+                        email,
+                        password,
+                        new Firebase.AuthResultHandler() {
+                            @Override
+                            public void onAuthenticated(AuthData authData) {
+                                FirebaseUtils.getUsersRef().child(authData.getUid()).setValue
+                                        (new FirebaseUtils.User(name,"",new HashMap<String, Object>(),new HashMap<String, Object>()));
+                                FirebaseUtils.setMyId(authData.getUid(),context);
+                                FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(context)).updateChildren(img);
+
+                                updateUser();
+
+                                backToLogin();
+                            }
+
+                            @Override
+                            public void onAuthenticationError(FirebaseError error) {
+                                Log.i("Debug-Firebase","error auth user in firebase");
+                            }
+                        }
+                );
+                //setMyId(result.get("uid").toString(), context);
+            }
+
+            @Override
+            public void onError(FirebaseError firebaseError) {
+                Log.i("Debug-Firebase", firebaseError.getMessage());
+            }
+        });
     }
 
     @Override
