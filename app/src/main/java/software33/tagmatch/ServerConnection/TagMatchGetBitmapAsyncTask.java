@@ -1,9 +1,12 @@
 package software33.tagmatch.ServerConnection;
 
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -16,11 +19,13 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
-public class TagMatchGetImageAsyncTask extends AsyncTask<JSONObject, Void, String> {
+import software33.tagmatch.R;
+
+public class TagMatchGetBitmapAsyncTask extends AsyncTask<JSONObject, Void, Bitmap> {
     private URL url;
     private Context context;
 
-    public TagMatchGetImageAsyncTask(String url2, Context coming_context) {
+    public TagMatchGetBitmapAsyncTask(String url2, Context coming_context) {
         try {
             url = new URL(url2);
             context = coming_context;
@@ -29,7 +34,7 @@ public class TagMatchGetImageAsyncTask extends AsyncTask<JSONObject, Void, Strin
         }
     }
 
-    protected String doInBackground(final JSONObject... params) {
+    protected Bitmap doInBackground(final JSONObject... params) {
 
         try {
             final String user = params[0].getString("username").toString();
@@ -56,7 +61,7 @@ public class TagMatchGetImageAsyncTask extends AsyncTask<JSONObject, Void, Strin
 
                 con.disconnect();
 
-                return con.getHeaderField("Location");
+                return Picasso.with(context).load(con.getHeaderField("Location")).error(R.drawable.image0).get();
             }
             else {
                 basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT));
@@ -75,7 +80,7 @@ public class TagMatchGetImageAsyncTask extends AsyncTask<JSONObject, Void, Strin
 
                 con.disconnect();
 
-                return con.getHeaderField("Location");
+                return Picasso.with(context).load(con.getHeaderField("Location")).error(R.drawable.image0).get();
             }
         } catch (IOException | JSONException e) {
             Log.e("error", e.getMessage());

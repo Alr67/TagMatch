@@ -48,8 +48,8 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
             String userPass = user + ":" + password;
 
             String basicAuth;
+            basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.NO_WRAP));
             if (url.getHost().contains("heroku")) {
-                basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.NO_WRAP));
                 HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
                 con.setConnectTimeout(5000);
                 con.setReadTimeout(5000);
@@ -88,7 +88,6 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
                 return aux;
             }
             else {
-                basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT));
                 HttpURLConnection con = (HttpURLConnection) url.openConnection();
            //     con.setConnectTimeout(5000);
          //       con.setReadTimeout(5000);

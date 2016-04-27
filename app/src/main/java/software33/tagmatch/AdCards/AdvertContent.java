@@ -25,7 +25,6 @@ public class AdvertContent {
     }
 
     public AdvertContent( String s, String img, String type, Double price, Integer id) {
-        Log.i(Constants.DebugTAG,"Creo un item");
         this.ad_name = s;
         this.ad_img_id = img;
         this.ad_type = type;

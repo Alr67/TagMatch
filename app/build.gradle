@@ -33,6 +33,10 @@ android {
         exclude 'META-INF/LICENSE-FIREBASE.txt'
         exclude 'META-INF/NOTICE'
     }
+    dexOptions {
+        incremental true
+        javaMaxHeapSize "3g"
+    }
 }
 
 dependencies {
