@@ -36,6 +36,7 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
@@ -113,14 +114,10 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                             Log.i("Debug-GetUser",jsonObject.toString());
                             tvLocation.setText(jsonObject.get("city").toString());
 
-                            LatLng latLng = new LatLng(jsonObject.getInt("latitude"), jsonObject.getInt("longitude"));
+                            LatLng latLng = new LatLng(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"));
                             try {
-                                CameraUpdate center =
-                                        CameraUpdateFactory.newLatLng(latLng);
-                                CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
-
-                                map.moveCamera(center);
-                                map.animateCamera(zoom);
+                                map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+                                map.addMarker(new MarkerOptions().position(latLng));
                             }
                             catch (Exception e) {}
                         }

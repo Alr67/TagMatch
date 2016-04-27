@@ -214,12 +214,10 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                         try {
                             Log.i("Debug-GetUser", jsonObject.toString());
                             userId = jsonObject.get("firebaseID").toString();
-                            LatLng latLng = new LatLng(jsonObject.getInt("latitude"), jsonObject.getInt("longitude"));
-                            CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
-                            CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
+                            LatLng latLng = new LatLng(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"));
 
-                            map.moveCamera(center);
-                            map.animateCamera(zoom);
+                            map.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 14));
+                            map.addMarker(new MarkerOptions().position(latLng));
                         }catch(Exception e){}
                     }
                 } catch (JSONException ignored) {
