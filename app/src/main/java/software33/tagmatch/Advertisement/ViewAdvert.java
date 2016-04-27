@@ -466,6 +466,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     if(jsonObject.has("error")) {
                         String error = jsonObject.get("error").toString();
                         Helpers.showError(error,getApplicationContext());
+                        Log.i("DEBUGASSOJODERXD",jsonObject.toString());
                     }
                     else {
                         Intent intent = new Intent(getApplicationContext(), Home.class);
