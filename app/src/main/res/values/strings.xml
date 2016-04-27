@@ -45,7 +45,7 @@
     <string name="registration_end_registrer">Finalitzar</string>
     <string name="registration_login">Ja ets membre? Inicia Sessió</string>
     <string name="registration_wrong_mail_match">Fica un correu correcte</string>
-    <string name="registration_wrong_username_void">El camp d\'usuari no pot estar vuit</string>
+    <string name="registration_wrong_username_void">El camp d\'usuari no pot estar buit</string>
     <string name="registration_profile_foto">Foto de perfil</string>
     <string name="registration_default_sell_location">Des d\'on vols vendre per defecte?</string>
     <string name="no_network_connection">No hi ha connexió a internet</string>
@@ -95,16 +95,9 @@
     <string name="title_activity_filter">Filter</string>
 
     <!-- Filters -->
-    <string name="filter_title">Filtres de cerca</string>
-    <string name="filter_same_city">Mateixa ciutat?</string>
-    <string name="filter_advertisement_type">Tipus d'anunci</string>
-    <string name="filter_change_advertisement">Intercanvi</string>
-    <string name="filter_gift_advertisement">Regal</string>
-    <string name="filter_sell_advertisement">Venda</string>
-    <string name="filter_tv1_price">Desde</string>
-    <string name="filter_tv2_price">€ fins a</string>
+    <string name="filter_title">Search Filter</string>
+    <string name="filter_same_city">Same city?</string>
+    <string name="filter_tv2_price">€ to</string>
     <string name="filter_tv3_price">€</string>
-
-
 
 </resources>

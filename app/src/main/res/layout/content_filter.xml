@@ -22,7 +22,7 @@
         <EditText
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/search_field"
+            android:id="@+id/filter_search_field"
             android:backgroundTint="@android:color/holo_blue_dark" />
 
         <ImageView
@@ -79,45 +79,12 @@
                 android:id="@+id/filter_same_city"
                 android:checked="false" />
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceSmall"
-                android:text="@string/filter_advertisement_type"
-                android:id="@+id/textView5" />
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/filter_sell_advertisement"
-                android:id="@+id/filter_sell"
-                android:checked="false" />
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/filter_change_advertisement"
-                android:id="@+id/filter_change"
-                android:checked="false" />
-
-            <CheckBox
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/filter_gift_advertisement"
-                android:id="@+id/filter_gift"
-                android:checked="false" />
-
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_weight="3"
                 android:weightSum="1">
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="@string/filter_tv1_price" />
 
                 <EditText
                     android:layout_width="wrap_content"

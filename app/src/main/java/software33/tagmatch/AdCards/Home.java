@@ -13,6 +13,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -78,7 +79,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         items = new ArrayList<>();
 
-        downloadAdvertsFromServer();
+        downloadAdvertsFromServer(getIntent().getExtras());
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
 
@@ -102,10 +103,17 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         recycler.setAdapter(adapter);
     }
 
-    private void downloadAdvertsFromServer() {
+    private void downloadAdvertsFromServer(Bundle extras) {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
-        String url = Constants.IP_SERVER+"/ads?idGreaterThan="+Constants.SERVER_IdGreaterThan+"&limit="+Constants.SERVER_limitAdverts;
+        String url = Constants.IP_SERVER;
+        try{
+            if(extras.getString("previousActivity").equals("filter"))
+                url = extras.getString("url");
+        } catch (Exception e){
+            url += "/ads?idGreaterThan=" + Constants.SERVER_IdGreaterThan + "&limit=" + Constants.SERVER_limitAdverts;
+        }
+        Log.i("url", url);
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());

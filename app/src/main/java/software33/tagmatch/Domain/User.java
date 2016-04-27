@@ -60,6 +60,10 @@ public class User {
         return mail;
     }
 
+    public String getCity() {
+        return city;
+    }
+
     public Integer getValoration() {
         return valoration;
     }
