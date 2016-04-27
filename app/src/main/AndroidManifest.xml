@@ -71,11 +71,16 @@
         <activity
             android:name=".Advertisement.ViewAdvert"
             android:label="@string/title_activity_view_advert"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Users.MyAdverts"
             android:label="@string/title_activity_my_adverts"
-            android:theme="@style/AppTheme.NoActionBar"/>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Filter.Filter"
+            android:label="@string/title_activity_filter"
+            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>

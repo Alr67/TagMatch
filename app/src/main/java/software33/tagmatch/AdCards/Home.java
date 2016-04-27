@@ -37,6 +37,7 @@ import software33.tagmatch.Advertisement.ViewAdvert;
 import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
+import software33.tagmatch.Filter.Filter;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
@@ -78,7 +79,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent novaRecepta = new Intent(getApplicationContext(), NewAdvertisement.class);
+                Intent novaRecepta = new Intent(getApplicationContext(), Filter.class);
                 startActivity(novaRecepta);
                 finish();
             }
@@ -86,7 +87,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         items = new ArrayList<>();
 
-        downloadAdvertsFromServer();
+        downloadAdvertsFromServer(getIntent().getExtras());
 
         this.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
 
@@ -111,10 +112,17 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     }
 
-    private void downloadAdvertsFromServer() {
+    private void downloadAdvertsFromServer(Bundle extras) {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
-        String url = Constants.IP_SERVER+"/ads?idGreaterThan="+Constants.SERVER_IdGreaterThan+"&limit="+Constants.SERVER_limitAdverts;
+        String url = Constants.IP_SERVER;
+        try{
+            if(extras.getString("previousActivity").equals("filter"))
+                url = extras.getString("url");
+        } catch (Exception e){
+            url += "/ads?idGreaterThan=" + Constants.SERVER_IdGreaterThan + "&limit=" + Constants.SERVER_limitAdverts;
+        }
+        Log.i("url", url);
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());
@@ -182,7 +190,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            super.onBackPressed();
+            finish();
         }
     }
 }

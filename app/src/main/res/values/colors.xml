@@ -2,7 +2,7 @@
 <resources>
     <color name="colorPrimary">#198cff</color>
     <color name="colorPrimaryDark">#0073e5</color>
-    <color name="colorAccent">#ffffff</color>
+    <color name="colorAccent">#0073e5</color>
     <color name="back_color">#198cff</color>
     <color name="FABcolor">#CD853F</color>
     <color name="app_header_color">#ffffff</color>
