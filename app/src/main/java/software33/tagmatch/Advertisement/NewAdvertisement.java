@@ -143,7 +143,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
         if(intent.hasExtra("edit") && intent.getBooleanExtra("edit",false)) { //Si es edit
             getAdvertisement(intent.getIntExtra("idAnunci",0));
-            getAdvertisementImages();
         }
 
     }
@@ -440,6 +439,10 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     private void fillComponents() {
+        getAdvertisementImages();
+        title.setText(adv.getTitle());
+        description.setText(adv.getDescription());
+        typeSpinner.setSelection(Helpers.getIntFromType(adv.getTypeDescription()));
     }
 
     private void getAdvertisementImages() {

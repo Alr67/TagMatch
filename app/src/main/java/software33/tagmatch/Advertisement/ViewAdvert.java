@@ -280,10 +280,16 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private void prepareEdit() {
         fab.setClickable(true);
         fab.setImageDrawable(getDrawable(R.drawable.ic_menu_manage));
-        Intent novaRecepta = new Intent(getApplicationContext(), NewAdvertisement.class);
-        novaRecepta.putExtra("edit", true);
-        startActivity(novaRecepta);
-        finish();
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent novaRecepta = new Intent(getApplicationContext(), NewAdvertisement.class);
+                novaRecepta.putExtra("edit", true);
+                novaRecepta.putExtra("idAnunci",adv.getID());
+                startActivity(novaRecepta);
+                finish();
+            }
+        });
     }
 
     private void getChats(){

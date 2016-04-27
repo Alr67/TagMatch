@@ -21,6 +21,7 @@ import software33.tagmatch.Domain.AdvGift;
 import software33.tagmatch.Domain.AdvSell;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
+import software33.tagmatch.R;
 
 
 public class Helpers {
@@ -72,6 +73,12 @@ public class Helpers {
         editor.remove("password");
         FirebaseUtils.removeMyId(context);
         editor.commit();
+    }
+
+    public static int getIntFromType(String type) {
+        if(type.equals(Constants.typeServerSELL)) return 0;
+        else if (type.equals(Constants.typeServerEXCHANGE)) return 1;
+        else return 2;
     }
 
     public static String checkServerError(Integer statusCode ) {
