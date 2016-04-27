@@ -16,8 +16,6 @@ import android.widget.Toast;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.concurrent.ExecutionException;
-
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
@@ -135,7 +133,6 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
             if(search[i].startsWith("#")){
                 search[i] = search[i].replaceFirst("#", "");
             }
-            Log.i("search tagns", search[i]);
         }
     }
 
