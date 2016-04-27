@@ -96,11 +96,12 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setClickable(false);
+        fab.setImageDrawable(getDrawable(R.drawable.loading));
 
     }
 
 
-    @Override
+    /*@Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         if (myAdv) getMenuInflater().inflate(R.menu.menu_view_my_adv, menu);
@@ -122,7 +123,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         }
 
         return super.onOptionsItemSelected(item);
-    }
+    }*/
 
     public void getAdvertisement(Integer id) {
         JSONObject jObject = new JSONObject();
@@ -157,14 +158,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view_advert);
         setSupportActionBar(toolbar);
 
-  /*      DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this); */
         userImage = (ImageView) findViewById(R.id.advert_user_image);
         userImage.setImageDrawable(getDrawable(R.drawable.loading));
         imageType = (ImageView) findViewById(R.id.advert_image_type);
@@ -278,9 +271,19 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                 if (url == null){
                     Picasso.with(ViewAdvert.this).load(R.drawable.image0).into(userImage);
                 }
-                getChats();
+                if(!myAdv) getChats();
+                else prepareEdit();
             }
         }.execute(jObject);
+    }
+
+    private void prepareEdit() {
+        fab.setClickable(true);
+        fab.setImageDrawable(getDrawable(R.drawable.ic_menu_manage));
+        Intent novaRecepta = new Intent(getApplicationContext(), NewAdvertisement.class);
+        novaRecepta.putExtra("edit", true);
+        startActivity(novaRecepta);
+        finish();
     }
 
     private void getChats(){
@@ -415,7 +418,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         if (idProduct.equals(title.getText().toString()) && userId.equals(this.userId)){
             this.idChat = idChat;
             fab.setClickable(true);
-
+            fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
@@ -428,6 +431,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             this.idChat = "Not exists";
             if (numChats == 1 && !this.username.getText().toString().equals(myName)){
                 fab.setClickable(true);
+                fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
                 fab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
