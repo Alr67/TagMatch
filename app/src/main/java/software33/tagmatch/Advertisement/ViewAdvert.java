@@ -1,15 +1,19 @@
 package software33.tagmatch.Advertisement;
 
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Base64;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -42,7 +46,9 @@ import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.SingleChatActivity;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
+import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchDeleteAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetBitmapAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
@@ -51,9 +57,9 @@ import software33.tagmatch.Utils.Helpers;
 
 public class ViewAdvert extends AppCompatActivity implements View.OnClickListener {
 
-    private Button chatButton,favouriteButton;
+    private Button chatButton;
     private ImageView imageType, userImage;
-    private TextView title,description,tags,username,valoration;
+    private TextView title,description,tags,username,location;
     private ViewPager mViewPager;
     private CustomPagerAdapterViewAdvert mCustomPagerAdapterViewAdvert;
     private GoogleMap map;
@@ -66,6 +72,8 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String imageChat;
     private String myName;
 
+    private boolean myAdv;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -75,9 +83,39 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Bundle b = getIntent().getExtras();
         if(b != null) {
             Log.i(Constants.DebugTAG,"Bundle not emptu");
+            if (b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT) != null &&
+                    b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT).equals(Helpers.getActualUser(this).getAlias())){
+                myAdv = true;
+            }
+
             getAdvertisement(b.getInt(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT));
         }
         else Log.i(Constants.DebugTAG,"Bundle EMPTY");
+    }
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        if (myAdv) getMenuInflater().inflate(R.menu.menu_view_my_adv, menu);
+        else getMenuInflater().inflate(R.menu.menu_view_adv, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_delete_adv) {
+            AlertDialog alertDialog = createDeleteDialog();
+            alertDialog.show();
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 
     public void getAdvertisement(Integer id) {
@@ -124,13 +162,11 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         userImage = (ImageView) findViewById(R.id.advert_user_image);
         userImage.setImageDrawable(getDrawable(R.drawable.loading));
         imageType = (ImageView) findViewById(R.id.advert_image_type);
-        valoration = (TextView) findViewById(R.id.advert_valoration);
+        location = (TextView) findViewById(R.id.advert_location);
         username = (TextView) findViewById(R.id.advert_name_user);
         tags = (TextView) findViewById(R.id.advert_tags);
         description = (TextView) findViewById(R.id.advert_description);
         title = (TextView) findViewById(R.id.advert_title);
-        favouriteButton = (Button) findViewById(R.id.advert_but_favourites);
-        favouriteButton.setOnClickListener(this);
 
         chatButton = (Button) findViewById(R.id.bStartXat);
 
@@ -142,7 +178,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         title.setText(adv.getTitle());
         description.setText(adv.getDescription());
         username.setText(adv.getOwner().getAlias());
-        valoration.setText(adv.getOwner().getValoration().toString());
+        location.setText(adv.getUser().getCity());
         if(adv.getTypeDescription().equals(Constants.typeServerEXCHANGE)) {
             imageType.setImageDrawable(getDrawable(R.drawable.advert_exchange));
         }
@@ -214,7 +250,8 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                         try {
                             Log.i("Debug-GetUser", jsonObject.toString());
                             userId = jsonObject.get("firebaseID").toString();
-                            LatLng latLng = new LatLng(jsonObject.getInt("latitude"), jsonObject.getInt("longitude"));
+                            location.setText(jsonObject.get("city").toString());
+                            LatLng latLng = new LatLng(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"));
                             CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
                             CameraUpdate zoom = CameraUpdateFactory.zoomTo(15);
 
@@ -274,9 +311,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         chatButton.getLayoutParams().height=params.height/5;
         chatButton.getLayoutParams().width=params.height/5;
         chatButton.setBackground(getDrawable(R.drawable.adver_chat));
-        favouriteButton.getLayoutParams().height=params.height/5;
-        favouriteButton.getLayoutParams().width=params.height/5;
-        favouriteButton.setBackgroundResource(R.drawable.advert_heart);
 
         imageType.getLayoutParams().height=params.height/5;
         imageType.getLayoutParams().width=params.height/5;
@@ -387,6 +421,61 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Log.i("Debug-Chat","userId " +userId);
         Log.i("Debug-Chat","this.userId " +this.userId);
 
+    }
 
+    public AlertDialog createDeleteDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.dialog_title_delete_adv)
+                .setMessage(R.string.dialog_message_delete_adv)
+                .setPositiveButton(R.string.dialog_confirm_delete_adv,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                deleteAdvertisement();
+                            }
+                        })
+                .setNegativeButton(R.string.dialog_cancel_delete_adv,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //onNegativeButtonClick();
+                            }
+                        });
+
+        return builder.create();
+    }
+
+    private void deleteAdvertisement() {
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
+            e.printStackTrace();
+        }
+
+        String url = Constants.IP_SERVER+"/ads/"+ adv.getID();
+
+        new TagMatchDeleteAsyncTask(url, this) {
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Helpers.showError(error,getApplicationContext());
+                    }
+                    else {
+                        Intent intent = new Intent(getApplicationContext(), Home.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                } catch (JSONException ignored) {
+                    Log.i("DEBUG","error al get user");
+                }
+            }
+        }.execute(jObject);
     }
 }

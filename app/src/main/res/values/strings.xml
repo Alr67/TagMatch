@@ -93,4 +93,15 @@
     <!-- Profile -->
     <string name="profile_button_advertisement">Advertisements</string>
 
+    <!-- View Adv -->
+    <string name="action_open_chat">Open chat</string>
+    <string name="action_tagmatch">Tagmatch!</string>
+    <string name="action_edit_adv">Edit advertisement</string>
+    <string name="action_delete_adv">Delete advertisement</string>
+
+    <string name="dialog_title_delete_adv">Delete advertisement</string>
+    <string name="dialog_message_delete_adv">Are you sure you want to delete this advertisement?</string>
+    <string name="dialog_confirm_delete_adv">Yes</string>
+    <string name="dialog_cancel_delete_adv">Cancel</string>
+
 </resources>

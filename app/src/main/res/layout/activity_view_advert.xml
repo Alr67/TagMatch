@@ -75,15 +75,6 @@
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Fav"
-                    android:id="@+id/advert_but_favourites"
-                    android:layout_alignParentBottom="true"
-                    android:layout_alignParentRight="true"
-                    android:background="#55676767" />
-
-                <Button
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
                     android:text="Xat"
                     android:id="@+id/bStartXat"
                     android:layout_alignParentRight="true"
@@ -167,8 +158,8 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="Valoració"
-                        android:id="@+id/advert_valoration"
+                        android:text="Location"
+                        android:id="@+id/advert_location"
                         android:layout_marginTop="@dimen/interlineat"
                         android:layout_marginBottom="@dimen/interlineat"
                         android:layout_gravity="center" />
