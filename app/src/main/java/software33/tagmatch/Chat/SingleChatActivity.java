@@ -14,6 +14,7 @@ import android.view.View;
 import android.widget.AbsListView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -34,7 +35,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private ChatArrayAdapter chatArrayAdapter;
     private ListView listView;
     private EditText chatText;
-    private Button buttonSend;
+    private ImageButton buttonSend;
 
     private Firebase myFirebaseRef;
     private Firebase messagesRef;
@@ -99,7 +100,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
         /************** Set the chat ************************/
 
-        buttonSend = (Button) findViewById(R.id.send);
+        buttonSend = (ImageButton) findViewById(R.id.send);
 
         listView = (ListView) findViewById(R.id.msgview);
 
