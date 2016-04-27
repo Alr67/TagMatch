@@ -72,11 +72,34 @@ public class RegistrationActivity extends AppCompatActivity {
         finish();
     }
 
-    private void continueRegistration(String email, String username, String passw){
+    private void continueRegistration(final String email, final String username, final String password) {
+        try {
+            JSONObject jObject = new JSONObject();
+            jObject.put("username", username);
+            jObject.put("password", password);
+            jObject.put("email", email);
+
+            new TagMatchPostAsyncTask(Constants.IP_SERVER + "/users", this, false) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        String error = jsonObject.get("error").toString();
+                        showError(error);
+
+                    } catch (JSONException ignored) {
+                        continueRegistration2(email, username, password);
+                    }
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+    private void continueRegistration2(String email, String username, String password){
         Intent act = new Intent(this, RegistrationActivity2.class);
         act.putExtra("email", email);
         act.putExtra("username", username);
-        act.putExtra("password", passw);
+        act.putExtra("password", password);
         startActivity(act);
     }
 

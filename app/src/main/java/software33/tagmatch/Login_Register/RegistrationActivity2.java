@@ -178,30 +178,6 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     }
 
     public void endRegistrer(View view) {
-        try {
-            JSONObject jObject = new JSONObject();
-            jObject.put("username", username);
-            jObject.put("password", password);
-            jObject.put("email", email);
-
-            new TagMatchPostAsyncTask(Constants.IP_SERVER + "/users", this, false){
-                @Override
-                protected void onPostExecute(JSONObject jsonObject) {
-                    try {
-                        String error = jsonObject.get("error").toString();
-                        showError(error);
-
-                    } catch (JSONException ignored) {
-                        updateIMGLocation();
-                    }
-                }
-            }.execute(jObject);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void updateIMGLocation() {
         Helpers.setPersonalData(username, password, this);
 
         if (imgExtension != null) {
