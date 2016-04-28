@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -59,9 +60,8 @@ import software33.tagmatch.Utils.Helpers;
 
 public class ViewAdvert extends AppCompatActivity implements View.OnClickListener {
 
-    private Button chatButton;
     private ImageView imageType, userImage;
-    private TextView title,description,tags,username,location;
+    private TextView description,tags,username,location;
     private ViewPager mViewPager;
     private CustomPagerAdapterViewAdvert mCustomPagerAdapterViewAdvert;
     private GoogleMap map;
@@ -83,21 +83,23 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.activity_view_advert);
         myName = Helpers.getActualUser(this).getAlias();
         initComponents();
+        setTitle(R.string.loading_title);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setClickable(false);
+        fab.setImageDrawable(getDrawable(R.drawable.loading));
         Bundle b = getIntent().getExtras();
         if(b != null) {
             Log.i(Constants.DebugTAG,"Bundle not emptu");
             if (b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT) != null && b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT).equals(Helpers.getActualUser(this).getAlias())){
                 myAdv = true;
             }
+            else myAdv = false;
 
             getAdvertisement(b.getInt(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT));
         }
         else Log.i(Constants.DebugTAG,"Bundle EMPTY");
-        setTitle(R.string.loading_title);
 
-        fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setClickable(false);
-        fab.setImageDrawable(getDrawable(R.drawable.loading));
 
     }
 
@@ -269,8 +271,8 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                 if (url == null){
                     Picasso.with(ViewAdvert.this).load(R.drawable.image0).into(userImage);
                 }
-                if(!myAdv) getChats();
-                else prepareEdit();
+                getChats();
+                if(myAdv)prepareEdit();
             }
         }.execute(jObject);
     }
@@ -291,16 +293,27 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     }
 
     private void getChats(){
+        Log.i("DEBUG XAT","Xddddd plural");
         FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.hasChildren()){
-                    if (!adv.getOwner().getAlias().equals(myName))
-                        fab.setEnabled(true);
+                if (!dataSnapshot.hasChildren()) {
+                    if (!adv.getOwner().getAlias().equals(myName)) {
+                        fab.setClickable(true);
+                        fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
+                        fab.setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View view) {
+                                Intent chat = buttonStartXat(view);
+                                startActivity(chat);
+                            }
+                        });
+                    }
                 }
                 else {
                     long numChats = dataSnapshot.getChildrenCount();
                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+
                         getChat(dataSnapshot1.getKey(), numChats);
                         --numChats;
                     }
@@ -336,7 +349,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
         b.putString("UserName", username.getText().toString());
-        b.putString("TitleProduct", title.getText().toString());
+        b.putString("TitleProduct", getTitle().toString());
 
         if (idChat.equals("Not exists")) {
             b.putString("IdChat", createChat());
@@ -373,7 +386,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         users.put(id1, Helpers.getActualUser(this).getAlias());
         users.put(id2, username.getText().toString());
 
-        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(title.getText().toString(), users);
+        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(getTitle().toString(), users);
         id.child("info").setValue(chatInfo);
 
         //Set the chats to each user
@@ -387,6 +400,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
     private void getChat(final String idChat, final long numChats) {
         //Accessing to the chat with idChat ONCE
+        Log.i("DEBUG XAT", "Xd");
         FirebaseUtils.getChatsRef().child(idChat).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
@@ -399,7 +413,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private void setButtonXat(final String idProduct, final Map<String, Object> users, final String idChat, final long numChats) {
+    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat, long numChats) {
         String userName = "";
         for (Object o : users.values()){
             if (!o.toString().equals(Helpers.getActualUser(this).getAlias())) {
@@ -415,7 +429,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
         //Restriccions de obrir xat:
         //      No mateix titul de producte ni id de usuari que ho ha publicat
-        if (idProduct.equals(title.getText().toString()) && userId.equals(this.userId)){
+        if (idProduct.equals(getTitle().toString()) && userId.equals(this.userId)){
             this.idChat = idChat;
             fab.setClickable(true);
             fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
@@ -443,7 +457,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         }
 
         Log.i("Debug-Chat","idProd " +idProduct);
-        Log.i("Debug-Chat","title.getText().toString() " +title.getText().toString());
+        Log.i("Debug-Chat","getTitle().toString() " +getTitle().toString());
         Log.i("Debug-Chat","userId " +userId);
         Log.i("Debug-Chat","this.userId " +this.userId);
 
