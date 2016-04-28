@@ -86,6 +86,9 @@
     <string name="ok">Okay</string>
     <string name="emptyPrice">The price is empty</string>
     <string name="zeroPrice">The price has to be bigger than zero</string>
+    <string name="new_photo">Add image</string>
+    <string name="new_ad_general_title">New advert</string>
+
     <!-- Navigation Drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
@@ -118,5 +121,6 @@
     <string name="hashtags_title">Hashtags:</string>
     <string name="about_user">About the seller</string>
     <string name="user_loc">User location:&#160;</string>
+
 
 </resources>

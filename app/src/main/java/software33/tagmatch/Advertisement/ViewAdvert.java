@@ -285,7 +285,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                 novaRecepta.putExtra("edit", true);
                 novaRecepta.putExtra("idAnunci",adv.getID());
                 startActivity(novaRecepta);
-                finish();
+                //finish();
             }
         });
     }

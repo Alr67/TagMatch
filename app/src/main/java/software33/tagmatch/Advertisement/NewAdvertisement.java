@@ -149,6 +149,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             edit = true;
             getAdvertisement(intent.getIntExtra("idAnunci",0));
         }
+        else setTitle(R.string.new_ad_general_title);
 
     }
 
@@ -440,9 +441,15 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, Home.class);
-        startActivity(intent);
-        finish();
+        if(edit) {
+            finish();
+        }
+        else {
+            Intent intent = new Intent(this, Home.class);
+            startActivity(intent);
+            finish();
+        }
+
     }
 
 
@@ -461,6 +468,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                     Log.i(Constants.DebugTAG,"onPostExecute");
                     Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
                     adv = Helpers.convertJSONToAdvertisement(jsonObject);
+                    setTitle("Editing " +adv.getTitle());
                     fillComponents();
                     //String error = jsonObject.get("error").toString();
                 }
