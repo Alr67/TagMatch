@@ -3,6 +3,7 @@ package software33.tagmatch.Advertisement;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
@@ -85,14 +86,14 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Bundle b = getIntent().getExtras();
         if(b != null) {
             Log.i(Constants.DebugTAG,"Bundle not emptu");
-            if (b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT) != null &&
-                    b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT).equals(Helpers.getActualUser(this).getAlias())){
+            if (b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT) != null && b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT).equals(Helpers.getActualUser(this).getAlias())){
                 myAdv = true;
             }
 
             getAdvertisement(b.getInt(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT));
         }
         else Log.i(Constants.DebugTAG,"Bundle EMPTY");
+        setTitle(R.string.loading_title);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setClickable(false);
@@ -101,11 +102,10 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     }
 
 
-    /*@Override
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         if (myAdv) getMenuInflater().inflate(R.menu.menu_view_my_adv, menu);
-        else getMenuInflater().inflate(R.menu.menu_view_adv, menu);
         return true;
     }
 
@@ -117,13 +117,13 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_delete_adv) {
+        if (id == R.id.action_delete) {
             AlertDialog alertDialog = createDeleteDialog();
             alertDialog.show();
         }
 
         return super.onOptionsItemSelected(item);
-    }*/
+    }
 
     public void getAdvertisement(Integer id) {
         JSONObject jObject = new JSONObject();
@@ -139,6 +139,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     Log.i(Constants.DebugTAG,"onPostExecute");
                         Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
                         adv = Helpers.convertJSONToAdvertisement(jsonObject);
+                        setTitle(adv.getTitle());
                         fillComponents();
                         //String error = jsonObject.get("error").toString();
                 }
@@ -160,19 +161,18 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
         userImage = (ImageView) findViewById(R.id.advert_user_image);
         userImage.setImageDrawable(getDrawable(R.drawable.loading));
+
         imageType = (ImageView) findViewById(R.id.advert_image_type);
         location = (TextView) findViewById(R.id.advert_location);
         username = (TextView) findViewById(R.id.advert_name_user);
         tags = (TextView) findViewById(R.id.advert_tags);
         description = (TextView) findViewById(R.id.advert_description);
-        title = (TextView) findViewById(R.id.advert_title);
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.advert_map)).getMap();
         prepareImages();
     }
 
     private void fillComponents(){
-        title.setText(adv.getTitle());
         description.setText(adv.getDescription());
         username.setText(adv.getOwner().getAlias());
         location.setText(adv.getUser().getCity());

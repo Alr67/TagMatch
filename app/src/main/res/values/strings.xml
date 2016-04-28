@@ -114,5 +114,7 @@
     <string name="dialog_cancel_delete_adv">Cancel</string>
     <string name="wait_chat">Wait, setting up some things</string>
     <string name="text_edit_button">Save changes</string>
+    <string name="loading_title">Loading...</string>
+    <string name="hashtags_title">Hashtags:</string>
 
 </resources>
