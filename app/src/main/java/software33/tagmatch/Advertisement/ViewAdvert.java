@@ -296,7 +296,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChildren()){
                     if (!adv.getOwner().getAlias().equals(myName))
-                        chatButton.setEnabled(true);
+                        fab.setEnabled(true);
                 }
                 else {
                     long numChats = dataSnapshot.getChildrenCount();

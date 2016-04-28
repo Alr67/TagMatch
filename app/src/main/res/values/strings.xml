@@ -112,6 +112,7 @@
     <string name="dialog_message_delete_adv">Are you sure you want to delete this advertisement?</string>
     <string name="dialog_confirm_delete_adv">Yes</string>
     <string name="dialog_cancel_delete_adv">Cancel</string>
-    <string name="wait_chat">Wait, setting up the chat</string>
+    <string name="wait_chat">Wait, setting up some things</string>
+    <string name="text_edit_button">Save changes</string>
 
 </resources>
