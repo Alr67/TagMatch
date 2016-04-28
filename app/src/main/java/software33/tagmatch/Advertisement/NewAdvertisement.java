@@ -17,7 +17,6 @@ import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.ThemedSpinnerAdapter;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
@@ -84,15 +83,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private void initElements(){
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_new_advert);
         setSupportActionBar(toolbar);
-      /*
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this); */
 
         typeSpinner = (Spinner) findViewById(R.id.typeSpinner);
         ArrayAdapter<String> typeAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item, Constants.typeList);
@@ -113,7 +103,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         newImage.setOnClickListener(this);
 
         wantedTagsLayout = (TextInputLayout) findViewById(R.id.input_price_textInput);
-      //  wantedTagsLayout.setHint(getString(R.string.input_price));
 
         title = (EditText) findViewById(R.id.input_title);
         description = (EditText) findViewById(R.id.input_description);
@@ -207,12 +196,11 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     private void updateAdvertToServer(Advertisement adv) {
         final Context context = this.getApplicationContext();
-        Toast.makeText(this,"Uploading Image, please whait",Toast.LENGTH_LONG);
+        Toast.makeText(this,"Uploading Advert To server, please whait",Toast.LENGTH_LONG).show();
         new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true){
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 try {
-                    if (jsonObject.has("status"))  Log.i(Constants.DebugTAG,"status: "+jsonObject.getInt("status"));
                     Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
                     if(jsonObject.has("error")) {
                         String error = jsonObject.get("error").toString();
@@ -233,38 +221,49 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     private void postImagesToServer(Integer advId) {
-        String url = Constants.IP_SERVER + "/ads/"+advId+"/photos";
-        for(Bitmap bm: images) {
-            ByteArrayOutputStream stream = new ByteArrayOutputStream();
-            bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
+        if(images.size() == 0) {
+            Log.i(Constants.DebugTAG, "Aquest anunci no te imatges");
+            advertUpdated();
+        }
+        else {
+            Log.i(Constants.DebugTAG,"Aquest anunci te " + images.size() + " fotos, anem a pujarles al server");
 
-            JSONObject jObject = new JSONObject();
-            try {
-                jObject.put("profilePhotoId", byteArray);
-            new TagMatchPostImgAsyncTask(url, this, byteArray, imgExtension) {
-                @Override
-                protected void onPostExecute(JSONObject jsonObject) {
-                    try {
-                        if(jsonObject.has("error")) {
-                            String error = jsonObject.get("error").toString();
-                            Toast.makeText(getApplicationContext(),error, Toast.LENGTH_SHORT).show();
+            String url = Constants.IP_SERVER + "/ads/" + advId + "/photos";
+            for (Bitmap bm : images) {
+                ByteArrayOutputStream stream = new ByteArrayOutputStream();
+                bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
+                byte[] byteArray = stream.toByteArray();
+
+                JSONObject jObject = new JSONObject();
+                try {
+                    jObject.put("profilePhotoId", byteArray);
+                    new TagMatchPostImgAsyncTask(url, this, byteArray, imgExtension) {
+                        @Override
+                        protected void onPostExecute(JSONObject jsonObject) {
+                            try {
+                                if (jsonObject.has("error")) {
+                                    String error = jsonObject.get("error").toString();
+                                    Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    advertUpdated();
+                                }
+                            } catch (JSONException ignored) {
+                                ignored.printStackTrace();
+                            }
                         }
-                        else {
-                            Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(getApplicationContext(), Home.class);
-                            startActivity(intent);
-                            finish();
-                        }
-                    } catch (JSONException ignored) {
-                        ignored.printStackTrace();
-                    }
+                    }.execute();
+                } catch (JSONException e) {
+                    e.printStackTrace();
                 }
-            }.execute();
-            } catch (JSONException e) {
-                e.printStackTrace();
             }
         }
+    }
+
+    private void advertUpdated() {
+        Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(getApplicationContext(), Home.class);
+        startActivity(intent);
+        finish();
     }
 
     /** MARK: Spinner type manager*/
