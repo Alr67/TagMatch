@@ -293,7 +293,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                             Toast.makeText(getApplicationContext(),error, Toast.LENGTH_SHORT).show();
                         }
                         else {
-                            Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
+                            if(edit) Toast.makeText(getApplicationContext(), "Congratulations, advertisement updated", Toast.LENGTH_SHORT).show();
+                            else Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
                             Intent intent = new Intent(getApplicationContext(), Home.class);
                             startActivity(intent);
                             finish();

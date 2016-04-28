@@ -108,7 +108,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
         new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/ads/" + advertId + "/photo/" + photoId, context) {
             @Override
             protected void onPostExecute(String url) {
-                Picasso.with(context).load(url).error(R.drawable.image0).into(image);
+                Picasso.with(context).load(url).error(R.drawable.image0).centerCrop().resize(image.getMeasuredWidth(),image.getMeasuredHeight()).into(image);
             }
         }.execute(jsonObject);
 
