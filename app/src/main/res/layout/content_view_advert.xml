@@ -97,7 +97,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Tags"
                     android:id="@+id/advert_tags"
                     android:layout_marginTop="@dimen/interlineat"
                     android:layout_marginBottom="@dimen/interlineat"/>
@@ -109,68 +108,103 @@
                 android:layout_height="match_parent"
                 android:layout_weight="100">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceMedium"
+                    android:text="@string/about_user"
+                    android:id="@+id/textView7"
+                    android:textStyle="bold"
+                    android:textSize="19dp"
+                    android:paddingBottom="6dp"
+                    android:paddingTop="7dp" />
+
                 <LinearLayout
-                    android:orientation="vertical"
+                    android:orientation="horizontal"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_weight="10">
+                    android:layout_weight="20">
 
                     <TextView
-                        android:layout_width="wrap_content"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Nom User"
                         android:id="@+id/advert_name_user"
-                        android:layout_marginTop="@dimen/interlineat"
-                        android:layout_marginBottom="@dimen/interlineat"
-                        android:layout_gravity="center" />
+                        android:layout_gravity="center"
+                        android:textStyle="bold"
+                        android:textSize="15dp"
+                        android:layout_weight="80"
+                        android:text="XDDD" />
 
                     <ImageView
                         android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_height="wrap_content"
                         android:id="@+id/advert_user_image"
                         android:src="@drawable/image_placeholder"
-                        android:layout_marginTop="@dimen/interlineat"
-                        android:layout_marginBottom="@dimen/interlineat"
-                        android:layout_gravity="center" />
+                        android:layout_weight="15" />
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:textAppearance="?android:attr/textAppearanceSmall"
-                        android:text="Location"
-                        android:id="@+id/advert_location"
-                        android:layout_marginTop="@dimen/interlineat"
-                        android:layout_marginBottom="@dimen/interlineat"
-                        android:layout_gravity="center" />
-
-                    <Button
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="TagMatch!"
-                        android:id="@+id/but_tagMatch"
-                        android:layout_below="@+id/textView"
-                        android:layout_centerHorizontal="true"
-                        android:onClick="startMainChatActivity"
-                        android:layout_marginTop="@dimen/interlineat"
-                        android:layout_marginBottom="@dimen/interlineat"
-                        android:layout_gravity="center" />
                 </LinearLayout>
 
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:layout_weight="5">
+                    android:layout_weight="15"
+                    android:paddingTop="7dp">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceMedium"
+                            android:text="@string/user_loc"
+                            android:id="@+id/textView8"
+                            android:textStyle="italic"
+                            android:textSize="19dp" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:textAppearance="?android:attr/textAppearanceSmall"
+                            android:text="Location"
+                            android:id="@+id/advert_location"
+                            android:layout_gravity="center"
+                            android:textSize="19dp"
+                            android:textStyle="italic" />
+                    </LinearLayout>
+
                     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
                         android:name="com.google.android.gms.maps.MapFragment"
                         android:id="@+id/advert_map"
                         android:layout_width="match_parent"
+                        android:layout_height="150dp" />
+
+                    <LinearLayout
+                        android:orientation="vertical"
+                        android:layout_width="match_parent"
                         android:layout_height="match_parent"
-                        android:layout_marginTop="@dimen/interlineat"
-                        android:layout_marginBottom="@dimen/interlineat" />
+                        android:layout_weight="10">
+
+                        <Button
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="TagMatch!"
+                            android:id="@+id/but_tagMatch"
+                            android:layout_below="@+id/textView"
+                            android:layout_centerHorizontal="true"
+                            android:onClick="startMainChatActivity"
+                            android:layout_marginTop="@dimen/interlineat"
+                            android:layout_marginBottom="@dimen/interlineat"
+                            android:layout_gravity="center" />
+                    </LinearLayout>
 
                 </LinearLayout>
+
             </LinearLayout>
+
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

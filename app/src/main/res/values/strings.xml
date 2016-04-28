@@ -116,5 +116,7 @@
     <string name="text_edit_button">Save changes</string>
     <string name="loading_title">Loading...</string>
     <string name="hashtags_title">Hashtags:</string>
+    <string name="about_user">About the seller</string>
+    <string name="user_loc">User location:&#160;</string>
 
 </resources>
