@@ -65,8 +65,7 @@ public class SingleChatActivity extends AppCompatActivity {
         myId = FirebaseUtils.getMyId(this);
 
         //Get Firebase Reference
-        myFirebaseRef =
-                new Firebase("https://torrid-torch-42.firebaseio.com/");
+        myFirebaseRef = FirebaseUtils.getMyFirebaseRef();
 
         messagesRef = myFirebaseRef.child("chats").child(idChat).child("messages");
         usersRef = myFirebaseRef.child("users");

@@ -184,8 +184,10 @@ public class RegistrationActivity2 extends AppCompatActivity implements
             updateIMG();
         }
 
-        /*** Firebase create user ***/
-        createUser(email, password, username, img, this);
+        /** Set img user in Firebase **/
+        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).updateChildren(img);
+
+        updateUser();
     }
 
     private void updateIMG() {
@@ -239,6 +241,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
                         String error = jsonObject.get("error").toString();
                         showError(error);
                     } catch (JSONException ignored) {
+                        backToLogin();
                     }
                 }
             }.execute(jObject);
@@ -251,42 +254,6 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         Intent act = new Intent(this, Login.class);
         startActivity(act);
         finish();
-    }
-
-    public void createUser(final String email, final String password, final String name, final Map<String, Object> img, final Context context) {
-        FirebaseUtils.getMyFirebaseRef().createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
-            @Override
-            public void onSuccess(Map<String, Object> result) {
-                FirebaseUtils.getMyFirebaseRef().authWithPassword(
-                        email,
-                        password,
-                        new Firebase.AuthResultHandler() {
-                            @Override
-                            public void onAuthenticated(AuthData authData) {
-                                FirebaseUtils.getUsersRef().child(authData.getUid()).setValue
-                                        (new FirebaseUtils.User(name,"",new HashMap<String, Object>(),new HashMap<String, Object>()));
-                                FirebaseUtils.setMyId(authData.getUid(),context);
-                                FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(context)).updateChildren(img);
-
-                                updateUser();
-
-                                backToLogin();
-                            }
-
-                            @Override
-                            public void onAuthenticationError(FirebaseError error) {
-                                Log.i("Debug-Firebase","error auth user in firebase");
-                            }
-                        }
-                );
-                //setMyId(result.get("uid").toString(), context);
-            }
-
-            @Override
-            public void onError(FirebaseError firebaseError) {
-                Log.i("Debug-Firebase", firebaseError.getMessage());
-            }
-        });
     }
 
     @Override
