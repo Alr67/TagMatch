@@ -49,8 +49,11 @@ import software33.tagmatch.Domain.AdvSell;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetBitmapAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.DialogError;
 import software33.tagmatch.Utils.Helpers;
@@ -64,6 +67,9 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private ViewPager mViewPager;
     private String imgExtension;
     private final String DebugTag = "DEBUG ADVERT";
+    Advertisement adv;
+    private boolean edit = false;
+    private Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -123,6 +129,16 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         mViewPager.setLayoutParams(params);
         mCustomPagerAdapterNewAdvert = new CustomPagerAdapterNewAdvert(this,params.height,params.width);
         mViewPager.setAdapter(mCustomPagerAdapterNewAdvert);
+
+
+         intent = getIntent();
+
+        if(intent.hasExtra("edit") && intent.getBooleanExtra("edit",false)) { //Si es edit
+            createButton.setText(R.string.text_edit_button);
+            edit = true;
+            getAdvertisement(intent.getIntExtra("idAnunci",0));
+        }
+        else setTitle(R.string.new_ad_general_title);
 
     }
 
@@ -197,30 +213,59 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private void updateAdvertToServer(Advertisement adv) {
         final Context context = this.getApplicationContext();
         Toast.makeText(this,"Uploading Advert To server, please whait",Toast.LENGTH_LONG).show();
-        new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true){
-            @Override
-            protected void onPostExecute(JSONObject jsonObject) {
-                try {
-                    Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
-                    if(jsonObject.has("error")) {
-                        String error = jsonObject.get("error").toString();
-                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                        if(jsonObject.has("id")) {
-                            Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
-                            postImagesToServer(jsonObject.getInt("id"));
+        if(edit) {
+            //System.out.println("VAMOSSS: " +Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci",0));
+            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci",0), getApplicationContext()){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if (jsonObject.has("status"))  Log.i(Constants.DebugTAG,"status: "+jsonObject.getInt("status"));
+                        Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
                         }
-                    }
-                } catch (JSONException ignored){
+                        else {
+                            if(jsonObject.has("id")) {
+                                Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
+                                postImagesToServer(jsonObject.getInt("id"));
+                            }
+                        }
+                    } catch (JSONException ignored){
 
+                    }
                 }
-            }
-        }.execute(adv.toJSON());
+            }.execute(adv.toJSON2());
+            Log.i(Constants.DebugTAG, adv.toJSON().toString());
+        }
+        else {
+            Toast.makeText(this,"Uploading Advert To server, please whait",Toast.LENGTH_LONG).show();
+            new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                        }
+                        else {
+                            if(jsonObject.has("id")) {
+                                Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
+                                postImagesToServer(jsonObject.getInt("id"));
+                            }
+                        }
+                    } catch (JSONException ignored){
+
+                    }
+                }
+            }.execute(adv.toJSON());
+        }
         Log.i(Constants.DebugTAG, adv.toJSON().toString());
     }
 
+
     private void postImagesToServer(Integer advId) {
+
         if(images.size() == 0) {
             Log.i(Constants.DebugTAG, "Aquest anunci no te imatges");
             advertUpdated();
@@ -260,7 +305,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     private void advertUpdated() {
-        Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
+                        if(edit) Toast.makeText(getApplicationContext(), "Congratulations, advertisement updated", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getApplicationContext(), Home.class);
         startActivity(intent);
         finish();
@@ -335,6 +381,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     private String pathfoto;
+
     private File createImageFile() throws IOException {
         Log.v(DebugTag, "Anem a crear el fitxer de la foto");
         //Create an unique name for the new picture
@@ -395,8 +442,88 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, Home.class);
-        startActivity(intent);
-        finish();
+        if(edit) {
+            finish();
+        }
+        else {
+            Intent intent = new Intent(this, Home.class);
+            startActivity(intent);
+            finish();
+        }
+
+    }
+
+
+    //Part només de l'edit
+    public void getAdvertisement(Integer id) {
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        Log.i(Constants.DebugTAG, "Vaig a mostrar l'anunci amb id: " + id);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+            Log.i(Constants.DebugTAG,"Vaig a fer el get a: "+ Constants.IP_SERVER+"/ads/"+id.toString());
+            new TagMatchGetAsyncTask(Constants.IP_SERVER+"/ads/"+id.toString(),this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    Log.i(Constants.DebugTAG,"onPostExecute");
+                    Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
+                    adv = Helpers.convertJSONToAdvertisement(jsonObject);
+                    setTitle("Editing " +adv.getTitle());
+                    fillComponents();
+                    //String error = jsonObject.get("error").toString();
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA");
+            e.printStackTrace();
+        }
+    }
+
+    private void fillComponents() {
+        getAdvertisementImages();
+        title.setText(adv.getTitle());
+        description.setText(adv.getDescription());
+        int type = Helpers.getIntFromType(adv.getTypeDescription());
+        typeSpinner.setSelection(type);
+        if(type == 0) wantedTags.setText(adv.getPrice().toString());
+        categorySpinner.setSelection(Helpers.getIntFromCategory(adv.getCategory()));
+        String sol = new String();
+        for(int q = 0; q < adv.getTags().length; ++q) {
+            sol += "#"+adv.getTags()[q];
+        }
+        tag.setText(sol);
+        if(type == 1) {
+            String next = new String();
+            for(int s = 0; s < ((AdvChange) adv).getWantedTags().length; ++s) {
+                next += ((AdvChange) adv).getWantedTags()[s];
+            }
+            wantedTags.setText(next);
+        }
+    }
+
+    private void getAdvertisementImages() {
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
+            e.printStackTrace();
+        }
+        String url = Constants.IP_SERVER+"/ads/"+ adv.getID().toString()+"/photo/";
+        Log.i(Constants.DebugTAG,"Aquest anunci te "+adv.getImagesIDs().length+" fotos");
+        for (String photoId :adv.getImagesIDs()) {
+            Log.i(Constants.DebugTAG, "Vaig a demanar la foto amb id: " + photoId);
+
+            new TagMatchGetBitmapAsyncTask(url+photoId.toString(),getApplicationContext()) {
+                @Override
+                protected void onPostExecute(Bitmap image) {
+                    mCustomPagerAdapterNewAdvert.addImageBitmap(image);
+                    Log.i(Constants.DebugTAG,"image added");
+                }
+            }.execute(jObject);
+        }
     }
 }

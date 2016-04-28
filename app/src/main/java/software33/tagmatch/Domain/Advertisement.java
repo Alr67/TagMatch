@@ -19,7 +19,7 @@ public class Advertisement {
 
     private Integer aID;
     private String title;
-    private  User owner;
+    private User owner;
     private String description;
     private List<Bitmap> images;
     private String[] imagesIDs;
@@ -118,6 +118,18 @@ public class Advertisement {
             jsonObject.put("name", title);
             jsonObject.put("type", getTypeDescription());
             jsonObject.put("owner", owner.getAlias());
+            jsonObject.put("category", category);
+            jsonObject.put("tags", new JSONArray(tags));
+            jsonObject.put("description", description);
+        } catch (JSONException e) {
+        }
+        return jsonObject;
+    }
+
+    public JSONObject toJSON2(){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("name", title);
             jsonObject.put("category", category);
             jsonObject.put("tags", new JSONArray(tags));
             jsonObject.put("description", description);

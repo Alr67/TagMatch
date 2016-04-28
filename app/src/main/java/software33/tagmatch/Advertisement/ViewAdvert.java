@@ -3,9 +3,11 @@ package software33.tagmatch.Advertisement;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -73,6 +75,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String myName;
 
     private boolean myAdv;
+    FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -83,14 +86,19 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Bundle b = getIntent().getExtras();
         if(b != null) {
             Log.i(Constants.DebugTAG,"Bundle not emptu");
-            if (b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT) != null &&
-                    b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT).equals(Helpers.getActualUser(this).getAlias())){
+            if (b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT) != null && b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT).equals(Helpers.getActualUser(this).getAlias())){
                 myAdv = true;
             }
 
             getAdvertisement(b.getInt(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT));
         }
         else Log.i(Constants.DebugTAG,"Bundle EMPTY");
+        setTitle(R.string.loading_title);
+
+        fab = (FloatingActionButton) findViewById(R.id.fab);
+        fab.setClickable(false);
+        fab.setImageDrawable(getDrawable(R.drawable.loading));
+
     }
 
 
@@ -98,7 +106,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         if (myAdv) getMenuInflater().inflate(R.menu.menu_view_my_adv, menu);
-        else getMenuInflater().inflate(R.menu.menu_view_adv, menu);
         return true;
     }
 
@@ -110,7 +117,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
-        if (id == R.id.action_delete_adv) {
+        if (id == R.id.action_delete) {
             AlertDialog alertDialog = createDeleteDialog();
             alertDialog.show();
         }
@@ -132,6 +139,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     Log.i(Constants.DebugTAG,"onPostExecute");
                         Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
                         adv = Helpers.convertJSONToAdvertisement(jsonObject);
+                        setTitle(adv.getTitle());
                         fillComponents();
                         //String error = jsonObject.get("error").toString();
                 }
@@ -144,38 +152,27 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
     @Override
     public void onClick(View v) {
-        Toast.makeText(this,"NOT IMPLEMENTED YET",Toast.LENGTH_SHORT).show();
+        Toast.makeText(this,R.string.wait_chat,Toast.LENGTH_SHORT).show();
     }
 
     private void initComponents() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view_advert);
         setSupportActionBar(toolbar);
 
-  /*      DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
-                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
-
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this); */
         userImage = (ImageView) findViewById(R.id.advert_user_image);
         userImage.setImageDrawable(getDrawable(R.drawable.loading));
+
         imageType = (ImageView) findViewById(R.id.advert_image_type);
         location = (TextView) findViewById(R.id.advert_location);
         username = (TextView) findViewById(R.id.advert_name_user);
         tags = (TextView) findViewById(R.id.advert_tags);
         description = (TextView) findViewById(R.id.advert_description);
-        title = (TextView) findViewById(R.id.advert_title);
-
-        chatButton = (Button) findViewById(R.id.bStartXat);
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.advert_map)).getMap();
         prepareImages();
     }
 
     private void fillComponents(){
-        title.setText(adv.getTitle());
         description.setText(adv.getDescription());
         username.setText(adv.getOwner().getAlias());
         location.setText(adv.getUser().getCity());
@@ -272,9 +269,25 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                 if (url == null){
                     Picasso.with(ViewAdvert.this).load(R.drawable.image0).into(userImage);
                 }
-                getChats();
+                if(!myAdv) getChats();
+                else prepareEdit();
             }
         }.execute(jObject);
+    }
+
+    private void prepareEdit() {
+        fab.setClickable(true);
+        fab.setImageDrawable(getDrawable(R.drawable.ic_menu_manage));
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent novaRecepta = new Intent(getApplicationContext(), NewAdvertisement.class);
+                novaRecepta.putExtra("edit", true);
+                novaRecepta.putExtra("idAnunci",adv.getID());
+                startActivity(novaRecepta);
+                //finish();
+            }
+        });
     }
 
     private void getChats(){
@@ -283,7 +296,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChildren()){
                     if (!adv.getOwner().getAlias().equals(myName))
-                        chatButton.setEnabled(true);
+                        fab.setEnabled(true);
                 }
                 else {
                     long numChats = dataSnapshot.getChildrenCount();
@@ -308,10 +321,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         mCustomPagerAdapterViewAdvert = new CustomPagerAdapterViewAdvert(this,params.height,params.width);
         mViewPager.setAdapter(mCustomPagerAdapterViewAdvert);
 
-        chatButton.getLayoutParams().height=params.height/5;
-        chatButton.getLayoutParams().width=params.height/5;
-        chatButton.setBackground(getDrawable(R.drawable.adver_chat));
-
         imageType.getLayoutParams().height=params.height/5;
         imageType.getLayoutParams().width=params.height/5;
     }
@@ -323,7 +332,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         finish();
     }
 
-    public void buttonStartXat(View view) {
+    public Intent buttonStartXat(View view) {
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
         b.putString("UserName", username.getText().toString());
@@ -351,7 +360,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         FirebaseUtils.setChatImage(imageChat,this);
         intent.putExtras(b);
 
-        startActivity(intent);
+        return intent;
     }
 
     private String createChat() {
@@ -390,7 +399,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat, long numChats) {
+    private void setButtonXat(final String idProduct, final Map<String, Object> users, final String idChat, final long numChats) {
         String userName = "";
         for (Object o : users.values()){
             if (!o.toString().equals(Helpers.getActualUser(this).getAlias())) {
@@ -407,13 +416,30 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         //Restriccions de obrir xat:
         //      No mateix titul de producte ni id de usuari que ho ha publicat
         if (idProduct.equals(title.getText().toString()) && userId.equals(this.userId)){
-            chatButton.setText("Xatejant");
             this.idChat = idChat;
-            chatButton.setEnabled(true);
+            fab.setClickable(true);
+            fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
+            fab.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Intent chat = buttonStartXat(view);
+                    startActivity(chat);
+                }
+            });
         }
         else {
             this.idChat = "Not exists";
-            if (numChats == 1 && !this.username.getText().toString().equals(myName)) chatButton.setEnabled(true);
+            if (numChats == 1 && !this.username.getText().toString().equals(myName)){
+                fab.setClickable(true);
+                fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
+                fab.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        Intent chat = buttonStartXat(view);
+                        startActivity(chat);
+                    }
+                });
+            }
         }
 
         Log.i("Debug-Chat","idProd " +idProduct);

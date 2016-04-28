@@ -24,6 +24,10 @@ public class CustomPagerAdapterNewAdvert extends CustomPagerAdapter {
         task.execute(url,imageHeight.toString(),imageWidth.toString());
     }
 
+    public void addImageBitmap(Bitmap image) {
+        super.newImageConverted(image);
+    }
+
 
     public void newImageConverted(Bitmap bitmap) {
         super.newImageConverted(bitmap);
