@@ -263,9 +263,13 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         Log.i(Constants.DebugTAG, adv.toJSON().toString());
     }
 
-
+    Integer okImages;
     private void postImagesToServer(Integer advId) {
-
+        okImages = 0;
+        if(edit) {
+            Log.i(Constants.DebugTAG,"tenia " + adv.getImagesIDs().length + " fotos" );
+            okImages = adv.getImagesIDs().length;
+        }
         if(images.size() == 0) {
             Log.i(Constants.DebugTAG, "Aquest anunci no te imatges");
             advertUpdated();
@@ -290,7 +294,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                                     String error = jsonObject.get("error").toString();
                                     Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
                                 } else {
-                                    advertUpdated();
+                                    newImageUpdated();
                                 }
                             } catch (JSONException ignored) {
                                 ignored.printStackTrace();
@@ -304,9 +308,16 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }
     }
 
+    private void newImageUpdated(){
+        ++okImages;
+        if(okImages == images.size()) {
+            advertUpdated();
+        }
+    }
+
     private void advertUpdated() {
-                        if(edit) Toast.makeText(getApplicationContext(), "Congratulations, advertisement updated", Toast.LENGTH_SHORT).show();
-                        Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
+        if(edit) Toast.makeText(getApplicationContext(), "Congratulations, advertisement updated", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getApplicationContext(), Home.class);
         startActivity(intent);
         finish();
