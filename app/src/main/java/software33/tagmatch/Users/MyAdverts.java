@@ -29,6 +29,7 @@ import java.util.List;
 
 import software33.tagmatch.AdCards.AdapterAdvert;
 import software33.tagmatch.AdCards.AdvertContent;
+import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
 import software33.tagmatch.Domain.Advertisement;
@@ -180,14 +181,14 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
 
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed(){
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-            Log.i("DEBUG","Drawer is open");
         } else {
-            Log.i("DEBUG","Drawer is NOT open");
-            super.onBackPressed();
+            Intent intent = new Intent(this, Home.class);
+            startActivity(intent);
+            finish();
         }
     }
 

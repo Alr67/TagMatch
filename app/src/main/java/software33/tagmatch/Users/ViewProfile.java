@@ -53,6 +53,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import software33.tagmatch.AdCards.AdvertContent;
+import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.SingleChatActivity;
 import software33.tagmatch.Domain.Advertisement;
@@ -143,14 +144,14 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     }
 
     @Override
-    public void onBackPressed() {
+    public void onBackPressed(){
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
-            Log.i("DEBUG","Drawer is open");
         } else {
-            Log.i("DEBUG","Drawer is NOT open");
-            super.onBackPressed();
+            Intent intent = new Intent(this, Home.class);
+            startActivity(intent);
+            finish();
         }
     }
 
