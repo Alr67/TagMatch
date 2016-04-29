@@ -443,6 +443,9 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     @Override
     public void onBackPressed() {
         if(edit) {
+            Intent viewRecepta = new Intent(getApplicationContext(), ViewAdvert.class).putExtra(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT, adv.getID());
+            viewRecepta.putExtra(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT,adv.getOwner().toString());
+            startActivity(viewRecepta);
             finish();
         }
         else {

@@ -56,6 +56,7 @@ public class Login extends AppCompatActivity {
         if(existing_login != null && existing_login.get(0) != null && existing_login.get(1) != null) {
             Intent success = new Intent(this, Home.class); //FAlta guardar en algun puesto l'usuari
             startActivity(success);
+            finish();
         }
 
         TextView app_header = (TextView) findViewById(R.id.app_header);

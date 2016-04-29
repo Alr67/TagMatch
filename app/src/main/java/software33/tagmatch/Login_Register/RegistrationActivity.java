@@ -144,6 +144,7 @@ public class RegistrationActivity extends AppCompatActivity {
     public void onBackPressed() {
         Intent success = new Intent(this, Login.class); //FAlta guardar en algun puesto l'usuari
         startActivity(success);
+        finish();
     }
 
     public void removeUser(final String email, final String password){

@@ -3,11 +3,9 @@ package software33.tagmatch.Advertisement;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import android.os.SystemClock;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AlertDialog;
@@ -19,7 +17,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -49,7 +46,6 @@ import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.SingleChatActivity;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
-import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchDeleteAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
@@ -287,7 +283,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                 novaRecepta.putExtra("edit", true);
                 novaRecepta.putExtra("idAnunci",adv.getID());
                 startActivity(novaRecepta);
-                //finish();
+                finish();
             }
         });
     }
@@ -432,6 +428,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         if (idProduct.equals(getTitle().toString()) && userId.equals(this.userId)){
             this.idChat = idChat;
             fab.setClickable(true);
+            //fab.setImageDrawable(getDrawable(R.drawable.existing_chat));
             fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
