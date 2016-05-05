@@ -26,11 +26,13 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -40,6 +42,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import software33.tagmatch.AdCards.Home;
@@ -51,6 +54,7 @@ import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetBitmapAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetTrendingAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
@@ -70,6 +74,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     Advertisement adv;
     private boolean edit = false;
     private Intent intent;
+    private AutoCompleteTextView sugg_hastags;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -117,6 +122,53 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         wantedTags.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         images = new ArrayList<>();
+
+        sugg_hastags = (AutoCompleteTextView) findViewById(R.id.sugg_hashtag);
+        final ArrayList<String> suggestions = new ArrayList<>();
+
+        /*PETICIO HASHTAGS*/
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
+            e.printStackTrace();
+        }
+        new TagMatchGetTrendingAsyncTask(Constants.IP_SERVER + "/tags/trending", getApplicationContext()) {
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    if (jsonObject.has("status"))
+                        Log.i(Constants.DebugTAG, "status: " + jsonObject.getInt("status"));
+                    Log.i(Constants.DebugTAG, "JSON: \n" + jsonObject);
+                    if (jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                    } else {
+                        /*JSONArray jsonArray = new JSONArray();
+                        Iterator x = jsonObject.keys();
+                        while (x.hasNext()){
+                            String key = (String) x.next();
+                            jsonArray.put(jsonObject.get(key));
+                        }*/
+                        JSONArray jsonArray = new JSONArray(jsonObject.toString());
+                        if (jsonObject != null) {
+                            for (int i = 0; i < jsonArray.length(); i++) {
+                                suggestions.add(jsonArray.get(i).toString());
+                            }
+                        }
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.execute(jObject);
+        /*PETICIO HASHTAGS*/
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_list_item_1,suggestions);
+        sugg_hastags.setAdapter(adapter);
+        sugg_hastags.setThreshold(1);
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
         DisplayMetrics displayMetrics = new DisplayMetrics();
