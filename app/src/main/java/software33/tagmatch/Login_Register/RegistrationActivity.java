@@ -51,6 +51,7 @@ public class RegistrationActivity extends AppCompatActivity {
         // finally change the color
         window.setStatusBarColor(this.getResources().getColor(R.color.colorPrimaryDark));
 
+        //para que no se abra el teclado al entrar en la activity
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
 

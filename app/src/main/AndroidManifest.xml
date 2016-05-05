@@ -79,7 +79,11 @@
         <activity
             android:name=".Filter.Filter"
             android:label="@string/title_activity_filter"
-            android:windowSoftInputMode="adjustPan"
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="adjustPan" />
+        <activity
+            android:name=".Users.EditProfile"
+            android:label="@string/title_activity_edit_profile"
             android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
