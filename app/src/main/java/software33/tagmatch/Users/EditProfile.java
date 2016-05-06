@@ -40,30 +40,6 @@ public class EditProfile extends AppCompatActivity {
 
         tl = (TableLayout) findViewById(R.id.edit_profile_table);
 
-        for (int i = 0; i <20; i++) {
-            final TableRow row = new TableRow(this);
-            TableRow.LayoutParams lp = new TableRow.LayoutParams(TableLayout.LayoutParams.WRAP_CONTENT);
-            row.setLayoutParams(lp);
-            TextView tv = new TextView(this);
-            tv.setText("qwe");
-            if(i == 0)
-                tv.setText("asdf");
-            Button btn = new Button(this);
-            btn.setBackground(getDrawable(android.R.drawable.ic_menu_delete));
-            btn.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    deleteRow(v);
-                }
-            });
-            String sBtn = String.valueOf(lastTableID);
-            btn.setText(sBtn);
-            btn.setTextColor(getResources().getColor(android.R.color.transparent));
-            row.addView(tv,0);
-            row.addView(btn,1);
-            tl.addView(row, lastTableID++);
-        }
-
         //para que no se abra el teclado al entrar en la activity
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
     }
@@ -77,8 +53,26 @@ public class EditProfile extends AppCompatActivity {
     }
 
     public void addInterest(View view) {
-        String interest = ((EditText) findViewById(R.id.edit_profile_et_interests)).getText().toString();
-        
+        EditText et = (EditText) findViewById(R.id.edit_profile_et_interests);
+        String interest = et.getText().toString();
+        TextView tv = new TextView(this);
+        tv.setText(interest);
+        Button btn = new Button(this);
+        btn.setBackground(getDrawable(android.R.drawable.ic_menu_delete));
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteRow(v);
+            }
+        });
+        String sBtn = String.valueOf(lastTableID);
+        btn.setText(sBtn);
+        btn.setTextColor(getResources().getColor(android.R.color.transparent));
+        TableRow row = new TableRow(this);
+        row.addView(tv,0);
+        row.addView(btn,1);
+        tl.addView(row, lastTableID++);
+        et.setText("");
     }
 
     private void deleteRow(View v){
