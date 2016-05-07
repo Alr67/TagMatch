@@ -17,7 +17,7 @@ import java.util.Map;
 
 public abstract class FirebaseUtils {
 
-    private static Firebase myFirebaseRef = new Firebase("https://tagmatch.firebaseio.com/");
+    private static Firebase myFirebaseRef = new Firebase("https://torrid-torch-42.firebaseio.com/");
     private static Firebase chatsRef = myFirebaseRef.child("chats");
     private static Firebase usersRef = myFirebaseRef.child("users");
 
