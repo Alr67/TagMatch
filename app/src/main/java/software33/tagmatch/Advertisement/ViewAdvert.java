@@ -296,7 +296,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                 if (!dataSnapshot.hasChildren()) {
                     if (!adv.getOwner().getAlias().equals(myName)) {
                         fab.setClickable(true);
-                        fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
+                        fab.setImageDrawable(getDrawable(R.drawable.chat_add));
                         fab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
@@ -428,7 +428,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         if (idProduct.equals(getTitle().toString()) && userId.equals(this.userId)){
             this.idChat = idChat;
             fab.setClickable(true);
-            //fab.setImageDrawable(getDrawable(R.drawable.existing_chat));
             fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -442,7 +441,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             this.idChat = "Not exists";
             if (numChats == 1 && !this.username.getText().toString().equals(myName)){
                 fab.setClickable(true);
-                fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
+                fab.setImageDrawable(getDrawable(R.drawable.chat_add));
                 fab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {

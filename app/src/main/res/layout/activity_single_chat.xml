@@ -6,6 +6,51 @@
         android:orientation="vertical"
         tools:context=".AdCards.Home">
 
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/layoutOffer"
+            android:background="@drawable/bar_bg">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Large Text"
+                android:id="@+id/tvContentOffer" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="right">
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/deny_offer"
+                    android:id="@+id/bCancelOffert"
+                    android:layout_gravity="right" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/accept"
+                    android:id="@+id/bAcceptOffer"
+                    android:layout_gravity="right" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="@string/pending_offer"
+                    android:id="@+id/tvPendingOffer"
+                    android:layout_gravity="right" />
+            </LinearLayout>
+
+        </LinearLayout>
+
         <ListView
             android:id="@+id/msgview"
             android:layout_width="fill_parent"
@@ -15,7 +60,7 @@
             android:divider="@null"
             android:stackFromBottom="false"
             android:transcriptMode="alwaysScroll"
-            android:padding="5dp"></ListView>
+            android:padding="5dp" />
 
         <LinearLayout
             android:layout_width="match_parent"
