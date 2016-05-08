@@ -147,4 +147,7 @@
     <string name="dialog_confirm_accept_offer">Accept</string>
     <string name="dialog_cancel_accept_offer">No</string>
 
+    <string name="mainchat_new_offer">Offer!</string>
+    <string name="mainchat_pending_offer">Pending</string>
+
 </resources>

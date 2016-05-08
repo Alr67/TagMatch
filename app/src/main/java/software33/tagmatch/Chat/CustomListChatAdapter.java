@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.provider.SyncStateContract;
 import android.util.Base64;
 import android.util.Log;
@@ -12,7 +13,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TableRow;
 import android.widget.TextView;
+
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 
@@ -24,16 +29,18 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
     /*********** Declare Used Variables *********/
     private Activity activity;
     private ArrayList data;
+    private String myId;
     private static LayoutInflater inflater=null;
     public Resources res;
     ListChatModel tempValues=null;
     int i=0;
 
     /*************  CustomAdapter Constructor *****************/
-    public CustomListChatAdapter(Activity a, ArrayList d, Resources resLocal) {
+    public CustomListChatAdapter(Activity a, String myId, ArrayList d, Resources resLocal) {
 
         /********** Take passed values **********/
         activity = a;
+        this.myId = myId;
         data=d;
         res = resLocal;
 
@@ -62,10 +69,13 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
     /********* Create a holder Class to contain inflated xml file elements *********/
     public static class ViewHolder{
 
+
+        public TableRow table;
         public TextView text;
         public TextView text1;
-        public TextView textWide;
         public ImageView image;
+        public TextView tvNumMessages;
+        public TextView tvOffer;
 
     }
 
@@ -83,9 +93,12 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
             /****** View Holder Object to contain chat_itemem.xml file elements ******/
 
             holder = new ViewHolder();
+            holder.table = (TableRow) vi.findViewById(R.id.tableItemChat);
             holder.text = (TextView) vi.findViewById(R.id.text);
             holder.text1=(TextView)vi.findViewById(R.id.text1);
             holder.image=(ImageView)vi.findViewById(R.id.image);
+            holder.tvNumMessages=(TextView)vi.findViewById(R.id.tvNumMessages);
+            holder.tvOffer=(TextView)vi.findViewById(R.id.tvOffer);
 
             /************  Set holder with LayoutInflater ************/
             vi.setTag( holder );
@@ -105,6 +118,9 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
 
             /************  Set Model values in Holder elements ***********/
 
+            if (tempValues.getOwner().equals(myId))
+                holder.table.setBackgroundColor(activity.getResources().getColor(R.color.my_chat_color));
+
             holder.text.setText( tempValues.getUserName() );
             holder.text1.setText( tempValues.getTitleProduct() );
 
@@ -120,12 +136,16 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
                 holder.image.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
             }
 
-            /* OLD
-            holder.image.setImageResource(
-                    res.getIdentifier(
-                            "software33.tagmatch:drawable/"+tempValues.getImage()
-                            ,null,null));*/
+            if (tempValues.getMessages()==0) holder.tvNumMessages.setVisibility(View.INVISIBLE);
+            else holder.tvNumMessages.setText(String.valueOf(tempValues.getMessages()));
 
+            if (tempValues.getNewOffer()!= 0){
+                if (tempValues.getNewOffer() == 1) holder.tvOffer.setText(R.string.mainchat_new_offer);
+                else holder.tvOffer.setText(R.string.mainchat_pending_offer);
+            }
+            else {
+                holder.tvOffer.setVisibility(View.INVISIBLE);
+            }
             /******** Set Item Click Listner for LayoutInflater for each row *******/
 
             vi.setOnClickListener(new OnItemClickListener( position ));

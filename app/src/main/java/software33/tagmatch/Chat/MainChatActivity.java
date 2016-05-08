@@ -1,6 +1,7 @@
 package software33.tagmatch.Chat;
 
 import android.app.Dialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Resources;
@@ -51,6 +52,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     public ArrayList<ListChatModel> CustomListViewValuesArr = new ArrayList<ListChatModel>();
     public ArrayList<ListChatModel> CustomListViewValuesArrSearch;
     boolean searching = false;
+    final Context context = this;
 
     private Firebase myFirebaseRef;
     private Firebase chatsRef;
@@ -99,7 +101,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         //Accessing to the chats of my user
 
         Resources res =getResources();
-        adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+        adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
         list.setAdapter( adapter );
         getChats();
         /*
@@ -128,12 +130,12 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     }
 
     private void getChats(){
-        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
+        FirebaseUtils.getUsersRef().child(myId).child("chats").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChildren()){
                     Resources res =getResources();
-                    adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+                    adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
                     list.setAdapter( adapter );
                 }
                 else {
@@ -180,8 +182,8 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                 Resources res =getResources();
                 searching = !newText.isEmpty();
 
-                if (searching)adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArrSearch,res );
-                else adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+                if (searching)adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArrSearch,res );
+                else adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
 
                 list.setAdapter( adapter );
 
@@ -197,26 +199,22 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         return NavigationController.onItemSelected(item.getItemId(),this);
     }
 
-    private static class ChatInfo {
-        String idProduct;
-        Map<String, Object> users = new HashMap<>();
-
-        public ChatInfo() {
+    private static class ChatOffer {
+        String senderId;
+        String text;
+        Boolean answered;
+        Boolean accepted;
+        public ChatOffer() {
             // empty default constructor, necessary for Firebase to be able to deserialize blog posts
         }
-
-        public ChatInfo(String idProduct, Map<String, Object> users) {
-            this.idProduct = idProduct;
-            this.users = users;
+        public String getSenderId() {
+            return senderId;
         }
-
-        public String getIdProduct() {
-            return idProduct;
+        public String getText() {
+            return text;
         }
-
-        public Map<String, Object> getUsers(){
-            return users;
-        }
+        public Boolean getAnswered() { return answered; }
+        public Boolean getAccepted() { return accepted; }
     }
 
     private static class User {
@@ -305,7 +303,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         users.put(id1, "My User Name");
         users.put(id2, "Usuari0");
 
-        ChatInfo chatInfo = new ChatInfo("Anuncio Test", users);
+        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo("Anuncio Test",id2, users);
         id.child("info").setValue(chatInfo);
 
         //Set the chats to each user
@@ -323,13 +321,15 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     }
 
     //Set data in the array
-    public void setListData(String idUser, String idProduct, String userName, String idChat, String img){
+    public void setListData(String idUser, String idProduct, String owner, String userName, String idChat, String img,int messages, int newOffer){
         final ListChatModel sched = new ListChatModel();
 
         sched.setUserName(userName);
-
+        sched.setOwner(owner);
         sched.setImage(img);
         sched.setTitleProduct(idProduct);
+        sched.setNewOffer(newOffer);
+        sched.setMessages(messages);
 
         CustomListViewValuesArr.add(sched);
 
@@ -338,16 +338,33 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         imageChatsUser.put(new Pair<String, String>(idProduct,userName), img);
 
         Resources res =getResources();
-        adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+        adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
         list.setAdapter( adapter );
     }
 
     public void getChat(final String idChat) {
         //Accessing to the chat with idChat ONCE
-        chatsRef.child(idChat).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
+        chatsRef.child(idChat).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                ChatInfo c = snapshot.getValue(ChatInfo.class);
+                FirebaseUtils.ChatInfo c = snapshot.child("info").getValue(FirebaseUtils.ChatInfo.class);
+                int messages = 0;
+                for (DataSnapshot dataSnapshot1 : snapshot.child("messages").getChildren()){
+                    FirebaseUtils.ChatText ct = dataSnapshot1.getValue(FirebaseUtils.ChatText.class);
+                    if (!ct.getRead() && !ct.getSenderId().equals(myId)){
+                        ++messages;
+                    }
+                }
+
+                //1: Offer 2: Pending
+                int newOffer = 0;
+                for (DataSnapshot dataSnapshot1 : snapshot.child("offers").getChildren()){
+                    ChatOffer o = dataSnapshot1.getValue(ChatOffer.class);
+                    if (!o.getAnswered()){
+                        if (!o.getSenderId().equals(myId)) newOffer = 1;
+                        else newOffer = 2;
+                    }
+                }
 
                 //Get Correct User Between two
                 String userName = "";
@@ -363,7 +380,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                     }
                 }
 
-                getUser(idUser, c.getIdProduct(), userName, idChat);
+                getUser(idUser, c.getIdProduct(), c.getOwner(), userName, idChat, messages, newOffer);
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {
@@ -371,12 +388,12 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         });
     }
 
-    public void getUser(final String idUser, final String idProduct, final String userName, final String idChat) {
+    public void getUser(final String idUser, final String idProduct, final String owner, final String userName, final String idChat, final int messages, final int newOffer) {
         usersRef.child(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 User u = snapshot.getValue(User.class);
-                setListData(idUser, idProduct, userName, idChat, u.getImg());
+                setListData(idUser, idProduct, owner, userName, idChat, u.getImg(), messages, newOffer);
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {
@@ -439,11 +456,11 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
             }
             CustomListViewValuesArrSearch.remove(mPosition);
             CustomListViewValuesArr.remove(lToRemove);
-            adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArrSearch,res );
+            adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArrSearch,res );
         }
         else {
             CustomListViewValuesArr.remove(mPosition);
-            adapter=new CustomListChatAdapter( CustomListView, CustomListViewValuesArr,res );
+            adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
         }
 
         //Remove from Firebase

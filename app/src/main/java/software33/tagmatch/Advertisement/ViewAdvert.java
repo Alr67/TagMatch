@@ -382,7 +382,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         users.put(id1, Helpers.getActualUser(this).getAlias());
         users.put(id2, username.getText().toString());
 
-        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(getTitle().toString(), users);
+        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(getTitle().toString(), id2, users);
         id.child("info").setValue(chatInfo);
 
         //Set the chats to each user

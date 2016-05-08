@@ -74,14 +74,16 @@ public abstract class FirebaseUtils {
 
     public static class ChatInfo {
         String idProduct;
+        String owner;
         Map<String, Object> users = new HashMap<>();
 
         public ChatInfo() {
             // empty default constructor, necessary for Firebase to be able to deserialize blog posts
         }
 
-        public ChatInfo(String idProduct, Map<String, Object> users) {
+        public ChatInfo(String idProduct, String owner, Map<String, Object> users) {
             this.idProduct = idProduct;
+            this.owner = owner;
             this.users = users;
         }
 
@@ -92,6 +94,8 @@ public abstract class FirebaseUtils {
         public Map<String, Object> getUsers(){
             return users;
         }
+
+        public String getOwner() {return owner;}
     }
 
     public static class User {
@@ -118,6 +122,22 @@ public abstract class FirebaseUtils {
         public Map<String, Object> getChats(){
             return chats;
         }
+    }
+
+    public static class ChatText {
+        String senderId;
+        String text;
+        boolean read;
+        public ChatText() {
+            // empty default constructor, necessary for Firebase to be able to deserialize blog posts
+        }
+        public String getSenderId() {
+            return senderId;
+        }
+        public String getText() {
+            return text;
+        }
+        public boolean getRead() { return read; }
     }
 
     public static void createUser(final String email, final String password, final String name, final Map<String, Object> img, final Context context) {

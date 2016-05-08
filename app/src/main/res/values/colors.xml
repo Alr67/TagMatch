@@ -8,4 +8,5 @@
     <color name="app_header_color">#ffffff</color>
     <color name="login_button_color">#0073e5</color>
     <color name="reg_color">#f2f2f2</color>
+    <color name="my_chat_color">#69ff04</color>
 </resources>

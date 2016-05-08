@@ -186,8 +186,13 @@ public class SingleChatActivity extends AppCompatActivity {
         mListener = this.messagesRef.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                ChatText c = dataSnapshot.getValue(ChatText.class);
-                setListData(c.getSenderId(), c.getText());
+                FirebaseUtils.ChatText c = dataSnapshot.getValue(FirebaseUtils.ChatText.class);
+                if (!c.getSenderId().equals(myId) && !c.getRead()){
+                    Map<String, Object> values = new HashMap<>();
+                    values.put("read", true);
+                    messagesRef.child(dataSnapshot.getKey()).updateChildren(values);
+                }
+                setListData(c.getSenderId(), c.getText(), c.getRead());
             }
 
             @Override
@@ -222,20 +227,6 @@ public class SingleChatActivity extends AppCompatActivity {
         });
     }
 
-    private static class ChatText {
-        String senderId;
-        String text;
-        public ChatText() {
-            // empty default constructor, necessary for Firebase to be able to deserialize blog posts
-        }
-        public String getSenderId() {
-            return senderId;
-        }
-        public String getText() {
-            return text;
-        }
-    }
-
     private static class ChatOffer {
         String senderId;
         String text;
@@ -255,8 +246,8 @@ public class SingleChatActivity extends AppCompatActivity {
     }
 
     //Set data in the array
-    public void setListData(String senderId, String text) {
-        chatArrayAdapter.add(new ChatMessage((senderId.equals(myId)), senderId, text));
+    public void setListData(String senderId, String text, boolean read) {
+        chatArrayAdapter.add(new ChatMessage((senderId.equals(myId)), senderId, text, read));
     }
 
     public void setOfferData(String senderId, String text, Boolean answered){
@@ -278,12 +269,12 @@ public class SingleChatActivity extends AppCompatActivity {
     private boolean sendChatMessage() {
         String text = chatText.getText().toString();
         if (!text.isEmpty()) {
-            //TODO: Get my id
             String senderId = myId;
 
             Map<String, Object> values = new HashMap<>();
             values.put("senderId", senderId);
             values.put("text", text);
+            values.put("read", false);
 
             messagesRef.push().setValue(values);
             chatText.setText("");
