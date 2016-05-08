@@ -61,7 +61,7 @@ public class TagMatchGetTrendingAsyncTask extends AsyncTask<JSONObject, Void, JS
                 }
                 else if (con.getResponseCode() == 200) {
                     aux = new JSONObject();
-                    aux.put("200", con.getInputStream());
+                    aux.put("200", iStreamToString(con.getInputStream()));
                 }
                 else {
                     aux = new JSONObject();
@@ -98,7 +98,7 @@ public class TagMatchGetTrendingAsyncTask extends AsyncTask<JSONObject, Void, JS
                 }
 
                 con.disconnect();
-
+                System.out.println("CACAAAAAAAAA" + aux);
                 return aux;
             }
         } catch (IOException | JSONException e) {

@@ -14,6 +14,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -41,6 +42,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -75,6 +77,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private boolean edit = false;
     private Intent intent;
     private AutoCompleteTextView sugg_hastags;
+    private ArrayList<String> suggestions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -124,7 +127,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         images = new ArrayList<>();
 
         sugg_hastags = (AutoCompleteTextView) findViewById(R.id.sugg_hashtag);
-        final ArrayList<String> suggestions = new ArrayList<>();
 
         /*PETICIO HASHTAGS*/
         JSONObject jObject = new JSONObject();
@@ -152,12 +154,12 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                             String key = (String) x.next();
                             jsonArray.put(jsonObject.get(key));
                         }*/
-                        JSONArray jsonArray = new JSONArray(jsonObject.toString());
-                        if (jsonObject != null) {
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                suggestions.add(jsonArray.get(i).toString());
-                            }
-                        }
+                        String add = jsonObject.getString("200");
+                        add = cleanJSON(add);
+                        suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_list_item_1,suggestions);
+                        sugg_hastags.setAdapter(adapter);
+                        sugg_hastags.setThreshold(1);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -166,16 +168,12 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }.execute(jObject);
         /*PETICIO HASHTAGS*/
 
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_list_item_1,suggestions);
-        sugg_hastags.setAdapter(adapter);
-        sugg_hastags.setThreshold(1);
-
         mViewPager = (ViewPager) findViewById(R.id.pager);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager windowmanager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         windowmanager.getDefaultDisplay().getMetrics(displayMetrics);
         int deviceHeight = displayMetrics.heightPixels;
-// Changes the height and width to the specified *pixels*
+        // Changes the height and width to the specified *pixels*
         ViewGroup.LayoutParams params = mViewPager.getLayoutParams();
         params.height = deviceHeight/3;
         mViewPager.setLayoutParams(params);
@@ -192,6 +190,13 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }
         else setTitle(R.string.new_ad_general_title);
 
+    }
+
+    private String cleanJSON(String input) {
+        input = input.replaceAll("\\[","");
+        input = input.replaceAll("\\]","");
+        input = input.replaceAll("\"","");
+        return input;
     }
 
     public void onClick(View view) {
