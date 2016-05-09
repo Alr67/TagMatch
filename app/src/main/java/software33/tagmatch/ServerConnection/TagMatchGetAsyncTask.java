@@ -72,7 +72,7 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
                     aux.put("arrayResponse",new JSONArray());
                 }
                 else {
-                    if(response.startsWith("[{")){
+                    if(response.startsWith("[")){
                         aux = new JSONObject();
                         aux.put("arrayResponse", new JSONArray(response));
                     }

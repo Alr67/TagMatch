@@ -2,6 +2,7 @@ package software33.tagmatch.Filter;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.ColorStateList;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
@@ -11,8 +12,11 @@ import android.view.View;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TableLayout;
+import android.widget.TableRow;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -26,6 +30,7 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView search_button;
     private String city;
+    private TableLayout tl;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,7 +49,11 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
         search_button = (ImageView) findViewById(R.id.search_image);
         search_button.setOnClickListener(this);
 
+        tl = (TableLayout) findViewById(R.id.filter_table);
+
         getUserCity();
+
+        fillCategories();
     }
 
     private void makeURL() {
@@ -59,18 +68,12 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
             }
         }
 
-        CheckBox cb_car = (CheckBox) findViewById(R.id.filter_cb_car);
-        CheckBox cb_games = (CheckBox) findViewById(R.id.filter_cb_videogames);
-        CheckBox cb_appliance = (CheckBox) findViewById(R.id.filter_cb_appliance);
-
-        if(cb_car.isChecked())
-            url += "category=Cotxes";
-
-        if(cb_games.isChecked())
-            url += "category=Videojocs";
-
-        if(cb_appliance.isChecked())
-            url += "category=Electrodomestics";
+        for(int i = 0; i < tl.getChildCount(); i++){
+            CheckBox cb = (CheckBox) ((TableRow) tl.getChildAt(i)).getChildAt(0);
+            if(cb.isChecked()){
+                url += "&category=" + cb.getText();
+            }
+        }
 
         CheckBox cb = (CheckBox) findViewById(R.id.filter_same_city);
 
@@ -87,6 +90,37 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
         intent.putExtra("url", url);
         startActivity(intent);
         finish();
+    }
+
+    private void fillCategories() {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("username", Helpers.getActualUser(this).getAlias());
+            jsonObject.put("password", Helpers.getActualUser(this).getPassword());
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/categories", this){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if (jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Helpers.showError(error, getApplicationContext());
+                        } else {
+                            JSONArray array = jsonObject.getJSONArray("arrayResponse");
+                            for(int i = 0; i < array.length(); i++){
+                                TableRow row = new TableRow(getApplicationContext());
+                                CheckBox cb = new CheckBox(getApplicationContext());
+                                cb.setButtonTintList(ColorStateList.valueOf(getResources().getColor(android.R.color.black)));
+                                cb.setText(array.getString(i));
+                                cb.setTextColor(getResources().getColor(android.R.color.black));
+                                row.addView(cb,0);
+                                tl.addView(row,i);
+                            }
+                        }
+                    } catch (Exception ignored){}
+                }
+            }.execute(jsonObject);
+        } catch (Exception ignored) {}
+
     }
 
     private void getUserCity() {
