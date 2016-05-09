@@ -23,15 +23,18 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -169,6 +172,20 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             }
         }.execute(jObject);
         /*PETICIO HASHTAGS*/
+
+        sugg_hastags.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    String aux = tag.getText().toString();
+                    aux += sugg_hastags.getText().toString() + " ";
+                    tag.setText(aux);
+                    sugg_hastags.setText("");
+                    return true;
+                }
+                return false;
+            }
+        });
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
         DisplayMetrics displayMetrics = new DisplayMetrics();
