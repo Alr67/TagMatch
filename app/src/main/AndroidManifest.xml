@@ -59,6 +59,7 @@
         <activity
             android:name=".Advertisement.NewAdvertisement"
             android:label="@string/title_activity_new_advertisement"
+            android:windowSoftInputMode="stateVisible|adjustResize"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Users.ViewProfile"

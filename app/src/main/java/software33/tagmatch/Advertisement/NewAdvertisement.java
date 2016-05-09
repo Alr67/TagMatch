@@ -9,11 +9,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
+import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -21,16 +23,21 @@ import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -39,7 +46,9 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import software33.tagmatch.AdCards.Home;
@@ -51,6 +60,7 @@ import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetBitmapAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetTrendingAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
@@ -70,6 +80,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     Advertisement adv;
     private boolean edit = false;
     private Intent intent;
+    private AutoCompleteTextView sugg_hastags;
+    private ArrayList<String> suggestions;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,12 +130,69 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
         images = new ArrayList<>();
 
+        sugg_hastags = (AutoCompleteTextView) findViewById(R.id.sugg_hashtag);
+
+        /*PETICIO HASHTAGS*/
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
+            e.printStackTrace();
+        }
+        new TagMatchGetTrendingAsyncTask(Constants.IP_SERVER + "/tags/trending", getApplicationContext()) {
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    if (jsonObject.has("status"))
+                        Log.i(Constants.DebugTAG, "status: " + jsonObject.getInt("status"));
+                    Log.i(Constants.DebugTAG, "JSON: \n" + jsonObject);
+                    if (jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                    } else {
+                        /*JSONArray jsonArray = new JSONArray();
+                        Iterator x = jsonObject.keys();
+                        while (x.hasNext()){
+                            String key = (String) x.next();
+                            jsonArray.put(jsonObject.get(key));
+                        }*/
+                        String add = jsonObject.getString("200");
+                        add = cleanJSON(add);
+                        suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.dropdown,suggestions);
+                        sugg_hastags.setTextColor(Color.BLACK);
+                        sugg_hastags.setAdapter(adapter);
+                        sugg_hastags.setThreshold(1);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.execute(jObject);
+        /*PETICIO HASHTAGS*/
+
+        sugg_hastags.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    String aux = tag.getText().toString();
+                    aux += sugg_hastags.getText().toString() + " ";
+                    tag.setText(aux);
+                    sugg_hastags.setText("");
+                    return true;
+                }
+                return false;
+            }
+        });
+
         mViewPager = (ViewPager) findViewById(R.id.pager);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager windowmanager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         windowmanager.getDefaultDisplay().getMetrics(displayMetrics);
         int deviceHeight = displayMetrics.heightPixels;
-// Changes the height and width to the specified *pixels*
+        // Changes the height and width to the specified *pixels*
         ViewGroup.LayoutParams params = mViewPager.getLayoutParams();
         params.height = deviceHeight/3;
         mViewPager.setLayoutParams(params);
@@ -140,6 +209,13 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }
         else setTitle(R.string.new_ad_general_title);
 
+    }
+
+    private String cleanJSON(String input) {
+        input = input.replaceAll("\\[","");
+        input = input.replaceAll("\\]","");
+        input = input.replaceAll("\"","");
+        return input;
     }
 
     public void onClick(View view) {

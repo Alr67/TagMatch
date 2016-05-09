@@ -23,4 +23,11 @@
         <item name="android:background">#5fa3d0</item>
     </style>
 
+    <style name="PopupMenuStyle" parent="Theme.AppCompat.Light">
+
+        <item name="android:background">@color/sugg_back_color</item>
+        <item name="android:textColor">@color/sugg_text_color</item>
+
+    </style>
+
 </resources>
