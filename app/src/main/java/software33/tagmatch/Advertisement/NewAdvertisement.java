@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -157,7 +158,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                         String add = jsonObject.getString("200");
                         add = cleanJSON(add);
                         suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),android.R.layout.simple_list_item_1,suggestions);
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.dropdown,suggestions);
+                        sugg_hastags.setTextColor(Color.BLACK);
                         sugg_hastags.setAdapter(adapter);
                         sugg_hastags.setThreshold(1);
                     }
