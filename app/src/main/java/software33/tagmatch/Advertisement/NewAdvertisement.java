@@ -80,8 +80,10 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     Advertisement adv;
     private boolean edit = false;
     private Intent intent;
+    private Integer okImages;
     private AutoCompleteTextView sugg_hastags;
     private ArrayList<String> suggestions;
+    private List<Bitmap> images;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -339,13 +341,9 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         Log.i(Constants.DebugTAG, adv.toJSON().toString());
     }
 
-    Integer okImages;
+
     private void postImagesToServer(Integer advId) {
         okImages = 0;
-        if(edit) {
-            Log.i(Constants.DebugTAG,"tenia " + adv.getImagesIDs().length + " fotos" );
-            okImages = adv.getImagesIDs().length;
-        }
         if(images.size() == 0) {
             Log.i(Constants.DebugTAG, "Aquest anunci no te imatges");
             advertUpdated();
@@ -423,7 +421,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
  /** MARK: IMAGES */
-    private List<Bitmap> images;
+
 
     public void onNewImageClicked() {
         AlertDialog.Builder builder =
@@ -612,6 +610,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                 protected void onPostExecute(Bitmap image) {
                     mCustomPagerAdapterNewAdvert.addImageBitmap(image);
                     Log.i(Constants.DebugTAG,"image added");
+                    images.add(image);
                 }
             }.execute(jObject);
         }
