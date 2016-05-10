@@ -118,6 +118,23 @@
 
             <!-- Type Content -->
             <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:imeOptions="actionDone"
+                android:layout_marginBottom="8dp">
+                <AutoCompleteTextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/sugg_hashtag_ex"
+                    android:singleLine="true"
+                    android:imeOptions="actionDone"
+                    android:hint="@string/noTag"
+                    android:textColor="@color/abc_input_method_navigation_guard"
+                    android:textStyle="italic" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
                 android:id="@+id/input_price_textInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -126,12 +143,16 @@
                 <EditText android:id="@+id/input_price"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapWords"
+                    android:inputType="textMultiLine"
                     android:hint="@string/input_price"
+                    android:contextClickable="true"
+                    android:focusable="false"
+                    android:enabled="false"
                     android:textStyle="italic" />
             </android.support.design.widget.TextInputLayout>
 
             <!-- Category Spinner -->
+
             <android.support.design.widget.TextInputLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -170,9 +191,12 @@
                     android:id="@+id/input_hashtags"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:inputType="textCapWords"
+                    android:inputType="textMultiLine"
                     android:hint="@string/input_hashtags"
-                    android:textStyle="italic" />
+                    android:textStyle="italic"
+                    android:contextClickable="true"
+                    android:focusable="false"
+                    android:enabled="false" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.v7.widget.AppCompatButton

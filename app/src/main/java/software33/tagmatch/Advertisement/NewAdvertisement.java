@@ -15,7 +15,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.provider.Settings;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -37,7 +36,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -48,7 +46,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import software33.tagmatch.AdCards.Home;
@@ -77,11 +74,11 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private ViewPager mViewPager;
     private String imgExtension;
     private final String DebugTag = "DEBUG ADVERT";
-    Advertisement adv;
+    private Advertisement adv;
     private boolean edit = false;
     private Intent intent;
     private Integer okImages;
-    private AutoCompleteTextView sugg_hastags;
+    private AutoCompleteTextView sugg_hashtags, sugg_hashtags_ex;
     private ArrayList<String> suggestions;
     private List<Bitmap> images;
 
@@ -123,16 +120,18 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         newImage.setOnClickListener(this);
 
         wantedTagsLayout = (TextInputLayout) findViewById(R.id.input_price_textInput);
-
         title = (EditText) findViewById(R.id.input_title);
         description = (EditText) findViewById(R.id.input_description);
         tag  = (EditText) findViewById(R.id.input_hashtags);
+        tag.setClickable(false);
         wantedTags  = (EditText) findViewById(R.id.input_price);
-        wantedTags.setInputType(InputType.TYPE_CLASS_NUMBER);
+        //wantedTags.setInputType(InputType.TYPE_CLASS_NUMBER);
 
         images = new ArrayList<>();
 
-        sugg_hastags = (AutoCompleteTextView) findViewById(R.id.sugg_hashtag);
+        sugg_hashtags = (AutoCompleteTextView) findViewById(R.id.sugg_hashtag);
+        sugg_hashtags_ex = (AutoCompleteTextView) findViewById(R.id.sugg_hashtag_ex);
+        sugg_hashtags_ex.setVisibility(View.GONE);
 
         /*PETICIO HASHTAGS*/
         JSONObject jObject = new JSONObject();
@@ -164,9 +163,12 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                         add = cleanJSON(add);
                         suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
                         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.dropdown,suggestions);
-                        sugg_hastags.setTextColor(Color.BLACK);
-                        sugg_hastags.setAdapter(adapter);
-                        sugg_hastags.setThreshold(1);
+                        sugg_hashtags.setTextColor(Color.BLACK);
+                        sugg_hashtags.setAdapter(adapter);
+                        sugg_hashtags.setThreshold(1);
+                        sugg_hashtags_ex.setTextColor(Color.BLACK);
+                        sugg_hashtags_ex.setAdapter(adapter);
+                        sugg_hashtags_ex.setThreshold(1);
                     }
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -175,14 +177,28 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }.execute(jObject);
         /*PETICIO HASHTAGS*/
 
-        sugg_hastags.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+        sugg_hashtags.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
                     String aux = tag.getText().toString();
-                    aux += sugg_hastags.getText().toString() + " ";
+                    aux += sugg_hashtags.getText().toString() + " ";
                     tag.setText(aux);
-                    sugg_hastags.setText("");
+                    sugg_hashtags.setText("");
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        sugg_hashtags_ex.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    String aux = tag.getText().toString();
+                    aux += sugg_hashtags_ex.getText().toString() + " ";
+                    wantedTags.setText(aux);
+                    sugg_hashtags_ex.setText("");
                     return true;
                 }
                 return false;
@@ -404,17 +420,21 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         if(newType.equals(Constants.typeGift)) {
             wantedTagsLayout.setHint(getString(R.string.input_gift));
             wantedTags.setEnabled(false);
+            sugg_hashtags_ex.setVisibility(View.GONE);
             wantedTags.setText("");
         }
         else if(newType.equals(Constants.typeExchange)) {
             wantedTagsLayout.setHint(getString(R.string.input_wantedHashtags));
-            wantedTags.setEnabled(true);
+            wantedTags.setEnabled(false);
+            wantedTags.setClickable(false);
+            sugg_hashtags_ex.setVisibility(View.VISIBLE);
             wantedTags.setText("");
             wantedTags.setInputType(InputType.TYPE_CLASS_TEXT);
         }
         else if(newType.equals(Constants.typeSell)) {
             wantedTagsLayout.setHint(getString(R.string.input_price));
             wantedTags.setEnabled(true);
+            sugg_hashtags_ex.setVisibility(View.GONE);
             wantedTags.setText("");
             wantedTags.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         }
@@ -570,6 +590,11 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     private void fillComponents() {
         getAdvertisementImages();
+        if(adv.getTypeDescription().equals(Constants.typeServerEXCHANGE)) {
+            sugg_hashtags_ex.setVisibility(View.VISIBLE);
+            wantedTags.setText(((AdvChange)adv).getWantedTags().toString());
+            wantedTags.setFocusable(true);
+        }
         title.setText(adv.getTitle());
         description.setText(adv.getDescription());
         int type = Helpers.getIntFromType(adv.getTypeDescription());
@@ -578,7 +603,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         categorySpinner.setSelection(Helpers.getIntFromCategory(adv.getCategory()));
         String sol = new String();
         for(int q = 0; q < adv.getTags().length; ++q) {
-            sol += "#"+adv.getTags()[q];
+            sol += adv.getTags()[q] + " ";
         }
         tag.setText(sol);
         if(type == 1) {

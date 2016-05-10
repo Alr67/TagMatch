@@ -27,11 +27,11 @@
             android:layout_height="match_parent"
             android:layout_weight="20">
 
-            <EditText
+            <AutoCompleteTextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/filter_search_field"
-                android:backgroundTint="@android:color/holo_blue_dark" />
+                android:hint="@string/input_hashtags" />
 
             <ImageView
                 android:layout_width="35dp"
