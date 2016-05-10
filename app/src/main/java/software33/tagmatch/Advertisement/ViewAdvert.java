@@ -7,7 +7,9 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -118,6 +120,14 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         if (id == R.id.action_delete) {
             AlertDialog alertDialog = createDeleteDialog();
             alertDialog.show();
+        }
+        else if (id == R.id.tagmatch_exchange) {
+            Intent intent = new Intent(getApplicationContext(), Home.class);
+            intent.putExtra("previousActivity", "ex_tagmatch");
+            String url = Constants.IP_SERVER + "/ads/" + adv.getID() + "/tagmatch";
+            intent.putExtra("url", url);
+            startActivity(intent);
+            //finish();
         }
 
         return super.onOptionsItemSelected(item);

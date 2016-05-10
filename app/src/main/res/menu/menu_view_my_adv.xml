@@ -6,4 +6,9 @@
         android:icon="@android:drawable/ic_menu_delete"
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
+    <item android:id="@+id/tagmatch_exchange"
+        android:title="@string/action_tagmatch"
+        android:icon="@android:drawable/ic_menu_share"
+        android:orderInCategory="100"
+        app:showAsAction="ifRoom" />
 </menu>
