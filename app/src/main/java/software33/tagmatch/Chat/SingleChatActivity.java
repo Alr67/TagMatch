@@ -216,9 +216,8 @@ public class SingleChatActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren()){
                     for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                        idOffer = dataSnapshot1.getKey();
                         ChatOffer o = dataSnapshot1.getValue(ChatOffer.class);
-                        setOfferData(o.getSenderId(), o.getText(), o.getAnswered());
+                        setOfferData(o.getSenderId(), o.getText(), o.getAnswered(), dataSnapshot1.getKey());
                     }
                 }
             }
@@ -250,10 +249,11 @@ public class SingleChatActivity extends AppCompatActivity {
         chatArrayAdapter.add(new ChatMessage((senderId.equals(myId)), senderId, text, read));
     }
 
-    public void setOfferData(String senderId, String text, Boolean answered){
+    public void setOfferData(String senderId, String text, Boolean answered, String idOffer){
         if (!answered) {
             layoutOffer.setVisibility(View.VISIBLE);
             tvContentOffer.setText(text);
+            this.idOffer = idOffer;
             if (senderId.equals(myId)) {
                 bCancelOffer.setVisibility(View.GONE);
                 bAcceptOffer.setVisibility(View.GONE);
@@ -264,10 +264,15 @@ public class SingleChatActivity extends AppCompatActivity {
                 tvPendingOffer.setVisibility(View.GONE);
             }
         }
+        else {
+            if (this.idOffer == null)
+                hideOffer();
+        }
     }
 
     private boolean sendChatMessage() {
         String text = chatText.getText().toString();
+        text = text.trim();
         if (!text.isEmpty()) {
             String senderId = myId;
 
@@ -322,6 +327,9 @@ public class SingleChatActivity extends AppCompatActivity {
         }
         if (id == R.id.action_send_offer) {
             createDialogSendOffer().show();
+            return true;
+        }
+        if (id == R.id.action_view_offers) {
             return true;
         }
         if (id == R.id.action_block_user) {
@@ -511,5 +519,12 @@ public class SingleChatActivity extends AppCompatActivity {
                         });
 
         return builder.create();
+    }
+
+    @Override
+    public void onBackPressed(){
+        messagesRef.removeEventListener(mListener);
+        offersRef.removeEventListener(mListenerOffers);
+        finish();
     }
 }

@@ -120,6 +120,7 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
 
             if (tempValues.getOwner().equals(myId))
                 holder.table.setBackgroundColor(activity.getResources().getColor(R.color.my_chat_color));
+            else holder.table.setBackgroundResource(R.drawable.bar_bg);
 
             holder.text.setText( tempValues.getUserName() );
             holder.text1.setText( tempValues.getTitleProduct() );

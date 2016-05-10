@@ -26,6 +26,7 @@
     <string name="send_message">Send</string>
     <string name="action_send_image">Send image</string>
     <string name="action_send_offer">Send offer</string>
+    <string name="action_view_offers">View offers</string>
     <string name="action_block_user">Block user</string>
     <string name="action_delete_chat">Delete chat</string>
     <string name="dialog_title_delete_chat">Delete chat</string>

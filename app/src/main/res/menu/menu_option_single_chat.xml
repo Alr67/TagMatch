@@ -12,6 +12,11 @@
         android:title="@string/action_send_offer"
         app:showAsAction="never" />
     <item
+        android:id="@+id/action_view_offers"
+        android:orderInCategory="100"
+        android:title="@string/action_view_offers"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/action_block_user"
         android:orderInCategory="100"
         android:title="@string/action_block_user"

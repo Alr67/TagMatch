@@ -38,6 +38,7 @@ import com.firebase.client.ValueEventListener;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 import software33.tagmatch.AdCards.Home;
@@ -100,32 +101,10 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
 
         //Accessing to the chats of my user
 
-        Resources res =getResources();
+        /*Resources res =getResources();
         adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
-        list.setAdapter( adapter );
+        list.setAdapter( adapter );*/
         getChats();
-        /*
-        mListener = this.usersRef.child(myId).child("chats").addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String previousChildName) {
-                getChat(dataSnapshot.getKey());
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {}
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String previousChildName) {}
-
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {
-                Log.e("FirebaseListAdapter", "Listen was cancelled, no more updates will occur");
-            }
-
-        });*/
 
     }
 
@@ -331,7 +310,16 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         sched.setNewOffer(newOffer);
         sched.setMessages(messages);
 
-        CustomListViewValuesArr.add(sched);
+        boolean found = false;
+        for (int i = 0; i < CustomListViewValuesArr.size(); i++)
+        {
+            if (CustomListViewValuesArr.get(i).getUserName().equals(userName) &&
+                    CustomListViewValuesArr.get(i).getTitleProduct().equals(idProduct)){
+                CustomListViewValuesArr.set(i,sched);
+                found = true;
+            }
+        }
+        if (!found)CustomListViewValuesArr.add(sched);
 
         //Save the id
         idChatsUser.put(new Pair<String, String>(idProduct,userName),new Pair<String, String>(idChat,idUser));
@@ -343,8 +331,8 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     }
 
     public void getChat(final String idChat) {
-        //Accessing to the chat with idChat ONCE
-        chatsRef.child(idChat).addListenerForSingleValueEvent(new ValueEventListener() {
+        //Accessing to the chat with idChat for every change
+        chatsRef.child(idChat).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 FirebaseUtils.ChatInfo c = snapshot.child("info").getValue(FirebaseUtils.ChatInfo.class);
@@ -386,6 +374,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
             public void onCancelled(FirebaseError firebaseError) {
             }
         });
+
     }
 
     public void getUser(final String idUser, final String idProduct, final String owner, final String userName, final String idChat, final int messages, final int newOffer) {
