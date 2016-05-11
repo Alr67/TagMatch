@@ -9,15 +9,23 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.android.gms.analytics.ecommerce.Product;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -41,6 +49,8 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
     private TableLayout tl;
     private ArrayList<String> suggestions;
     private AutoCompleteTextView sugg_hashtags;
+    private ListView con_search;
+    ArrayList<String> hash_search;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,6 +71,35 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
 
         tl = (TableLayout) findViewById(R.id.filter_table);
         sugg_hashtags = (AutoCompleteTextView) findViewById(R.id.filter_search_field);
+        con_search = (ListView) findViewById(R.id.listView);
+        hash_search = new ArrayList<>();
+
+        //PER EVITAR SCROLL
+        con_search.setOnTouchListener(new ListView.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                int action = event.getAction();
+                switch (action)
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+
+                // Handle ListView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });
+
         /*PETICIO HASHTAGS*/
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
@@ -81,12 +120,6 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
                     if (jsonObject.has("error")) {
                         String error = jsonObject.get("error").toString();
                     } else {
-                        /*JSONArray jsonArray = new JSONArray();
-                        Iterator x = jsonObject.keys();
-                        while (x.hasNext()){
-                            String key = (String) x.next();
-                            jsonArray.put(jsonObject.get(key));
-                        }*/
                         String add = jsonObject.getString("200");
                         add = cleanJSON(add);
                         suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
@@ -102,6 +135,19 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
         }.execute(jObject);
         /*PETICIO HASHTAGS*/
         getUserCity();
+
+        sugg_hashtags.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    hash_search.add(sugg_hashtags.getText().toString());
+                    sugg_hashtags.setText("");
+                    con_search.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, hash_search));
+                    return true;
+                }
+                return false;
+            }
+        });
 
         fillCategories();
     }

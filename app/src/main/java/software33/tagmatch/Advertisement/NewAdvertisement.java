@@ -81,6 +81,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private AutoCompleteTextView sugg_hashtags, sugg_hashtags_ex;
     private ArrayList<String> suggestions;
     private List<Bitmap> images;
+    private String pathfoto;
+    private Spinner categorySpinner, typeSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -153,12 +155,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                     if (jsonObject.has("error")) {
                         String error = jsonObject.get("error").toString();
                     } else {
-                        /*JSONArray jsonArray = new JSONArray();
-                        Iterator x = jsonObject.keys();
-                        while (x.hasNext()){
-                            String key = (String) x.next();
-                            jsonArray.put(jsonObject.get(key));
-                        }*/
                         String add = jsonObject.getString("200");
                         add = cleanJSON(add);
                         suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
@@ -357,7 +353,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         Log.i(Constants.DebugTAG, adv.toJSON().toString());
     }
 
-
     private void postImagesToServer(Integer advId) {
         okImages = 0;
         if(images.size() == 0) {
@@ -414,8 +409,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     /** MARK: Spinner type manager*/
-    private Spinner categorySpinner, typeSpinner;
-
     public void onTypeSpinnerChanged(String newType) {
         if(newType.equals(Constants.typeGift)) {
             wantedTagsLayout.setHint(getString(R.string.input_gift));
@@ -441,8 +434,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
  /** MARK: IMAGES */
-
-
     public void onNewImageClicked() {
         AlertDialog.Builder builder =
                 new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
@@ -484,8 +475,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }
         else Log.e(DebugTag,"Error en crear la foto");
     }
-
-    private String pathfoto;
 
     private File createImageFile() throws IOException {
         Log.v(DebugTag, "Anem a crear el fitxer de la foto");
