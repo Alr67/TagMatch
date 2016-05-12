@@ -60,6 +60,8 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        Bundle extras = getIntent().getExtras();
+
         tvUserName = (TextView) findViewById(R.id.tvUserName);
         tvLocation = (TextView) findViewById(R.id.tvLocation);
         ivUserImage = (ImageView) findViewById(R.id.ivUserImage);
@@ -68,6 +70,24 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
+        try{
+            initOtherUser(extras.getString("username"));
+        } catch (Exception e){
+            initCurrentUser();
+        }
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_view_profile);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
+                intent.putExtra("userPosition", userPosition);
+                startActivity(intent);
+            }
+        });
+    }
+
+    private void initCurrentUser() {
         User user = Helpers.getActualUser(this);
         tvUserName.setText(user.getAlias());
 
@@ -124,16 +144,64 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_view_profile);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
-                intent.putExtra("userPosition", userPosition);
-                startActivity(intent);
-            }
-        });
+    private void initOtherUser(String username) {
+        tvUserName.setText(username);
+
+        final TextView interests = (TextView) findViewById(R.id.profile_interests);
+
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("username", Helpers.getActualUser(this).getAlias());
+            jsonObject.put("password", Helpers.getActualUser(this).getPassword());
+
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + username, this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Helpers.showError(error,getApplicationContext());
+                        }
+                        else if (jsonObject.has("username")){
+                            Log.i("Debug-GetUser",jsonObject.toString());
+                            tvLocation.setText(jsonObject.get("city").toString());
+
+                            userPosition = new LatLng(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"));
+                            try {
+                                map.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 15));
+                                map.addMarker(new MarkerOptions().position(userPosition));
+                            }
+                            catch (Exception e) {}
+                            JSONArray interestsArray = jsonObject.getJSONArray("interests");
+                            String interestsString = "";
+                            for(int i = 0; i < interestsArray.length(); ++i) {
+                                if(i != 0)
+                                    interestsString += " ";
+                                interestsString += "#"+interestsArray.getString(i);
+                            }
+                            interests.setText(interestsString);
+                        }
+                    } catch (JSONException ignored) {
+                        Log.i("DEBUG","error al get user");
+                    }
+                }
+            }.execute(jsonObject);
+
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + username + "/photo", this) {
+                @Override
+                protected void onPostExecute(String url) {
+                    Picasso.with(ViewProfile.this).load(url).error(R.drawable.image0).into(ivUserImage);
+                    if (url == null){
+                        Picasso.with(ViewProfile.this).load(R.drawable.image0).into(ivUserImage);
+                    }
+                }
+            }.execute(jsonObject);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
