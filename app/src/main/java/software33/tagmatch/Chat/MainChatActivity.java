@@ -53,7 +53,6 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     public ArrayList<ListChatModel> CustomListViewValuesArr = new ArrayList<ListChatModel>();
     public ArrayList<ListChatModel> CustomListViewValuesArrSearch;
     boolean searching = false;
-    final Context context = this;
 
     private Firebase myFirebaseRef;
     private Firebase chatsRef;
@@ -61,8 +60,6 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
 
     private String myId;
     private String myName;
-
-    private ChildEventListener mListener;
 
     //Identified by IdProduct, UserName and have the id of the chat and it's user
     public Map<Pair<String, String>, Pair<String, String>> idChatsUser = new HashMap<>();
@@ -86,7 +83,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         setTitle(R.string.main_chat_activity_title);
 
         CustomListView = this;
-        list= ( ListView )findViewById( R.id.list_chats );
+        list = (ListView) findViewById(R.id.list_chats);
         Firebase.setAndroidContext(this);
         //Get Firebase Reference
         myFirebaseRef = FirebaseUtils.getMyFirebaseRef();
@@ -104,11 +101,12 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         /*Resources res =getResources();
         adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
         list.setAdapter( adapter );*/
-        getChats();
+
+        getUserChats();
 
     }
 
-    private void getChats(){
+    public void getUserChats(){
         FirebaseUtils.getUsersRef().child(myId).child("chats").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -178,127 +176,6 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         return NavigationController.onItemSelected(item.getItemId(),this);
     }
 
-    private static class ChatOffer {
-        String senderId;
-        String text;
-        Boolean answered;
-        Boolean accepted;
-        public ChatOffer() {
-            // empty default constructor, necessary for Firebase to be able to deserialize blog posts
-        }
-        public String getSenderId() {
-            return senderId;
-        }
-        public String getText() {
-            return text;
-        }
-        public Boolean getAnswered() { return answered; }
-        public Boolean getAccepted() { return accepted; }
-    }
-
-    private static class User {
-        String alias;
-        String img;
-        Map<String, Object> blockeds = new HashMap<>();
-        Map<String, Object> chats = new HashMap<>();
-        public User() {}
-        public User(String alias, String img, Map<String, Object> blockeds, Map<String, Object> chats) {
-            this.alias = alias;
-            this.img = img;
-            this.blockeds = blockeds;
-            this.chats = chats;
-        }
-        public String getAlias() {
-            return alias;
-        }
-        public String getImg() {
-            return img;
-        }
-        public Map<String, Object> getBloqueados(){
-            return blockeds;
-        }
-        public Map<String, Object> getChats(){
-            return chats;
-        }
-    }
-
-    String uid1;
-    String uid2;
-
-    boolean first = true;
-    boolean second = false;
-    private void setUID(String s){
-        if (first) {
-            uid1 = s;
-            usersRef.child(uid1).setValue(new User("My User Name","",new HashMap<String, Object>(),new HashMap<String, Object>()));
-            createUser("correu2@xd.com", "contra123");
-            first = false;
-            second = true;
-        }
-        else if (second) {
-            uid2 = s;
-            usersRef.child(uid2).setValue(new User("Usuari0","",new HashMap<String, Object>(),new HashMap<String, Object>()));
-            createChat();
-        }
-    }
-
-    public void createUser(final String email, final String password) {
-        myFirebaseRef.createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
-            @Override
-            public void onSuccess(Map<String, Object> result) {
-                myFirebaseRef.authWithPassword(
-                        email,
-                        password,
-                        new Firebase.AuthResultHandler() {
-                            @Override
-                            public void onAuthenticated(AuthData authData) {
-                                /*usersRef.child(authData.getUid()).setValue
-                                        (new User(name,"",new HashMap<String, Object>(),new HashMap<String, Object>()));*/
-                            }
-
-                            @Override
-                            public void onAuthenticationError(FirebaseError error) {
-                                // Should hopefully not happen as we just created the user.
-                            }
-                        }
-                );
-                setUID(result.get("uid").toString());
-            }
-
-            @Override
-            public void onError(FirebaseError firebaseError) {
-                Toast.makeText(getApplicationContext(),"error Creating",Toast.LENGTH_SHORT).show();
-            }
-        });
-    }
-
-    public String createChat() {
-        Firebase id = chatsRef.push();
-
-        String id1 = uid1;
-        String id2 = uid2;
-
-        Map<String, Object> users = new HashMap<>();
-        users.put(id1, "My User Name");
-        users.put(id2, "Usuari0");
-
-        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo("Anuncio Test",id2, users);
-        id.child("info").setValue(chatInfo);
-
-        //Set the chats to each user
-        Map<String, Object> chats1 = new HashMap<>();
-        chats1.put(id.getKey(),"");
-        usersRef.child(id1).child("chats").setValue(chats1);
-
-        /*
-        Map<String, Object> chats2 = new HashMap<>();
-        chats2.put(id.getKey(),"");
-        usersRef.child(id2).child("chats").setValue(chats2);
-        */
-
-        return id.getKey();
-    }
-
     //Set data in the array
     public void setListData(String idUser, String idProduct, String owner, String userName, String idChat, String img,int messages, int newOffer){
         final ListChatModel sched = new ListChatModel();
@@ -332,26 +209,29 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
 
     public void getChat(final String idChat) {
         //Accessing to the chat with idChat for every change
+        final Context context = this;
         chatsRef.child(idChat).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 FirebaseUtils.ChatInfo c = snapshot.child("info").getValue(FirebaseUtils.ChatInfo.class);
                 int messages = 0;
-                for (DataSnapshot dataSnapshot1 : snapshot.child("messages").getChildren()){
+                for (DataSnapshot dataSnapshot1 : snapshot.child("messages").getChildren()) {
                     FirebaseUtils.ChatText ct = dataSnapshot1.getValue(FirebaseUtils.ChatText.class);
-                    if (!ct.getRead() && !ct.getSenderId().equals(myId)){
+                    if (!ct.getRead() && !ct.getSenderId().equals(myId)) {
                         ++messages;
                     }
                 }
+                if (messages > 0) FirebaseUtils.displayNotification(context);
 
-                //1: Offer 2: Pending
+                //1: Offer 2: Pending 3: Closed
                 int newOffer = 0;
-                for (DataSnapshot dataSnapshot1 : snapshot.child("offers").getChildren()){
-                    ChatOffer o = dataSnapshot1.getValue(ChatOffer.class);
-                    if (!o.getAnswered()){
+                if (snapshot.hasChild("offer")){
+                    FirebaseUtils.ChatOffer o = snapshot.child("offer").getValue(FirebaseUtils.ChatOffer.class);
+                    if (!o.getAccepted()) {
                         if (!o.getSenderId().equals(myId)) newOffer = 1;
                         else newOffer = 2;
                     }
+                    else newOffer = 3;
                 }
 
                 //Get Correct User Between two
@@ -378,15 +258,14 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     }
 
     public void getUser(final String idUser, final String idProduct, final String owner, final String userName, final String idChat, final int messages, final int newOffer) {
-        usersRef.child(idUser).addListenerForSingleValueEvent(new ValueEventListener() {
+        usersRef.child(idUser).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
-                User u = snapshot.getValue(User.class);
+                FirebaseUtils.User u = snapshot.getValue(FirebaseUtils.User.class);
                 setListData(idUser, idProduct, owner, userName, idChat, u.getImg(), messages, newOffer);
             }
             @Override
-            public void onCancelled(FirebaseError firebaseError) {
-            }
+            public void onCancelled(FirebaseError firebaseError) {}
         });
     }
 
@@ -416,6 +295,8 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
 
         b.putString("IdChat", ids.first);
         b.putString("IdUser", ids.second);
+        if (tempValues.getOwner().equals(myId)) b.putBoolean("isMyAdv", true);
+        else b.putBoolean("isMyAdv", false);
 
         FirebaseUtils.setChatImage(img,this);
 

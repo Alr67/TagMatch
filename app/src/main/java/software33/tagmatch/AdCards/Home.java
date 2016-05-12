@@ -35,6 +35,7 @@ import java.util.List;
 import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
 import software33.tagmatch.Chat.FirebaseUtils;
+import software33.tagmatch.Chat.MainChatActivity;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.Filter.Filter;
@@ -111,6 +112,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         });
         recycler.setAdapter(adapter);
 
+        startChatListeners();
     }
 
     private void downloadAdvertsFromServer(Bundle extras) {
@@ -179,6 +181,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         return super.onOptionsItemSelected(item);
     }*/
+
+    private void startChatListeners(){
+        FirebaseUtils.startListeners(FirebaseUtils.getMyId(this));
+    }
 
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {

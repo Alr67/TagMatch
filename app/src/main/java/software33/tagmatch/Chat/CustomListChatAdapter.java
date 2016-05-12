@@ -142,7 +142,8 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
 
             if (tempValues.getNewOffer()!= 0){
                 if (tempValues.getNewOffer() == 1) holder.tvOffer.setText(R.string.mainchat_new_offer);
-                else holder.tvOffer.setText(R.string.mainchat_pending_offer);
+                else if (tempValues.getNewOffer() == 2) holder.tvOffer.setText(R.string.mainchat_pending_offer);
+                else holder.tvOffer.setText(R.string.mainchat_closed_offer);
             }
             else {
                 holder.tvOffer.setVisibility(View.INVISIBLE);

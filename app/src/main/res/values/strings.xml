@@ -128,7 +128,6 @@
     <string name="dialog_select_offer">Select offer:</string>
     <string name="dialog_information_offer">Set the offer:</string>
     <string name="dialog_money_information_offer">enter a € quantity</string>
-    <string name="dialog_product_information_offer">enter a product</string>
     <string name="dialog_other_information_offer">enter a some commentary</string>
     <string name="dialog_error_send_offer_no_offer">You have to select an offer</string>
     <string name="dialog_error_send_offer_no_information">You have to set the offer</string>
@@ -150,5 +149,14 @@
 
     <string name="mainchat_new_offer">Offer!</string>
     <string name="mainchat_pending_offer">Pending</string>
+    <string name="mainchat_closed_offer">Closed</string>
+
+    <string name="message_accepted_offer">I accept your offer!</string>
+    <string name="message_denied_offer">Sorry, I decline your offer!</string>
+    <string name="message_made_offer">I send you and offer</string>
+
+    <string name="title_dialog_error_create_offer">Can not create offer</string>
+    <string name="button_dialog_error_create_offer">OK</string>
+    <string name="message_dialog_error_create_offer">This advertisement has already accepted an offer</string>
 
 </resources>

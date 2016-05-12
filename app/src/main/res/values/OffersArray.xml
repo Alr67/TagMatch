@@ -3,7 +3,6 @@
     <string-array name="offers_array">
         <item>No offer selected</item>
         <item>Offer money</item>
-        <item>Offer product</item>
         <item>Offer my advert</item>
         <item>Other offers</item>
     </string-array>

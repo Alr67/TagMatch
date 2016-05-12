@@ -1,10 +1,16 @@
 package software33.tagmatch.Chat;
 
 import android.app.Dialog;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.database.DataSetObserver;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.TaskStackBuilder;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -42,6 +48,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.DialogError;
 
 public class SingleChatActivity extends AppCompatActivity {
 
@@ -65,9 +72,12 @@ public class SingleChatActivity extends AppCompatActivity {
     private String myId;
     private String idUser;
     private String imageChat;
-    private String idOffer;
     private ChildEventListener mListener;
     private ValueEventListener mListenerOffers;
+
+    // Yes OR No
+    private String canSendOffers;
+    private boolean isMyAdv = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,6 +91,7 @@ public class SingleChatActivity extends AppCompatActivity {
         titleProduct = b.getString("TitleProduct");
         idChat = b.getString("IdChat");
         idUser = b.getString("IdUser");
+        if (b.getBoolean("isMyAdv")) isMyAdv = true;
         imageChat = FirebaseUtils.getChatImage(this);
         FirebaseUtils.removeChatImage(this);
         myId = FirebaseUtils.getMyId(this);
@@ -89,7 +100,7 @@ public class SingleChatActivity extends AppCompatActivity {
         myFirebaseRef = FirebaseUtils.getMyFirebaseRef();
 
         messagesRef = myFirebaseRef.child("chats").child(idChat).child("messages");
-        offersRef = myFirebaseRef.child("chats").child(idChat).child("offers");
+        offersRef = myFirebaseRef.child("chats").child(idChat).child("offer");
         usersRef = myFirebaseRef.child("users");
 
 
@@ -131,7 +142,7 @@ public class SingleChatActivity extends AppCompatActivity {
         bCancelOffer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                createDialog(true, getString(R.string.dialog_title_deny_offer),
+                createOfferDialog(true, getString(R.string.dialog_title_deny_offer),
                         getString(R.string.dialog_message_deny_offer),
                         getString(R.string.dialog_confirm_deny_offer),
                         getString(R.string.dialog_cancel_deny_offer)).show();
@@ -140,7 +151,7 @@ public class SingleChatActivity extends AppCompatActivity {
         bAcceptOffer.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View arg0) {
-                createDialog(false, getString(R.string.dialog_title_accept_offer),
+                createOfferDialog(false, getString(R.string.dialog_title_accept_offer),
                         getString(R.string.dialog_message_accept_offer),
                         getString(R.string.dialog_confirm_accept_offer),
                         getString(R.string.dialog_cancel_accept_offer)).show();
@@ -214,11 +225,13 @@ public class SingleChatActivity extends AppCompatActivity {
         mListenerOffers = this.offersRef.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChildren()){
-                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                        ChatOffer o = dataSnapshot1.getValue(ChatOffer.class);
-                        setOfferData(o.getSenderId(), o.getText(), o.getAnswered(), dataSnapshot1.getKey());
-                    }
+                if (dataSnapshot.hasChildren()) {
+                    FirebaseUtils.ChatOffer o = dataSnapshot.getValue(FirebaseUtils.ChatOffer.class);
+                    setOfferData(o.getSenderId(), o.getText(), o.getAccepted(), o.getExchangeID());
+                }
+                else {
+                    canSendOffers = "Yes";
+                    hideOffer();
                 }
             }
             @Override
@@ -226,34 +239,16 @@ public class SingleChatActivity extends AppCompatActivity {
         });
     }
 
-    private static class ChatOffer {
-        String senderId;
-        String text;
-        Boolean answered;
-        Boolean accepted;
-        public ChatOffer() {
-            // empty default constructor, necessary for Firebase to be able to deserialize blog posts
-        }
-        public String getSenderId() {
-            return senderId;
-        }
-        public String getText() {
-            return text;
-        }
-        public Boolean getAnswered() { return answered; }
-        public Boolean getAccepted() { return accepted; }
-    }
-
     //Set data in the array
     public void setListData(String senderId, String text, boolean read) {
         chatArrayAdapter.add(new ChatMessage((senderId.equals(myId)), senderId, text, read));
     }
 
-    public void setOfferData(String senderId, String text, Boolean answered, String idOffer){
-        if (!answered) {
+    public void setOfferData(String senderId, String text, Boolean accepted, String exchangeID){
+        if (!accepted) {
+            canSendOffers = "Yes";
             layoutOffer.setVisibility(View.VISIBLE);
             tvContentOffer.setText(text);
-            this.idOffer = idOffer;
             if (senderId.equals(myId)) {
                 bCancelOffer.setVisibility(View.GONE);
                 bAcceptOffer.setVisibility(View.GONE);
@@ -265,8 +260,8 @@ public class SingleChatActivity extends AppCompatActivity {
             }
         }
         else {
-            if (this.idOffer == null)
-                hideOffer();
+            canSendOffers = "No";
+            hideOffer();
         }
     }
 
@@ -310,7 +305,8 @@ public class SingleChatActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_option_single_chat, menu);
+        if (isMyAdv) getMenuInflater().inflate(R.menu.menu_option_my_single_chat, menu);
+        else getMenuInflater().inflate(R.menu.menu_option_single_chat, menu);
         return true;
     }
 
@@ -326,10 +322,13 @@ public class SingleChatActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_send_offer) {
-            createDialogSendOffer().show();
-            return true;
-        }
-        if (id == R.id.action_view_offers) {
+            if (canSendOffers != null){
+                if (canSendOffers.equals("Yes")) {
+                    createDialogSendOffer().show();
+                } else {
+                    createErrorDialog().show();
+                }
+            }
             return true;
         }
         if (id == R.id.action_block_user) {
@@ -384,12 +383,6 @@ public class SingleChatActivity extends AppCompatActivity {
                     offerInformation.setVisibility(View.VISIBLE);
                     offerInformation.setHint(R.string.dialog_money_information_offer);
                     offerInformation.setInputType(InputType.TYPE_CLASS_NUMBER);
-                }
-                if (offerList.getSelectedItem().toString().equals("Offer product")){
-                    tvSetOffer.setVisibility(View.VISIBLE);
-                    offerInformation.setVisibility(View.VISIBLE);
-                    offerInformation.setHint(R.string.dialog_product_information_offer);
-                    offerInformation.setInputType(InputType.TYPE_CLASS_TEXT);
                 }
                 if (offerList.getSelectedItem().toString().equals("Offer my advert")){
                     tvSetOffer.setVisibility(View.VISIBLE);
@@ -447,48 +440,43 @@ public class SingleChatActivity extends AppCompatActivity {
     }
 
     private void createOffer(String typeOffer, String content){
+        String senderId = myId;
+        Map<String, Object> values = new HashMap<>();
+        values.put("senderId", senderId);
+        values.put("text", content);
+        values.put("accepted", false);
+
         switch(typeOffer){
             case "Offer money":
                 break;
-            case "Offer product":
-                break;
             case "Offer my advert":
+                values.put("exchangeID", "ID");
                 break;
             case "Other offers":
                 break;
         }
 
-        String senderId = myId;
+        offersRef.setValue(values);
 
-        Map<String, Object> values = new HashMap<>();
-        values.put("senderId", senderId);
-        values.put("text", content);
-        values.put("answered", false);
-        values.put("accepted", false);
-
-        idOffer = offersRef.push().getKey();
-        offersRef.child(idOffer).setValue(values);
-
-        checkUserChat();
+        addMessageOffer(0);
     }
 
     private void denyOffer(){
         Map<String, Object> values = new HashMap<>();
-        values.put("answered", true);
-        values.put("accepted", false);
 
-        offersRef.child(idOffer).updateChildren(values);
+        offersRef.setValue(values);
 
+        addMessageOffer(2);
         hideOffer();
     }
 
     private void acceptOffer(){
         Map<String, Object> values = new HashMap<>();
-        values.put("answered", true);
         values.put("accepted", true);
 
-        offersRef.child(idOffer).updateChildren(values);
+        offersRef.updateChildren(values);
 
+        addMessageOffer(1);
         hideOffer();
     }
 
@@ -496,7 +484,24 @@ public class SingleChatActivity extends AppCompatActivity {
         layoutOffer.setVisibility(View.GONE);
     }
 
-    public AlertDialog createDialog(boolean deny, String title, String message, String positive, String negative) {
+    private void addMessageOffer(int status){
+        String senderId = myId;
+
+        Map<String, Object> values = new HashMap<>();
+        values.put("senderId", senderId);
+        if (status == 0) values.put("text", getString(R.string.message_made_offer));
+        else if (status == 1) values.put("text", getString(R.string.message_accepted_offer));
+        else values.put("text", getString(R.string.message_denied_offer));
+        values.put("read", false);
+
+        messagesRef.push().setValue(values);
+        chatText.setText("");
+
+        //Check if the other user have a chat with you ONCE
+        checkUserChat();
+    }
+
+    public AlertDialog createOfferDialog(boolean deny, String title, String message, String positive, String negative) {
         final boolean deny1 = deny;
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
 
@@ -515,6 +520,22 @@ public class SingleChatActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 //onNegativeButtonClick();
+                            }
+                        });
+
+        return builder.create();
+    }
+
+    public AlertDialog createErrorDialog() {
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.title_dialog_error_create_offer)
+                .setMessage(R.string.message_dialog_error_create_offer)
+                .setPositiveButton(R.string.button_dialog_error_create_offer,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
                             }
                         });
 
