@@ -51,6 +51,7 @@ import software33.tagmatch.ServerConnection.TagMatchDeleteAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetBitmapAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
+import software33.tagmatch.Users.ViewProfile;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
@@ -332,6 +333,13 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
         imageType.getLayoutParams().height=params.height/5;
         imageType.getLayoutParams().width=params.height/5;
+    }
+
+    public void goToUser(View view) {
+        String username = ((TextView) findViewById(R.id.advert_name_user)).getText().toString();
+        Intent intent = new Intent(this, ViewProfile.class);
+        intent.putExtra("username", username);
+        startActivity(intent);
     }
 
     @Override
