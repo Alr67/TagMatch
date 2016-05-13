@@ -49,9 +49,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.w3c.dom.Text;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.Domain.AdvGift;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
@@ -93,6 +97,10 @@ public class SingleChatActivity extends AppCompatActivity {
     private ValueEventListener mListenerOffers;
 
     private HashMap<String, ChatMessage> unreadChatMessageMap = new HashMap<>();
+    private ArrayList<String> advertisementsTitles = new ArrayList<>();
+    private ArrayList<String> advertisementsIds = new ArrayList<>();
+    private int positionMyAdv;
+
 
     // Yes OR No
     private String canSendOffers;
@@ -124,7 +132,8 @@ public class SingleChatActivity extends AppCompatActivity {
         offersRef = myFirebaseRef.child("chats").child(idChat).child("offer");
         usersRef = myFirebaseRef.child("users");
 
-
+        //Donwload my adverts
+        downloadMyAdvertsFromServer();
 
         /************** Set the action Bar *****************/
 
@@ -408,11 +417,27 @@ public class SingleChatActivity extends AppCompatActivity {
 
         final TextView tvSetOffer = (TextView) view.findViewById(R.id.tvSetOffer);
         final EditText offerInformation = (EditText) view.findViewById(R.id.offerInformation);
-        final TextView tvErrorOffer = (TextView) view.findViewById(R.id.tvErrorOffer);
+        final TextView tvErrorOffer = (TextView) view.findViewById( R.id.tvErrorOffer);
+        final LinearLayout layoutMyAdvs = (LinearLayout) view.findViewById(R.id.layoutMyAdvs);
+        final ListView listViewMyAdvs = (ListView) view.findViewById(R.id.listViewMyAdvs);
+        final ArrayAdapter<String> listArrayAdapter;
+        positionMyAdv = -1;
+
+        listArrayAdapter = new ArrayAdapter<String>(this,
+                R.layout.layout_offer_my_adv, advertisementsTitles);
+        listViewMyAdvs.setAdapter(listArrayAdapter);
+        listViewMyAdvs.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                view.setSelected(true);
+                positionMyAdv = position;
+            }
+        });
 
         tvSetOffer.setVisibility(View.INVISIBLE);
         offerInformation.setVisibility(View.INVISIBLE);
         tvErrorOffer.setVisibility(View.INVISIBLE);
+        layoutMyAdvs.setVisibility(View.GONE);
 
         offerList.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener(){
             @Override
@@ -420,22 +445,34 @@ public class SingleChatActivity extends AppCompatActivity {
                 if (offerList.getSelectedItem().toString().equals("No offer selected")) {
                     tvSetOffer.setVisibility(View.INVISIBLE);
                     offerInformation.setVisibility(View.INVISIBLE);
+                    offerInformation.setText("");
+                    layoutMyAdvs.setVisibility(View.GONE);
+                    positionMyAdv = -1;
                 }
                 if (offerList.getSelectedItem().toString().equals("Offer money")){
                     tvSetOffer.setVisibility(View.VISIBLE);
                     offerInformation.setVisibility(View.VISIBLE);
+                    offerInformation.setText("");
+                    layoutMyAdvs.setVisibility(View.GONE);
                     offerInformation.setHint(R.string.dialog_money_information_offer);
                     offerInformation.setInputType(InputType.TYPE_CLASS_NUMBER);
+                    positionMyAdv = -1;
                 }
                 if (offerList.getSelectedItem().toString().equals("Offer my advert")){
                     tvSetOffer.setVisibility(View.VISIBLE);
-                    offerInformation.setVisibility(View.INVISIBLE);
+                    layoutMyAdvs.setVisibility(View.VISIBLE);
+                    offerInformation.setVisibility(View.GONE);
+                    offerInformation.setText("");
+                    positionMyAdv = -1;
                 }
                 if (offerList.getSelectedItem().toString().equals("Other offers")){
                     tvSetOffer.setVisibility(View.VISIBLE);
+                    layoutMyAdvs.setVisibility(View.GONE);
                     offerInformation.setVisibility(View.VISIBLE);
+                    offerInformation.setText("");
                     offerInformation.setHint(R.string.dialog_other_information_offer);
                     offerInformation.setInputType(InputType.TYPE_CLASS_TEXT);
+                    positionMyAdv = -1;
                 }
             }
 
@@ -465,6 +502,17 @@ public class SingleChatActivity extends AppCompatActivity {
                             tvErrorOffer.setText(R.string.dialog_error_send_offer_no_offer);
                             tvErrorOffer.setVisibility(View.VISIBLE);
                         }
+                        else if (offerList.getSelectedItem().toString().equals("Offer my advert")) {
+                            if (positionMyAdv == -1){
+                                tvErrorOffer.setText(R.string.dialog_error_send_offer_no_information);
+                                tvErrorOffer.setVisibility(View.VISIBLE);
+                            }
+                            else {
+                                tvErrorOffer.setVisibility(View.INVISIBLE);
+                                createOffer(offerList.getSelectedItem().toString(), "");
+                                d.dismiss();
+                            }
+                        }
                         else if (s.isEmpty() || s.equals("")){
                             tvErrorOffer.setText(R.string.dialog_error_send_offer_no_information);
                             tvErrorOffer.setVisibility(View.VISIBLE);
@@ -491,7 +539,8 @@ public class SingleChatActivity extends AppCompatActivity {
                 content = content+"€";
                 break;
             case "Offer my advert":
-                values.put("exchangeID", "ID");
+                //values.put("exchangeID", advertisementsIds.get(positionMyAdv));
+                content = advertisementsTitles.get(positionMyAdv);
                 break;
             case "Other offers":
                 break;
@@ -659,5 +708,38 @@ public class SingleChatActivity extends AppCompatActivity {
                 }
             }
         }.execute(jsonObject);
+    }
+
+    private void downloadMyAdvertsFromServer() {
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        String url = Constants.IP_SERVER+"/users/"+actualUser.getAlias()+"/ads?limit="+Constants.SERVER_limitAdverts;
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+            new TagMatchGetAsyncTask(url,this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    if(jsonObject.has("arrayResponse")) {
+                        try {
+                            JSONArray jsonArray = jsonObject.getJSONArray("arrayResponse");
+                            if(jsonArray.length()>0) {
+                                for (int n = 0; n < jsonArray.length(); n++) {
+                                    JSONObject object = jsonArray.getJSONObject(n);
+                                    Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
+                                    advertisementsTitles.add(newAdvert.getTitle());
+                                    advertisementsIds.add(Integer.toString(newAdvert.getID()));
+                                }
+                            }
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }
