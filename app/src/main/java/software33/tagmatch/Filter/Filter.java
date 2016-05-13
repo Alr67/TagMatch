@@ -1,18 +1,22 @@
 package software33.tagmatch.Filter;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
@@ -97,6 +101,28 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
                 // Handle ListView touch events.
                 v.onTouchEvent(event);
                 return true;
+            }
+        });
+
+        con_search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int choice) {
+                        switch (choice) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                Toast.makeText(getApplicationContext(),"CACA",Toast.LENGTH_LONG);
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(Filter.this, R.style.myDialog));
+                builder.setMessage("Delete this image?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener);
+                builder.show();
             }
         });
 
@@ -293,4 +319,5 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
         input = input.replaceAll("\"","");
         return input;
     }
+
 }
