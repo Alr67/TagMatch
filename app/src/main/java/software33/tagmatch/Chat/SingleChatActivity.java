@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
+import android.support.v4.util.Pair;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -73,7 +74,10 @@ public class SingleChatActivity extends AppCompatActivity {
     private String idUser;
     private String imageChat;
     private ChildEventListener mListener;
+    private ValueEventListener mListenerChats;
     private ValueEventListener mListenerOffers;
+
+    private HashMap<String, ChatMessage> unreadChatMessageMap = new HashMap<>();
 
     // Yes OR No
     private String canSendOffers;
@@ -203,11 +207,15 @@ public class SingleChatActivity extends AppCompatActivity {
                     values.put("read", true);
                     messagesRef.child(dataSnapshot.getKey()).updateChildren(values);
                 }
-                setListData(c.getSenderId(), c.getText(), c.getRead());
+                setListData(dataSnapshot.getKey(), c.getSenderId(), c.getText(), c.getRead());
             }
 
             @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {}
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+                ChatMessage message = unreadChatMessageMap.get(dataSnapshot.getKey());
+                chatArrayAdapter.updateMessageToRead(message);
+                unreadChatMessageMap.remove(dataSnapshot.getKey());
+            }
 
             @Override
             public void onChildRemoved(DataSnapshot dataSnapshot) {}
@@ -240,8 +248,12 @@ public class SingleChatActivity extends AppCompatActivity {
     }
 
     //Set data in the array
-    public void setListData(String senderId, String text, boolean read) {
-        chatArrayAdapter.add(new ChatMessage((senderId.equals(myId)), senderId, text, read));
+    public void setListData(String id, String senderId, String text, boolean read) {
+        ChatMessage message = new ChatMessage((senderId.equals(myId)), senderId, text, read);
+        if (!read) {
+            unreadChatMessageMap.put(id, message);
+        }
+        chatArrayAdapter.add(message);
     }
 
     public void setOfferData(String senderId, String text, Boolean accepted, String exchangeID){
@@ -292,7 +304,12 @@ public class SingleChatActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot snapshot) {
                 if (!snapshot.hasChild(idChat)) {
                     Map<String, Object> chats = new HashMap<>();
-                    chats.put(idChat,"");
+                    chats.put(idChat,true);
+                    usersRef.child(idUser).child("chats").updateChildren(chats);
+                }
+                else if (snapshot.child(idChat).getValue() == false) {
+                    Map<String, Object> chats = new HashMap<>();
+                    chats.put(idChat,true);
                     usersRef.child(idUser).child("chats").updateChildren(chats);
                 }
             }
@@ -335,6 +352,9 @@ public class SingleChatActivity extends AppCompatActivity {
             return true;
         }
         if (id == R.id.action_delete_chat) {
+            AlertDialog alertDialog = createDeleteDialog();
+            alertDialog.show();
+
             return true;
         }
 
@@ -540,6 +560,40 @@ public class SingleChatActivity extends AppCompatActivity {
                         });
 
         return builder.create();
+    }
+
+    private AlertDialog createDeleteDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.dialog_title_delete_chat)
+                .setMessage(R.string.dialog_message_delete_chat)
+                .setPositiveButton(R.string.dialog_confirm_delete_chat,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                onPossitiveButtonClick();
+                            }
+                        })
+                .setNegativeButton(R.string.dialog_cancel_delete_chat,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //onNegativeButtonClick();
+                            }
+                        });
+
+        return builder.create();
+    }
+
+    private void onPossitiveButtonClick(){
+        //Remove from Firebase putting the value to false
+        Map<String, Object> value = new HashMap<>();
+        value.put(idChat,false);
+        usersRef.child(myId).child("chats").updateChildren(value);
+        startActivity(new Intent(this, MainChatActivity.class));
+        messagesRef.removeEventListener(mListener);
+        offersRef.removeEventListener(mListenerOffers);
+        finish();
     }
 
     @Override

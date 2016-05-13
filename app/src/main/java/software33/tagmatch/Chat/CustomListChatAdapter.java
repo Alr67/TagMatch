@@ -137,7 +137,7 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
                 holder.image.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
             }
 
-            if (tempValues.getMessages()==0) holder.tvNumMessages.setVisibility(View.INVISIBLE);
+            if (tempValues.getMessages()==0) holder.tvNumMessages.setText("");
             else holder.tvNumMessages.setText(String.valueOf(tempValues.getMessages()));
 
             if (tempValues.getNewOffer()!= 0){
@@ -146,7 +146,7 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
                 else holder.tvOffer.setText(R.string.mainchat_closed_offer);
             }
             else {
-                holder.tvOffer.setVisibility(View.INVISIBLE);
+                holder.tvOffer.setText("");
             }
             /******** Set Item Click Listner for LayoutInflater for each row *******/
 

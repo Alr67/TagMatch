@@ -116,8 +116,17 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                     list.setAdapter( adapter );
                 }
                 else {
-                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                        getChat(dataSnapshot1.getKey());
+                    boolean noValidChats = true;
+                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                        if (dataSnapshot1.getValue().equals(true)) {
+                            getChat(dataSnapshot1.getKey());
+                            noValidChats = false;
+                        }
+                    }
+                    if (noValidChats){
+                        Resources res =getResources();
+                        adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
+                        list.setAdapter( adapter );
                     }
                 }
             }
@@ -221,7 +230,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                         ++messages;
                     }
                 }
-                if (messages > 0) FirebaseUtils.displayNotification(context);
+                //if (messages > 0) FirebaseUtils.displayNotification(context);
 
                 //1: Offer 2: Pending 3: Closed
                 int newOffer = 0;
@@ -333,9 +342,11 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
             adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
         }
 
-        //Remove from Firebase
+        //Remove from Firebase putting the value to false
         Pair<String,String> ids = idChatsUser.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
-        usersRef.child(myId).child("chats").child(ids.first).setValue(new HashMap<String, Object>());
+        Map<String, Object> value = new HashMap<>();
+        value.put(ids.first,false);
+        usersRef.child(myId).child("chats").updateChildren(value);
 
         list.setAdapter( adapter );
     }

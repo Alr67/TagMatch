@@ -33,6 +33,12 @@ public abstract class FirebaseUtils {
 
     private static final String SH_PREF_FIREBASE = "Firebase_pref";
 
+    private static ValueEventListener listener1;
+    private static ValueEventListener listener2;
+    private static ValueEventListener listener3;
+    private static boolean startedListeners = false;
+
+
     public static String getMyId(Context context){
         String data;
         SharedPreferences prefs = context.getSharedPreferences(SH_PREF_FIREBASE, Context.MODE_PRIVATE);
@@ -256,39 +262,57 @@ public abstract class FirebaseUtils {
         mNotificationManager.notify(notificationID, mBuilder.build());
     }
 
-    public static void startListeners(final String myId){
-        FirebaseUtils.getUsersRef().child(myId).child("chats").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChildren()){
-                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
-                        FirebaseUtils.getChatsRef().child(dataSnapshot1.getKey()).addValueEventListener(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(DataSnapshot snapshot) {
-                                ChatInfo c = snapshot.child("info").getValue(ChatInfo.class);
-                                String idUser = "";
-                                for (String s : c.getUsers().keySet()) {
-                                    if (!s.equals(myId)) {
-                                        idUser = s;
+    public static void startListeners(final String myId, final Context context){
+        if (!startedListeners) {
+            startedListeners = true;
+            listener1 = FirebaseUtils.getUsersRef().child(myId).child("chats").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (dataSnapshot.hasChildren()) {
+                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                            listener2 = FirebaseUtils.getChatsRef().child(dataSnapshot1.getKey()).addValueEventListener(new ValueEventListener() {
+                                @Override
+                                public void onDataChange(DataSnapshot snapshot) {
+                                    ChatInfo c = snapshot.child("info").getValue(ChatInfo.class);
+                                    int messages = 0;
+                                    for (DataSnapshot dataSnapshot1 : snapshot.child("messages").getChildren()) {
+                                        FirebaseUtils.ChatText ct = dataSnapshot1.getValue(FirebaseUtils.ChatText.class);
+                                        if (!ct.getRead() && !ct.getSenderId().equals(myId)) {
+                                            ++messages;
+                                        }
                                     }
+                                    if (messages > 0) FirebaseUtils.displayNotification(context);
+
+                                    String idUser = "";
+                                    for (String s : c.getUsers().keySet()) {
+                                        if (!s.equals(myId)) {
+                                            idUser = s;
+                                        }
+                                    }
+
+                                    listener3 = FirebaseUtils.getUsersRef().child(idUser).addValueEventListener(new ValueEventListener() {
+                                        @Override
+                                        public void onDataChange(DataSnapshot snapshot) {
+                                        }
+
+                                        @Override
+                                        public void onCancelled(FirebaseError firebaseError) {
+                                        }
+                                    });
                                 }
 
-                                FirebaseUtils.getUsersRef().child(idUser).addValueEventListener(new ValueEventListener() {
-                                    @Override
-                                    public void onDataChange(DataSnapshot snapshot) {}
-                                    @Override
-                                    public void onCancelled(FirebaseError firebaseError) {}
-                                });
-                            }
-                            @Override
-                            public void onCancelled(FirebaseError firebaseError) {}
-                        });
+                                @Override
+                                public void onCancelled(FirebaseError firebaseError) {
+                                }
+                            });
+                        }
                     }
                 }
-            }
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {}
-        });
 
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                }
+            });
+        }
     }
 }

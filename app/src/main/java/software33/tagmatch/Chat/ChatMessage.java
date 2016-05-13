@@ -23,4 +23,6 @@ public class ChatMessage {
     }
 
     public boolean getRead() { return read; }
+
+    public void setRead(boolean read) { this.read = read; }
 }

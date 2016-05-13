@@ -289,7 +289,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     }
 
     private void getChats(){
-        Log.i("DEBUG XAT","Xddddd plural");
         FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
@@ -388,7 +387,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         //Set the chats to each user
 
         Map<String, Object> chats1 = new HashMap<>();
-        chats1.put(id.getKey(),"");
+        chats1.put(id.getKey(),true);
         FirebaseUtils.getUsersRef().child(id1).child("chats").updateChildren(chats1);
 
         return id.getKey();
@@ -396,7 +395,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
     private void getChat(final String idChat, final long numChats) {
         //Accessing to the chat with idChat ONCE
-        Log.i("DEBUG XAT", "Xd");
         FirebaseUtils.getChatsRef().child(idChat).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
