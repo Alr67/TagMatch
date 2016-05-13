@@ -69,6 +69,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private Firebase usersRef;
     private String userName;
     private String titleProduct;
+    private String idProduct;
     private String idChat;
     private String myId;
     private String idUser;
@@ -92,6 +93,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
         Bundle b = getIntent().getExtras();
         userName = b.getString("UserName");
+        idProduct = b.getString("IdProduct");
         titleProduct = b.getString("TitleProduct");
         idChat = b.getString("IdChat");
         idUser = b.getString("IdUser");

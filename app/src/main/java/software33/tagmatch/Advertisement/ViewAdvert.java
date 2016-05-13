@@ -69,6 +69,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String userId;
     private String imageChat;
     private String myName;
+    private String idProduct;
 
     private boolean myAdv;
     FloatingActionButton fab;
@@ -127,6 +128,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
         Log.i(Constants.DebugTAG, "Vaig a mostrar l'anunci amb id: " + id);
+        idProduct = id.toString();
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());
@@ -381,7 +383,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         users.put(id1, Helpers.getActualUser(this).getAlias());
         users.put(id2, username.getText().toString());
 
-        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(getTitle().toString(), id2, users);
+        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(idProduct, getTitle().toString(), id2, users);
         id.child("info").setValue(chatInfo);
 
         //Set the chats to each user
@@ -399,7 +401,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 FirebaseUtils.ChatInfo c = snapshot.getValue(FirebaseUtils.ChatInfo.class);
-                setButtonXat(c.getIdProduct(), c.getUsers(), idChat, numChats);
+                setButtonXat(c.getIdProduct(), idChat, numChats);
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {
@@ -407,23 +409,10 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat, long numChats) {
-        String userName = "";
-        for (Object o : users.values()){
-            if (!o.toString().equals(Helpers.getActualUser(this).getAlias())) {
-                userName = o.toString();
-            }
-        }
-        String userId = "";
-        for (String s : users.keySet()){
-            if (!s.equals(FirebaseUtils.getMyId(this))) {
-                userId = s;
-            }
-        }
+    private void setButtonXat(String idProduct, String idChat, long numChats) {
 
         //Restriccions de obrir xat:
-        //      No mateix titul de producte ni id de usuari que ho ha publicat
-        if (idProduct.equals(getTitle().toString()) && userId.equals(this.userId)){
+        if (idProduct.equals(this.idProduct)){
             this.idChat = idChat;
             fab.setClickable(true);
             fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
@@ -449,12 +438,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                 });
             }
         }
-
-        Log.i("Debug-Chat","idProd " +idProduct);
-        Log.i("Debug-Chat","getTitle().toString() " +getTitle().toString());
-        Log.i("Debug-Chat","userId " +userId);
-        Log.i("Debug-Chat","this.userId " +this.userId);
-
     }
 
     public AlertDialog createDeleteDialog() {

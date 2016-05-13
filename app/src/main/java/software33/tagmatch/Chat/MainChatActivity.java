@@ -186,13 +186,14 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     }
 
     //Set data in the array
-    public void setListData(String idUser, String idProduct, String owner, String userName, String idChat, String img,int messages, int newOffer){
+    public void setListData(String idUser, String idProduct, String titleProduct, String owner, String userName, String idChat, String img,int messages, int newOffer){
         final ListChatModel sched = new ListChatModel();
 
         sched.setUserName(userName);
         sched.setOwner(owner);
         sched.setImage(img);
-        sched.setTitleProduct(idProduct);
+        sched.setIdProduct(idProduct);
+        sched.setTitleProduct(titleProduct);
         sched.setNewOffer(newOffer);
         sched.setMessages(messages);
 
@@ -257,7 +258,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                     }
                 }
 
-                getUser(idUser, c.getIdProduct(), c.getOwner(), userName, idChat, messages, newOffer);
+                getUser(idUser, c.getIdProduct(), c.getTitleProduct(), c.getOwner(), userName, idChat, messages, newOffer);
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {
@@ -266,12 +267,12 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
 
     }
 
-    public void getUser(final String idUser, final String idProduct, final String owner, final String userName, final String idChat, final int messages, final int newOffer) {
+    public void getUser(final String idUser, final String idProduct, final String titleProduct, final String owner, final String userName, final String idChat, final int messages, final int newOffer) {
         usersRef.child(idUser).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 FirebaseUtils.User u = snapshot.getValue(FirebaseUtils.User.class);
-                setListData(idUser, idProduct, owner, userName, idChat, u.getImg(), messages, newOffer);
+                setListData(idUser, idProduct, titleProduct, owner, userName, idChat, u.getImg(), messages, newOffer);
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {}
@@ -283,8 +284,8 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         if (searching) tempValues = ( ListChatModel ) CustomListViewValuesArrSearch.get(mPosition);
         else tempValues = ( ListChatModel ) CustomListViewValuesArr.get(mPosition);
 
-        Pair<String,String> ids = idChatsUser.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
-        String img = imageChatsUser.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
+        Pair<String,String> ids = idChatsUser.get(new Pair<String, String>(tempValues.getIdProduct(),tempValues.getUserName()));
+        String img = imageChatsUser.get(new Pair<String, String>(tempValues.getIdProduct(),tempValues.getUserName()));
 
         /*Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
@@ -300,6 +301,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
         b.putString("UserName", tempValues.getUserName());
+        b.putString("IdProduct", tempValues.getIdProduct());
         b.putString("TitleProduct", tempValues.getTitleProduct());
 
         b.putString("IdChat", ids.first);
@@ -343,7 +345,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         }
 
         //Remove from Firebase putting the value to false
-        Pair<String,String> ids = idChatsUser.get(new Pair<String, String>(tempValues.getTitleProduct(),tempValues.getUserName()));
+        Pair<String,String> ids = idChatsUser.get(new Pair<String, String>(tempValues.getIdProduct(),tempValues.getUserName()));
         Map<String, Object> value = new HashMap<>();
         value.put(ids.first,false);
         usersRef.child(myId).child("chats").updateChildren(value);
