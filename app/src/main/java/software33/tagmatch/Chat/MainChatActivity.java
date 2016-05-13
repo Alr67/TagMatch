@@ -201,7 +201,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         for (int i = 0; i < CustomListViewValuesArr.size(); i++)
         {
             if (CustomListViewValuesArr.get(i).getUserName().equals(userName) &&
-                    CustomListViewValuesArr.get(i).getTitleProduct().equals(idProduct)){
+                    CustomListViewValuesArr.get(i).getIdProduct().equals(idProduct)){
                 CustomListViewValuesArr.set(i,sched);
                 found = true;
             }

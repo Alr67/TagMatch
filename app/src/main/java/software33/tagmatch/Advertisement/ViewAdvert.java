@@ -303,6 +303,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                             public void onClick(View view) {
                                 Intent chat = buttonStartXat(view);
                                 startActivity(chat);
+                                finish();
                             }
                         });
                     }
@@ -353,6 +354,8 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         }
         else b.putString("IdChat", idChat);
         b.putString("IdUser", userId);
+
+        b.putBoolean("FromAdvert",true);
 
         //Get user Image
         Drawable drawable = userImage.getDrawable();
@@ -421,6 +424,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                 public void onClick(View view) {
                     Intent chat = buttonStartXat(view);
                     startActivity(chat);
+                    finish();
                 }
             });
         }
@@ -434,6 +438,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     public void onClick(View view) {
                         Intent chat = buttonStartXat(view);
                         startActivity(chat);
+                        finish();
                     }
                 });
             }

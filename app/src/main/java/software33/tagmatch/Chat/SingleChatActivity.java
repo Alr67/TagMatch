@@ -36,6 +36,7 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.client.ChildEventListener;
 import com.firebase.client.DataSnapshot;
@@ -43,13 +44,24 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.w3c.dom.Text;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import software33.tagmatch.Domain.AdvGift;
+import software33.tagmatch.Domain.Advertisement;
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
+import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.DialogError;
+import software33.tagmatch.Utils.Helpers;
 
 public class SingleChatActivity extends AppCompatActivity {
 
@@ -70,10 +82,12 @@ public class SingleChatActivity extends AppCompatActivity {
     private String userName;
     private String titleProduct;
     private String idProduct;
+    Advertisement adv;
     private String idChat;
     private String myId;
     private String idUser;
     private String imageChat;
+    private boolean fromAdvert = false;
     private ChildEventListener mListener;
     private ValueEventListener mListenerChats;
     private ValueEventListener mListenerOffers;
@@ -98,6 +112,7 @@ public class SingleChatActivity extends AppCompatActivity {
         idChat = b.getString("IdChat");
         idUser = b.getString("IdUser");
         if (b.getBoolean("isMyAdv")) isMyAdv = true;
+        if (b.getBoolean("FromAdvert")) fromAdvert = true;
         imageChat = FirebaseUtils.getChatImage(this);
         FirebaseUtils.removeChatImage(this);
         myId = FirebaseUtils.getMyId(this);
@@ -198,6 +213,12 @@ public class SingleChatActivity extends AppCompatActivity {
                 chatView.setSelection(chatArrayAdapter.getCount() - 1);
             }
         });
+
+        if (fromAdvert){
+            Map<String, Object> chats = new HashMap<>();
+            chats.put(idChat,true);
+            usersRef.child(myId).child("chats").updateChildren(chats);
+        }
 
         //Update Data
         mListener = this.messagesRef.addChildEventListener(new ChildEventListener() {
@@ -464,12 +485,10 @@ public class SingleChatActivity extends AppCompatActivity {
     private void createOffer(String typeOffer, String content){
         String senderId = myId;
         Map<String, Object> values = new HashMap<>();
-        values.put("senderId", senderId);
-        values.put("text", content);
-        values.put("accepted", false);
 
         switch(typeOffer){
             case "Offer money":
+                content = content+"€";
                 break;
             case "Offer my advert":
                 values.put("exchangeID", "ID");
@@ -477,6 +496,11 @@ public class SingleChatActivity extends AppCompatActivity {
             case "Other offers":
                 break;
         }
+
+
+        values.put("senderId", senderId);
+        values.put("text", content);
+        values.put("accepted", false);
 
         offersRef.setValue(values);
 
@@ -499,6 +523,7 @@ public class SingleChatActivity extends AppCompatActivity {
         offersRef.updateChildren(values);
 
         addMessageOffer(1);
+
         hideOffer();
     }
 
@@ -534,7 +559,7 @@ public class SingleChatActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (deny1) denyOffer();
-                                else acceptOffer();
+                                else closeAdvert();
                             }
                         })
                 .setNegativeButton(negative,
@@ -602,6 +627,37 @@ public class SingleChatActivity extends AppCompatActivity {
     public void onBackPressed(){
         messagesRef.removeEventListener(mListener);
         offersRef.removeEventListener(mListenerOffers);
+        if (fromAdvert){
+            Intent intent = new Intent(this, MainChatActivity.class);
+            startActivity(intent);
+        }
         finish();
+    }
+
+    private void closeAdvert() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("sold", true);
+        } catch (JSONException e) {
+        }
+
+        final Context context = this.getApplicationContext();
+        new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/"+idProduct, this){
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        acceptOffer();
+                    }
+                } catch (JSONException ignored){
+
+                }
+            }
+        }.execute(jsonObject);
     }
 }
