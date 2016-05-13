@@ -155,12 +155,15 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
     private void makeURL() {
         String url = Constants.IP_SERVER + "/ads/search?limit=" + Constants.SERVER_limitAdverts + "&idGreaterThan=" + Constants.SERVER_IdGreaterThan;
 
-        String tags = sugg_hashtags.getText().toString();
-        if(!tags.isEmpty()){
-            String[] search = tags.split(" ");
-            clearHashTag(search);
-            for (int i=0; i<search.length; ++i) {
-                url += "&hashtag=" + search[i];
+        String tags = null;
+        for (String s : hash_search)
+        {
+            tags += s + "";
+        }
+        if(!hash_search.isEmpty()){
+            clearHashTag(hash_search);
+            for (int i=0; i<hash_search.size(); ++i) {
+                url += "&hashtag=" + hash_search.get(i);
             }
         }
 
@@ -269,10 +272,10 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
         }
     }
 
-    private void clearHashTag(String[] search){
-        for(int i=0; i<search.length; ++i){
-            if(search[i].startsWith("#")){
-                search[i] = search[i].replaceFirst("#", "");
+    private void clearHashTag(ArrayList<String> search){
+        for(int i=0; i<search.size(); ++i){
+            if(search.get(i).startsWith("#")){
+                search.set(i, search.get(i).replaceFirst("#", ""));
             }
         }
     }
