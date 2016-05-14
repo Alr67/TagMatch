@@ -1,6 +1,7 @@
 package software33.tagmatch.Users;
 
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
@@ -12,7 +13,9 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.firebase.client.Firebase;
@@ -27,6 +30,8 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
@@ -38,10 +43,11 @@ import software33.tagmatch.Utils.NavigationController;
 
 public class ViewProfile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
-    TextView tvUserName, tvLocation;
-    ImageView ivUserImage;
+    private TextView tvLocation, title;
+    private ImageView ivUserImage;
+    private ListView interests_hash;
     private GoogleMap map;
-    LatLng userPosition;
+    private LatLng userPosition;
 
 
     @Override
@@ -60,18 +66,25 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        tvUserName = (TextView) findViewById(R.id.tvUserName);
         tvLocation = (TextView) findViewById(R.id.tvLocation);
         ivUserImage = (ImageView) findViewById(R.id.ivUserImage);
+
+        interests_hash = (ListView) findViewById(R.id.profile_interests);
 
         Firebase.setAndroidContext(this);
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
         User user = Helpers.getActualUser(this);
-        tvUserName.setText(user.getAlias());
+        //tvUserName.setText(user.getAlias());
 
-        final TextView interests = (TextView) findViewById(R.id.profile_interests);
+        title = (TextView) findViewById(R.id.toolbar_title_view_profile);
+        title.setText(getResources().getString(R.string.vw_1) + user.getAlias() + getResources().getString(R.string.ed_2));
+        if (Build.VERSION.SDK_INT < 23) {
+            title.setTextAppearance(getApplicationContext(),R.style.normalText);
+        } else {
+            title.setTextAppearance(R.style.normalText);
+        }
 
         try {
             JSONObject jsonObject = new JSONObject();
@@ -97,13 +110,13 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                             }
                             catch (Exception e) {}
                             JSONArray interestsArray = jsonObject.getJSONArray("interests");
-                            String interestsString = "";
-                            for(int i = 0; i < interestsArray.length(); ++i) {
-                                if(i != 0)
-                                    interestsString += " ";
-                                interestsString += "#"+interestsArray.getString(i);
+                            ArrayList<String> listdata = new ArrayList<String>();
+                            if (interestsArray != null) {
+                                for (int i=0;i<interestsArray.length();i++){
+                                    listdata.add(interestsArray.get(i).toString());
+                                }
                             }
-                            interests.setText(interestsString);
+                            interests_hash.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, listdata));
                         }
                     } catch (JSONException ignored) {
                         Log.i("DEBUG","error al get user");
@@ -114,10 +127,10 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias() + "/photo", this) {
                 @Override
                 protected void onPostExecute(String url) {
-                    Picasso.with(ViewProfile.this).load(url).error(R.drawable.image0).into(ivUserImage);
                     if (url == null){
-                        Picasso.with(ViewProfile.this).load(R.drawable.image0).into(ivUserImage);
+                        Picasso.with(ViewProfile.this).load(R.drawable.image0).centerCrop().resize(ivUserImage.getMeasuredWidth(),ivUserImage.getMeasuredHeight()).into(ivUserImage);
                     }
+                    else Picasso.with(ViewProfile.this).load(url).error(R.drawable.image0).centerCrop().resize(ivUserImage.getMeasuredWidth(),ivUserImage.getMeasuredHeight()).into(ivUserImage);
                 }
             }.execute(jsonObject);
 

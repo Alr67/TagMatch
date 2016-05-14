@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AlertDialog;
@@ -20,16 +21,12 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.AutoCompleteTextView;
 import android.widget.CheckBox;
-import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
-
-import com.google.android.gms.analytics.ecommerce.Product;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,6 +48,7 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
     private ImageView search_button;
     private String city;
     private TableLayout tl;
+    private TextView title;
     private ArrayList<String> suggestions;
     private AutoCompleteTextView sugg_hashtags;
     private ListView con_search;
@@ -78,6 +76,14 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
         sugg_hashtags = (AutoCompleteTextView) findViewById(R.id.filter_search_field);
         con_search = (ListView) findViewById(R.id.listView);
         hash_search = new ArrayList<>();
+
+        title = (TextView) findViewById(R.id.toolbar_title_filter);
+        title.setText(R.string.edit_activity_title);
+        if (Build.VERSION.SDK_INT < 23) {
+            title.setTextAppearance(getApplicationContext(),R.style.normalText);
+        } else {
+            title.setTextAppearance(R.style.normalText);
+        }
 
         //PER EVITAR SCROLL
         con_search.setOnTouchListener(new ListView.OnTouchListener()

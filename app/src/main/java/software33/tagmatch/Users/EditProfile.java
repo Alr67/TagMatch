@@ -12,11 +12,9 @@ import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
@@ -44,8 +42,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
-import java.util.HashMap;
-import java.util.Map;
 
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
@@ -65,6 +61,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
     private GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
     private ImageView iv;
+    private TextView title;
     private boolean imgMod, locationMod;
     private String imgExtension;
 
@@ -85,6 +82,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
         });
 
         imgMod = locationMod = false;
+
 
         Bundle extras = getIntent().getExtras();
 
@@ -108,6 +106,9 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
 
         //para que no se abra el teclado al entrar en la activity
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        title = (TextView) findViewById(R.id.toolbar_title_edit_prof);
+        //title.setText(getResources().getString(R.string.ed_1) + user.getAlias() + getResources().getString(R.string.ed_2));
 
         initMap();
         getIMGFromServer();

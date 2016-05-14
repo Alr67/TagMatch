@@ -273,10 +273,10 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         new TagMatchGetImageAsyncTask(url, this) {
             @Override
             protected void onPostExecute(String url) {
-                Picasso.with(ViewAdvert.this).load(url).error(R.drawable.image0).into(userImage);
                 if (url == null){
                     Picasso.with(ViewAdvert.this).load(R.drawable.image0).into(userImage);
                 }
+                else Picasso.with(ViewAdvert.this).load(url).error(R.drawable.image0).into(userImage);
                 getChats();
                 if(myAdv)prepareEdit();
             }

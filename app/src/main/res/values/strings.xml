@@ -2,7 +2,7 @@
     <!-- Manifest -->
     <string name="app_name">TagMatch!</string>
     <string name="title_activity_new_advertisement">NewAdvertisement</string>
-    <string name="title_activity_view_profile">ViewProfile</string>
+    <!--<string name="title_activity_view_profile">ViewProfile</string>-->
     <string name="title_activity_view_chat">ViewChat</string>
     <string name="title_activity_view_advert">ViewAdvert</string>
     <string name="title_activity_my_adverts">My Adverts</string>
@@ -96,6 +96,9 @@
 
     <!-- Profile -->
     <string name="title_activity_filter">Filter</string>
+    <string name="ed_1">Editing&#160;</string>
+    <string name="ed_2">\'s profile</string>
+    <string name="vw_1">Watching&#160;</string>
 
     <!-- Filters -->
     <string name="filter_title">Search Filter</string>
@@ -109,6 +112,7 @@
     <string name="positive_button">Yes</string>
     <string name="negative_button">No</string>
     <string name="succ_delete">Hashtag succesfully deleted</string>
+    <string name="edit_activity_title">Search</string>
 
     <!-- View Adv -->
     <string name="action_open_chat">Open chat</string>

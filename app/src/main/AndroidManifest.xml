@@ -63,7 +63,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Users.ViewProfile"
-            android:label="@string/title_activity_view_profile"
+            android:label=""
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".Chat.MainChatActivity"
