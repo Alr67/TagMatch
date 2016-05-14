@@ -53,6 +53,7 @@
     <string name="hint_single_chat">Write your message…</string>
     <string name="hint_loading_adverts">Loading advertisements from server, please wait</string>
     <string name="hint_no_adverts">You don\'t have any advert, create one!</string>
+    <string name="upload_ad_to_server">"Uploading the advert to our server, please wait"</string>
 
     <!-- Login -->
     <string name="login">Login</string>

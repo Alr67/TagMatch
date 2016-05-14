@@ -145,10 +145,24 @@
                     android:layout_height="wrap_content"
                     android:inputType="textMultiLine"
                     android:hint="@string/input_price"
-                    android:contextClickable="true"
-                    android:focusable="false"
-                    android:enabled="false"
-                    android:textStyle="italic" />
+                    android:contextClickable="false"
+                    android:focusable="true"
+                    android:enabled="true"
+                    android:textStyle="italic"
+                    android:editable="true" />
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="8dp">
+                <ListView
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:id="@+id/input_hashtags2"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp" />
             </android.support.design.widget.TextInputLayout>
 
             <!-- Category Spinner -->
@@ -187,16 +201,12 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="8dp"
                 android:layout_marginBottom="8dp">
-                <EditText
-                    android:id="@+id/input_hashtags"
+                <ListView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textMultiLine"
-                    android:hint="@string/input_hashtags"
-                    android:textStyle="italic"
-                    android:contextClickable="true"
-                    android:focusable="false"
-                    android:enabled="false" />
+                    android:layout_height="100dp"
+                    android:id="@+id/input_hashtags"
+                    android:layout_marginTop="15dp"
+                    android:layout_marginBottom="15dp" />
             </android.support.design.widget.TextInputLayout>
 
             <android.support.v7.widget.AppCompatButton
