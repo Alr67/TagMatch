@@ -54,7 +54,8 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
     private ArrayList<String> suggestions;
     private AutoCompleteTextView sugg_hashtags;
     private ListView con_search;
-    ArrayList<String> hash_search;
+    private ArrayList<String> hash_search;
+    private ArrayAdapter<String> adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,12 +108,15 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
         con_search.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final String pressed = hash_search.get(position);
                 DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int choice) {
                         switch (choice) {
                             case DialogInterface.BUTTON_POSITIVE:
-                                Toast.makeText(getApplicationContext(),"CACA",Toast.LENGTH_LONG);
+                                hash_search.remove(pressed);
+                                Toast.makeText(getApplicationContext(),R.string.succ_delete,Toast.LENGTH_LONG).show();
+                                con_search.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, hash_search));
                                 break;
                             case DialogInterface.BUTTON_NEGATIVE:
                                 break;
@@ -121,7 +125,7 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
                 };
 
                 AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(Filter.this, R.style.myDialog));
-                builder.setMessage("Delete this image?").setPositiveButton("Yes", dialogClickListener).setNegativeButton("No", dialogClickListener);
+                builder.setMessage(getResources().getString(R.string.delete_hash)).setPositiveButton(R.string.positive_button, dialogClickListener).setNegativeButton(R.string.negative_button, dialogClickListener);
                 builder.show();
             }
         });
@@ -149,7 +153,7 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
                         String add = jsonObject.getString("200");
                         add = cleanJSON(add);
                         suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
-                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.dropdown,suggestions);
+                        adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.dropdown,suggestions);
                         sugg_hashtags.setTextColor(Color.BLACK);
                         sugg_hashtags.setAdapter(adapter);
                         sugg_hashtags.setThreshold(1);

@@ -104,6 +104,10 @@
     <string name="filter_appliance">Appliances</string>
     <string name="filter_categories">Categories</string>
     <string name="profile_button_advertisement">Advertisements</string>
+    <string name="delete_hash">Delete this hashtag?</string>
+    <string name="positive_button">Yes</string>
+    <string name="negative_button">No</string>
+    <string name="succ_delete">Hashtag succesfully deleted</string>
 
     <!-- View Adv -->
     <string name="action_open_chat">Open chat</string>
