@@ -21,6 +21,14 @@
         android:paddingLeft="24dp"
         android:paddingRight="24dp">
 
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:id="@+id/textView12"
+            android:layout_weight="35"
+            android:text="@string/hash_filter" />
+
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"

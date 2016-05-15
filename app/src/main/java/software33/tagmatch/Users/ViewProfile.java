@@ -48,6 +48,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     private ListView interests_hash;
     private GoogleMap map;
     private LatLng userPosition;
+    private User user;
 
 
     @Override
@@ -75,7 +76,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
-        User user = Helpers.getActualUser(this);
+        user = Helpers.getActualUser(this);
         //tvUserName.setText(user.getAlias());
 
         title = (TextView) findViewById(R.id.toolbar_title_view_profile);
@@ -107,6 +108,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                             try {
                                 map.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 15));
                                 map.addMarker(new MarkerOptions().position(userPosition));
+                                map.getUiSettings().setScrollGesturesEnabled(false);
                             }
                             catch (Exception e) {}
                             JSONArray interestsArray = jsonObject.getJSONArray("interests");
@@ -144,7 +146,10 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), EditProfile.class);
                 intent.putExtra("userPosition", userPosition);
+                intent.putExtra("username",user.getAlias());
+                intent.putExtra("city", user.getCity());
                 startActivity(intent);
+                finish();
             }
         });
     }

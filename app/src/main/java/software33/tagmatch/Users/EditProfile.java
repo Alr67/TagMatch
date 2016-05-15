@@ -2,11 +2,14 @@ package software33.tagmatch.Users;
 
 import android.Manifest;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
@@ -14,13 +17,25 @@ import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ListView;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
@@ -42,10 +57,15 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
+import java.util.Arrays;
 
+import software33.tagmatch.AdCards.Home;
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetTrendingAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.BitmapWorkerTask;
@@ -54,55 +74,154 @@ import software33.tagmatch.Utils.Helpers;
 
 public class EditProfile extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
-    private TableLayout tl;
-    private int lastTableID;
-    private View.OnClickListener btnOCL;
     private LatLng userPosition;
+    private ListView interests_hash;
     private GoogleMap map;
     private GoogleApiClient mGoogleApiClient;
     private ImageView iv;
-    private TextView title;
+    private TextView title, user_loc_text;
     private boolean imgMod, locationMod;
     private String imgExtension;
+    private ArrayList<String> listdata, suggestions;
+    private AutoCompleteTextView sugg_hashtags;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_profile);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_edit_profile);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_edit_profile);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                if(imgMod)
-                    updateIMG();
-                updateLocInterest();
-                backToProfile();
-            }
-        });
+        fab.setVisibility(View.GONE);
 
         imgMod = locationMod = false;
 
+        listdata = new ArrayList<>();
+        iv = (ImageView) findViewById(R.id.edit_profile_imageView);
 
         Bundle extras = getIntent().getExtras();
 
+        user_loc_text = (TextView) findViewById(R.id.textView13);
+        user_loc_text.setText(extras.getString("city"));
+
+        title = (TextView) findViewById(R.id.toolbar_title_edit_prof);
+        title.setText(getResources().getString(R.string.ed_1) + extras.getString("username") + getResources().getString(R.string.ed_2));
+        if (Build.VERSION.SDK_INT < 23) {
+            title.setTextAppearance(getApplicationContext(),R.style.normalText);
+        } else {
+            title.setTextAppearance(R.style.normalText);
+        }
+
         userPosition = (LatLng) extras.get("userPosition");
 
-        lastTableID = 0;
+        sugg_hashtags = (AutoCompleteTextView) findViewById(R.id.sugg_hashtag_edit_prof);
 
-        iv = (ImageView) findViewById(R.id.edit_profile_imageView);
-        tl = (TableLayout) findViewById(R.id.edit_profile_table);
-
-        btnOCL = new View.OnClickListener() {
+        /*PETICIO HASHTAGS*/
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
+            e.printStackTrace();
+        }
+        new TagMatchGetTrendingAsyncTask(Constants.IP_SERVER + "/tags/trending", getApplicationContext()) {
             @Override
-            public void onClick(View v) {
-                int rowID = Integer.parseInt(((Button) v).getText().toString());
-                tl.removeViewAt(rowID);
-                refreshID();
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    if (jsonObject.has("status"))
+                        Log.i(Constants.DebugTAG, "status: " + jsonObject.getInt("status"));
+                    Log.i(Constants.DebugTAG, "JSON: \n" + jsonObject);
+                    if (jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                    } else {
+                        String add = jsonObject.getString("200");
+                        add = Helpers.cleanJSON(add);
+                        suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.dropdown,suggestions);
+                        sugg_hashtags.setTextColor(Color.BLACK);
+                        sugg_hashtags.setAdapter(adapter);
+                        sugg_hashtags.setThreshold(1);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
-        };
+        }.execute(jObject);
 
-        initTable();
+        interests_hash = (ListView) findViewById(R.id.profile_interests_edit);
+        /*PETICIO HASHTAGS*/
+
+        sugg_hashtags.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    listdata.add(sugg_hashtags.getText().toString());
+                    sugg_hashtags.setText("");
+                    interests_hash.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, listdata));
+                    return true;
+                }
+                return false;
+            }
+        });
+
+
+        //PER EVITAR SCROLL
+        interests_hash.setOnTouchListener(new ListView.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                int action = event.getAction();
+                switch (action)
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+
+                // Handle ListView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });
+
+        interests_hash.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final String pressed = listdata.get(position);
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int choice) {
+                        switch (choice) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                listdata.remove(pressed);
+                                Toast.makeText(getApplicationContext(),R.string.succ_delete,Toast.LENGTH_LONG).show();
+                                interests_hash.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, listdata));
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                };
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(new ContextThemeWrapper(EditProfile.this, R.style.myDialog));
+                builder.setMessage(getResources().getString(R.string.delete_hash)).setPositiveButton(R.string.positive_button, dialogClickListener).setNegativeButton(R.string.negative_button, dialogClickListener);
+                builder.show();
+            }
+        });
+
+
+        fillListView();
 
         //para que no se abra el teclado al entrar en la activity
         this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
@@ -113,8 +232,32 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
         initMap();
         getIMGFromServer();
     }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_edit_prof, menu);
+        return true;
+    }
 
-    private void initTable() {
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_delete) {
+            if(imgMod) updateIMG();
+            updateLocInterest();
+            Intent intent = new Intent(this, ViewProfile.class);
+            startActivity(intent);
+            finish();
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void fillListView() {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
@@ -130,21 +273,13 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
                         }
                         else if (jsonObject.has("username")){
                             JSONArray interestsArray = jsonObject.getJSONArray("interests");
-                            for(int i = 0; i < interestsArray.length(); ++i) {
-                                String interest = interestsArray.getString(i);
-                                TextView tv = new TextView(getApplicationContext());
-                                tv.setText(interest);
-                                Button btn = new Button(getApplicationContext());
-                                btn.setBackground(getDrawable(android.R.drawable.ic_menu_delete));
-                                btn.setOnClickListener(btnOCL);
-                                String sBtn = String.valueOf(lastTableID);
-                                btn.setText(sBtn);
-                                btn.setTextColor(getResources().getColor(android.R.color.transparent));
-                                TableRow row = new TableRow(getApplicationContext());
-                                row.addView(tv,0);
-                                row.addView(btn,1);
-                                tl.addView(row, lastTableID++);
+                            listdata = new ArrayList<String>();
+                            if (interestsArray != null) {
+                                for (int i=0;i<interestsArray.length();i++){
+                                    listdata.add(interestsArray.get(i).toString());
+                                }
                             }
+                            interests_hash.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, listdata));
                         }
                     } catch (JSONException ignored) {
                         Log.i("DEBUG","error al get user");
@@ -175,18 +310,9 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     private String[] loadInterest(JSONObject jObject) {
-        String[] interests = new String[tl.getChildCount()];
-        for(int i = 0; i < tl.getChildCount(); i++){
-            TableRow row = (TableRow) tl.getChildAt(i);
-            TextView tv = (TextView) row.getChildAt(0);
-            interests[i] = tv.getText().toString();
-        }
-        return interests;
-    }
-
-    private void backToProfile() {
-        Intent intent = new Intent(this, ViewProfile.class);
-        startActivity(intent);
+        String[] stockArr = new String[listdata.size()];
+        stockArr = listdata.toArray(stockArr);
+        return stockArr;
     }
 
     private void getIMGFromServer() {
@@ -244,13 +370,6 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
         }
     }
 
-    private void refreshID() {
-        for(lastTableID = 0; lastTableID < tl.getChildCount(); lastTableID++){
-            TableRow row = (TableRow) tl.getChildAt(lastTableID);
-            Button btn = (Button) row.getChildAt(1);
-            btn.setText(String.valueOf(lastTableID));
-        }
-    }
 
     private void updateIMG() {
         try {
@@ -287,24 +406,6 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
         Toast toast = Toast.makeText(context, text, duration);
         toast.show();
         return;
-    }
-
-    public void addInterest(View view) {
-        EditText et = (EditText) findViewById(R.id.edit_profile_et_interests);
-        String interest = et.getText().toString();
-        TextView tv = new TextView(this);
-        tv.setText(interest);
-        Button btn = new Button(this);
-        btn.setBackground(getDrawable(android.R.drawable.ic_menu_delete));
-        btn.setOnClickListener(btnOCL);
-        String sBtn = String.valueOf(lastTableID);
-        btn.setText(sBtn);
-        btn.setTextColor(getResources().getColor(android.R.color.transparent));
-        TableRow row = new TableRow(this);
-        row.addView(tv,0);
-        row.addView(btn,1);
-        tl.addView(row, lastTableID++);
-        et.setText("");
     }
 
     public void addPhoto(View view) {
@@ -353,6 +454,8 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
 
     @Override
     public void onBackPressed() {
+        Intent intent = new Intent(this, ViewProfile.class);
+        startActivity(intent);
         finish();
     }
 

@@ -23,12 +23,14 @@
             android:textColor="@color/app_header_color" />
 
         <ImageView
-            android:layout_width="125dp"
-            android:layout_height="125dp"
+            android:layout_width="match_parent"
+            android:layout_height="150dp"
             android:id="@+id/edit_profile_imageView"
-            android:layout_gravity="center_horizontal"
             android:baselineAlignBottom="false"
-            android:contextClickable="false" />
+            android:contextClickable="false"
+            android:layout_marginTop="5dp"
+            android:layout_marginBottom="5dp"
+            android:scaleType="centerCrop" />
 
         <Button
             android:layout_width="fill_parent"
@@ -38,76 +40,65 @@
             android:layout_gravity="center_horizontal"
             android:onClick="addPhoto"
             android:background="@color/login_button_color"
-            android:textColor="@color/app_header_color" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_weight="0.40" />
+            android:textColor="@color/app_header_color"
+            android:layout_marginBottom="5dp" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/registration_default_sell_location"
-            android:id="@+id/textView4"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/app_header_color" />
-
-        <Space
+            android:text="Interests"
+            android:id="@+id/interest_edit_prof"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="5dp" />
+        <AutoCompleteTextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="0.1" />
+            android:id="@+id/sugg_hashtag_edit_prof"
+            android:singleLine="true"
+            android:imeOptions="actionDone"
+            android:hint="@string/noTag"
+            android:textColor="@color/abc_input_method_navigation_guard"
+            android:textStyle="italic" />
+        <ListView
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:id="@+id/profile_interests_edit"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="15dp" />
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:text="@string/user_loc"
+                android:id="@+id/textView4"
+                android:layout_marginBottom="5dp"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:id="@+id/textView13"
+                android:layout_gravity="center_horizontal"
+                android:textColor="@color/abc_primary_text_material_light" />
+        </LinearLayout>
 
         <fragment xmlns:android="http://schemas.android.com/apk/res/android"
             android:name="com.google.android.gms.maps.MapFragment"
             android:id="@+id/edit_profile_map"
             android:layout_width="match_parent"
-            android:layout_height="200dp"
+            android:layout_height="115dp"
             android:layout_weight="2.35" />
-
-        <Space
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_weight="0.1" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:text="@string/edit_profile_interests"
-            android:id="@+id/textView9"
-            android:layout_gravity="center_horizontal"
-            android:textColor="@color/app_header_color" />
-
-        <LinearLayout
-            android:orientation="horizontal"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:weightSum="1">
-
-            <EditText
-                android:layout_width="224dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/edit_profile_et_interests"
-                android:layout_gravity="center" />
-            <Button
-                android:layout_width="34dp"
-                android:layout_height="wrap_content"
-                android:background="@android:drawable/ic_menu_add"
-                android:layout_weight="0.26"
-                android:onClick="addInterest" />
-
-        </LinearLayout>
-
-        <TableLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/edit_profile_table" >
-
-        </TableLayout>
 
     </LinearLayout>
 

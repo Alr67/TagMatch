@@ -63,7 +63,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private ViewPager mViewPager;
     private CustomPagerAdapterViewAdvert mCustomPagerAdapterViewAdvert;
     private GoogleMap map;
-    Advertisement adv;
+    private Advertisement adv;
 
     private ChildEventListener mListener;
     private String idChat = "Not exists";
@@ -73,7 +73,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String myName;
 
     private boolean myAdv;
-    FloatingActionButton fab;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

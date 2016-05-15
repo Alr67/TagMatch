@@ -85,7 +85,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private Integer okImages;
     private AutoCompleteTextView sugg_hashtags, sugg_hashtags_ex;
     private ArrayList<String> suggestions, ex_hash, off_hash;
-    private ArrayAdapter<String> adapter, ex_adapter;
     private List<Bitmap> images;
     private String pathfoto;
     private Spinner categorySpinner, typeSpinner;
@@ -163,7 +162,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                         String error = jsonObject.get("error").toString();
                     } else {
                         String add = jsonObject.getString("200");
-                        add = cleanJSON(add);
+                        add = Helpers.cleanJSON(add);
                         suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
                         ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.dropdown,suggestions);
                         sugg_hashtags.setTextColor(Color.BLACK);
@@ -336,12 +335,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     }
 
-    private String cleanJSON(String input) {
-        input = input.replaceAll("\\[","");
-        input = input.replaceAll("\\]","");
-        input = input.replaceAll("\"","");
-        return input;
-    }
 
     public void onClick(View view) {
         switch (view.getId()) {

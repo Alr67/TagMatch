@@ -114,33 +114,36 @@
                     android:textAppearance="?android:attr/textAppearanceMedium"
                     android:text="@string/about_user"
                     android:id="@+id/textView7"
-                    android:textStyle="bold"
+                    android:textStyle="bold|italic"
                     android:textSize="19dp"
                     android:paddingBottom="6dp"
                     android:paddingTop="7dp" />
 
                 <LinearLayout
-                    android:orientation="horizontal"
+                    android:orientation="vertical"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_weight="20">
 
                     <TextView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="25dp"
                         android:id="@+id/advert_name_user"
                         android:layout_gravity="center"
                         android:textStyle="bold"
-                        android:textSize="15dp"
+                        android:textSize="18dp"
                         android:layout_weight="80"
-                        android:text="XDDD" />
+                        android:text="XDDD"
+                        android:layout_marginBottom="5dp" />
 
                     <ImageView
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
+                        android:layout_height="220dp"
                         android:id="@+id/advert_user_image"
                         android:src="@drawable/image_placeholder"
-                        android:layout_weight="15" />
+                        android:layout_weight="15"
+                        android:scaleType="centerCrop"
+                        android:layout_marginBottom="5dp" />
 
                 </LinearLayout>
 
@@ -162,7 +165,7 @@
                             android:textAppearance="?android:attr/textAppearanceMedium"
                             android:text="@string/user_loc"
                             android:id="@+id/textView8"
-                            android:textStyle="italic"
+                            android:textStyle="bold|italic"
                             android:textSize="19dp" />
 
                         <TextView
@@ -173,7 +176,7 @@
                             android:id="@+id/advert_location"
                             android:layout_gravity="center"
                             android:textSize="19dp"
-                            android:textStyle="italic" />
+                            android:textStyle="bold|italic" />
                     </LinearLayout>
 
                     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
