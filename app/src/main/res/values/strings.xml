@@ -121,7 +121,7 @@
     <string name="hash_filter">Hashtags to search</string>
 
     <!-- View Adv -->
-    <string name="action_open_chat">Open chat</string>
+    <string name="action_report">Report</string>
     <string name="action_tagmatch">Tagmatch!</string>
     <string name="action_edit_adv">Edit advertisement</string>
     <string name="action_delete_adv">Delete advertisement</string>

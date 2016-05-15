@@ -49,6 +49,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     private GoogleMap map;
     private LatLng userPosition;
     private User user;
+    private FloatingActionButton fab;
 
 
     @Override
@@ -164,6 +165,15 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
+                intent.putExtra("userPosition", userPosition);
+                startActivity(intent);
+            }
+        });
     }
 
 
@@ -230,6 +240,8 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        fab.setVisibility(View.INVISIBLE);
     }
 
     @Override
