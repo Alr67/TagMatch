@@ -71,21 +71,13 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
 
+        fab = (FloatingActionButton) findViewById(R.id.fab_view_profile);
+
         try{
             initOtherUser(extras.getString("username"));
         } catch (Exception e){
             initCurrentUser();
         }
-
-        fab = (FloatingActionButton) findViewById(R.id.fab_view_profile);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
-                intent.putExtra("userPosition", userPosition);
-                startActivity(intent);
-            }
-        });
     }
 
     private void initCurrentUser() {
@@ -213,14 +205,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             e.printStackTrace();
         }
 
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
-                intent.putExtra("userPosition", userPosition);
-                startActivity(intent);
-            }
-        });
+        fab.setVisibility(View.INVISIBLE);
     }
 
     @Override
