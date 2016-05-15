@@ -107,6 +107,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         if (myAdv) getMenuInflater().inflate(R.menu.menu_view_my_adv, menu);
+        else getMenuInflater().inflate(R.menu.menu_view_foreign_adv, menu);
         return true;
     }
 
@@ -129,6 +130,9 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             intent.putExtra("url", url);
             startActivity(intent);
             //finish();
+        }
+        else if (id == R.id.action_fav) {
+
         }
 
         return super.onOptionsItemSelected(item);
