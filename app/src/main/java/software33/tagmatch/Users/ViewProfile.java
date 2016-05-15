@@ -42,6 +42,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     ImageView ivUserImage;
     private GoogleMap map;
     LatLng userPosition;
+    FloatingActionButton fab;
 
 
     @Override
@@ -76,7 +77,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             initCurrentUser();
         }
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_view_profile);
+        fab = (FloatingActionButton) findViewById(R.id.fab_view_profile);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -144,6 +145,15 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
+                intent.putExtra("userPosition", userPosition);
+                startActivity(intent);
+            }
+        });
     }
 
     private void initOtherUser(String username) {
@@ -202,6 +212,15 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
+                intent.putExtra("userPosition", userPosition);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
