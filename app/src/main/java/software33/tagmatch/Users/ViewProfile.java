@@ -67,6 +67,10 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        Bundle extras = getIntent().getExtras();
+
+        user = Helpers.getActualUser(this);
+
         tvLocation = (TextView) findViewById(R.id.tvLocation);
         ivUserImage = (ImageView) findViewById(R.id.ivUserImage);
 
@@ -75,17 +79,38 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         Firebase.setAndroidContext(this);
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
-
-        user = Helpers.getActualUser(this);
-        //tvUserName.setText(user.getAlias());
+        map.getUiSettings().setScrollGesturesEnabled(false);
 
         title = (TextView) findViewById(R.id.toolbar_title_view_profile);
+        if(getIntent().hasExtra("username")) {
+            initOtherUser(extras.getString("username"));
+        }
+        else {
+            initCurrentUser();
+        }
+
+    }
+
+    private void initCurrentUser() {
         title.setText(getResources().getString(R.string.vw_1) + user.getAlias() + getResources().getString(R.string.ed_2));
         if (Build.VERSION.SDK_INT < 23) {
             title.setTextAppearance(getApplicationContext(),R.style.normalText);
         } else {
             title.setTextAppearance(R.style.normalText);
         }
+
+        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_view_profile);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
+                intent.putExtra("userPosition", userPosition);
+                intent.putExtra("username",user.getAlias());
+                intent.putExtra("city", user.getCity());
+                startActivity(intent);
+                finish();
+            }
+        });
 
         try {
             JSONObject jsonObject = new JSONObject();
@@ -139,19 +164,72 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+
+    private void initOtherUser(String username) {
+
+        title.setText(getResources().getString(R.string.vw_1) + username + getResources().getString(R.string.ed_2));
+        if (Build.VERSION.SDK_INT < 23) {
+            title.setTextAppearance(getApplicationContext(),R.style.normalText);
+        } else {
+            title.setTextAppearance(R.style.normalText);
+        }
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_view_profile);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(getApplicationContext(), EditProfile.class);
-                intent.putExtra("userPosition", userPosition);
-                intent.putExtra("username",user.getAlias());
-                intent.putExtra("city", user.getCity());
-                startActivity(intent);
-                finish();
-            }
-        });
+        fab.setVisibility(View.GONE);
+
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("username", Helpers.getActualUser(this).getAlias());
+            jsonObject.put("password", Helpers.getActualUser(this).getPassword());
+
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + username, this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Helpers.showError(error,getApplicationContext());
+                        }
+                        else if (jsonObject.has("username")){
+                            Log.i("Debug-GetUser",jsonObject.toString());
+                            tvLocation.setText(jsonObject.get("city").toString());
+
+                            userPosition = new LatLng(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"));
+                            try {
+                                map.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 15));
+                                map.addMarker(new MarkerOptions().position(userPosition));
+                            }
+                            catch (Exception e) {}
+                            JSONArray interestsArray = jsonObject.getJSONArray("interests");
+                            ArrayList<String> listdata = new ArrayList<String>();
+                            if (interestsArray != null) {
+                                for (int i=0;i<interestsArray.length();i++){
+                                    listdata.add(interestsArray.get(i).toString());
+                                }
+                            }
+                            interests_hash.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, listdata));
+                        }
+                    } catch (JSONException ignored) {
+                        Log.i("DEBUG","error al get user");
+                    }
+                }
+            }.execute(jsonObject);
+
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + username + "/photo", this) {
+                @Override
+                protected void onPostExecute(String url) {
+                    Picasso.with(ViewProfile.this).load(url).error(R.drawable.image0).into(ivUserImage);
+                    if (url == null){
+                        Picasso.with(ViewProfile.this).load(R.drawable.image0).into(ivUserImage);
+                    }
+                }
+            }.execute(jsonObject);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
