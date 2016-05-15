@@ -16,6 +16,8 @@
     <string name="nav_myAdverts">My Adverts</string>
     <string name="nav_xats">Chats</string>
     <string name="nav_viewAdvert">View Advertisement </string>
+    <string name="nav_discovery_tag">Discovery TagMatch!</string>
+    <string name="settings">User settings</string>
 
     <!-- Desordere total -->
     <string name="action_settings">Settings</string>

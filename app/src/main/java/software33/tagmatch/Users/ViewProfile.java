@@ -238,9 +238,14 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent intent = new Intent(this, Home.class);
-            startActivity(intent);
-            finish();
+            if(getIntent().hasExtra("username")) {
+                finish();
+            }
+            else {
+                Intent intent = new Intent(this, Home.class);
+                startActivity(intent);
+                finish();
+            }
         }
     }
 

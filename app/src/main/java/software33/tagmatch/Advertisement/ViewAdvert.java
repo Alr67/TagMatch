@@ -347,10 +347,12 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     }
 
     public void goToUser(View view) {
-        Intent intent = new Intent(this, ViewProfile.class);
-        intent.putExtra("username", adv.getOwner().getAlias());
-        startActivity(intent);
-        finish();
+        if(!adv.getOwner().getAlias().equals(Helpers.getActualUser(getApplicationContext()).getAlias())) {
+            Intent intent = new Intent(this, ViewProfile.class);
+            intent.putExtra("username", adv.getOwner().getAlias());
+            startActivity(intent);
+            //finish();
+        }
     }
 
     @Override

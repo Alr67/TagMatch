@@ -7,6 +7,10 @@
             android:icon="@drawable/ic_menu_slideshow"
             android:title="@string/nav_mainPage" />
         <item
+            android:id="@+id/nav_discovery_tagmatch"
+            android:icon="@drawable/ic_menu_slideshow"
+            android:title="@string/nav_discovery_tag" />
+        <item
             android:id="@+id/nav_viewUser"
             android:icon="@drawable/ic_menu_gallery"
             android:title="@string/nav_viewUser" />
@@ -20,7 +24,7 @@
             android:title="@string/nav_xats" />
     </group>
 
-    <item android:title="Communicate">
+    <item android:title="@string/settings">
         <menu>
             <item
                 android:id="@+id/nav_settings"
