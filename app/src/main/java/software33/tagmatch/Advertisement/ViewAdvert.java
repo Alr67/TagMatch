@@ -36,13 +36,16 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.SingleChatActivity;
@@ -53,6 +56,7 @@ import software33.tagmatch.ServerConnection.TagMatchDeleteAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetBitmapAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Users.ViewProfile;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
@@ -72,6 +76,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String userId;
     private String imageChat;
     private String myName;
+    private Menu my_menu;
 
     private boolean myAdv;
     private FloatingActionButton fab;
@@ -104,10 +109,36 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        my_menu = menu;
         if (myAdv) getMenuInflater().inflate(R.menu.menu_view_my_adv, menu);
-        else getMenuInflater().inflate(R.menu.menu_view_foreign_adv, menu);
+        else {
+            JSONObject jObject = new JSONObject();
+            User actualUser = Helpers.getActualUser(this);
+            String url = Constants.IP_SERVER+ "/"+ adv.getID().toString() + "/favs";
+            try {
+                jObject.put("username", actualUser.getAlias());
+                jObject.put("password", actualUser.getPassword());
+                new TagMatchGetAsyncTask(url,this) {
+                    @Override
+                    protected void onPostExecute(JSONObject jsonObject) {
+                        if(jsonObject.has("arrayResponse")) {
+                            //JSONArray jsonArray = jsonObject.getJSONArray("arrayResponse");
+                            if(jsonObject.has(adv.getID().toString())) {
+                                getMenuInflater().inflate(R.menu.menu_view_foreign_unfav_adv, menu);
+                            }
+                            else {
+                                getMenuInflater().inflate(R.menu.menu_view_foreign_adv, menu);
+                            }
+                        }
+                    }
+                }.execute(jObject);
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+
+        }
         return true;
     }
 
@@ -132,7 +163,52 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             //finish();
         }
         else if (id == R.id.action_fav) {
+            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/"+ adv.getID().toString() + "/fav", getApplicationContext()){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if (jsonObject.has("status"))  Log.i(Constants.DebugTAG,"status: "+jsonObject.getInt("status"));
+                        Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                        }
+                        else {
+                            if(jsonObject.has("id")) {
+                                Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
+                                Toast.makeText(getApplicationContext(),R.string.added_fav,Toast.LENGTH_LONG).show();
+                                getMenuInflater().inflate(R.menu.menu_view_foreign_unfav_adv, my_menu);
+                            }
+                        }
+                    } catch (JSONException ignored){
 
+                    }
+                }
+            }.execute(adv.toJSON2());
+            Log.i(Constants.DebugTAG, adv.toJSON().toString());
+        }
+        else if (id == R.id.action_unfav) {
+            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/"+ adv.getID() + "/unfav", getApplicationContext()){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if (jsonObject.has("status"))  Log.i(Constants.DebugTAG,"status: "+jsonObject.getInt("status"));
+                        Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                        }
+                        else {
+                            if(jsonObject.has("id")) {
+                                Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
+                                Toast.makeText(getApplicationContext(),R.string.added_fav,Toast.LENGTH_LONG).show();
+                                getMenuInflater().inflate(R.menu.menu_view_foreign_adv, my_menu);
+                            }
+                        }
+                    } catch (JSONException ignored){
+
+                    }
+                }
+            }.execute(adv.toJSON2());
+            Log.i(Constants.DebugTAG, adv.toJSON().toString());
         }
 
         return super.onOptionsItemSelected(item);

@@ -145,7 +145,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         ex_hash = new ArrayList<String>();
         off_hash = new ArrayList<String>();
 
-
         /*PETICIO HASHTAGS*/
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
