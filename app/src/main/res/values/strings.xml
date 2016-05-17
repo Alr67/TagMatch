@@ -168,9 +168,10 @@
     <string name="mainchat_pending_offer">Pending</string>
     <string name="mainchat_closed_offer">Closed</string>
 
-    <string name="message_accepted_offer">I accept your offer!</string>
-    <string name="message_denied_offer">Sorry, I decline your offer!</string>
-    <string name="message_made_offer">I send you and offer</string>
+    <string name="message_information_offer">Information!\n</string>
+    <string name="message_accepted_offer">has accepted your offer</string>
+    <string name="message_denied_offer">has declined your offer</string>
+    <string name="message_made_offer">has offered you:</string>
 
     <string name="title_dialog_error_create_offer">Can not create offer</string>
     <string name="button_dialog_error_create_offer">OK</string>

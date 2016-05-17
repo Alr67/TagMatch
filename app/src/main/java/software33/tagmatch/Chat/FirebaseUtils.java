@@ -27,7 +27,7 @@ import software33.tagmatch.R;
 
 public abstract class FirebaseUtils {
 
-    private static Firebase myFirebaseRef = new Firebase("https://torrid-torch-42.firebaseio.com/");
+    private static Firebase myFirebaseRef = new Firebase("https://tagmatch.firebaseio.com/");
     private static Firebase chatsRef = myFirebaseRef.child("chats");
     private static Firebase usersRef = myFirebaseRef.child("users");
 
@@ -123,7 +123,7 @@ public abstract class FirebaseUtils {
         String senderId;
         String text;
         Boolean accepted;
-        String exchangeID;
+        int exchangeID;
         public ChatOffer() {
             // empty default constructor, necessary for Firebase to be able to deserialize blog posts
         }
@@ -134,7 +134,7 @@ public abstract class FirebaseUtils {
             return text;
         }
         public Boolean getAccepted() { return accepted; }
-        public String getExchangeID() {
+        public int getExchangeID() {
             return exchangeID;
         }
     }

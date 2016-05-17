@@ -98,7 +98,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
     private HashMap<String, ChatMessage> unreadChatMessageMap = new HashMap<>();
     private ArrayList<String> advertisementsTitles = new ArrayList<>();
-    private ArrayList<String> advertisementsIds = new ArrayList<>();
+    private ArrayList<Integer> advertisementsIds = new ArrayList<>();
     private int positionMyAdv;
 
 
@@ -288,7 +288,7 @@ public class SingleChatActivity extends AppCompatActivity {
         chatArrayAdapter.add(message);
     }
 
-    public void setOfferData(String senderId, String text, Boolean accepted, String exchangeID){
+    public void setOfferData(String senderId, String text, Boolean accepted, int exchangeID){
         if (!accepted) {
             canSendOffers = "Yes";
             layoutOffer.setVisibility(View.VISIBLE);
@@ -539,7 +539,7 @@ public class SingleChatActivity extends AppCompatActivity {
                 content = content+"€";
                 break;
             case "Offer my advert":
-                //values.put("exchangeID", advertisementsIds.get(positionMyAdv));
+                values.put("exchangeID", advertisementsIds.get(positionMyAdv));
                 content = advertisementsTitles.get(positionMyAdv);
                 break;
             case "Other offers":
@@ -553,7 +553,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
         offersRef.setValue(values);
 
-        addMessageOffer(0);
+        addMessageOffer(0,content);
     }
 
     private void denyOffer(){
@@ -561,7 +561,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
         offersRef.setValue(values);
 
-        addMessageOffer(2);
+        addMessageOffer(2,"");
         hideOffer();
     }
 
@@ -571,7 +571,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
         offersRef.updateChildren(values);
 
-        addMessageOffer(1);
+        addMessageOffer(1,"");
 
         hideOffer();
     }
@@ -580,14 +580,15 @@ public class SingleChatActivity extends AppCompatActivity {
         layoutOffer.setVisibility(View.GONE);
     }
 
-    private void addMessageOffer(int status){
+    private void addMessageOffer(int status, String content){
+        String alias = Helpers.getActualUser(this).getAlias();
         String senderId = myId;
 
         Map<String, Object> values = new HashMap<>();
-        values.put("senderId", senderId);
-        if (status == 0) values.put("text", getString(R.string.message_made_offer));
-        else if (status == 1) values.put("text", getString(R.string.message_accepted_offer));
-        else values.put("text", getString(R.string.message_denied_offer));
+        values.put("senderId", "FirebaseAutoMessage");
+        if (status == 0) values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_made_offer)+" "+content);
+        else if (status == 1) values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_accepted_offer));
+        else values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_denied_offer));
         values.put("read", false);
 
         messagesRef.push().setValue(values);
@@ -728,7 +729,7 @@ public class SingleChatActivity extends AppCompatActivity {
                                     JSONObject object = jsonArray.getJSONObject(n);
                                     Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
                                     advertisementsTitles.add(newAdvert.getTitle());
-                                    advertisementsIds.add(Integer.toString(newAdvert.getID()));
+                                    advertisementsIds.add(newAdvert.getID());
                                 }
                             }
 
