@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
@@ -43,6 +44,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import software33.tagmatch.AdCards.AdvertContent;
@@ -64,11 +66,12 @@ import software33.tagmatch.Utils.Helpers;
 public class ViewAdvert extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView imageType, userImage;
-    private TextView description,tags,username,location;
+    private TextView description,tags,username,location, title;
     private ViewPager mViewPager;
     private CustomPagerAdapterViewAdvert mCustomPagerAdapterViewAdvert;
     private GoogleMap map;
     private Advertisement adv;
+    private List<Advertisement> advertisements;
 
     private ChildEventListener mListener;
     private String idChat = "Not exists";
@@ -87,7 +90,9 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.activity_view_advert);
         myName = Helpers.getActualUser(this).getAlias();
         initComponents();
-        setTitle(R.string.loading_title);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view_advert);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setClickable(false);
@@ -116,28 +121,59 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         else {
             JSONObject jObject = new JSONObject();
             User actualUser = Helpers.getActualUser(this);
-            String url = Constants.IP_SERVER+ "/"+ adv.getID().toString() + "/favs";
+            String url = Constants.IP_SERVER + "/favs";
             try {
                 jObject.put("username", actualUser.getAlias());
-                jObject.put("password", actualUser.getPassword());
-                new TagMatchGetAsyncTask(url,this) {
-                    @Override
-                    protected void onPostExecute(JSONObject jsonObject) {
-                        if(jsonObject.has("arrayResponse")) {
-                            //JSONArray jsonArray = jsonObject.getJSONArray("arrayResponse");
-                            if(jsonObject.has(adv.getID().toString())) {
-                                getMenuInflater().inflate(R.menu.menu_view_foreign_unfav_adv, menu);
-                            }
-                            else {
-                                getMenuInflater().inflate(R.menu.menu_view_foreign_adv, menu);
-                            }
-                        }
-                    }
-                }.execute(jObject);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
+            try {
+                jObject.put("password", actualUser.getPassword());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            new TagMatchGetAsyncTask(url, this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if (jsonObject.has("status"))
+                            Log.i(Constants.DebugTAG, "status: " + jsonObject.getInt("status"));
+                        Log.i(Constants.DebugTAG, "JSON: \n" + jsonObject);
+                        if (jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                        } else {
+                            Log.i(Constants.DebugTAG, "PUTITA PARA DENTRO");
+                            JSONArray jsonArray = null;
+                            try {
+                                jsonArray = jsonObject.getJSONArray("arrayResponse");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            advertisements = new ArrayList<>();
+                            boolean stop = false;
+                            for (int n = 0; n < jsonArray.length() || stop; n++) {
+                                JSONObject object = null;
+                                try {
+                                    object = jsonArray.getJSONObject(n);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+                                Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
+                                if (newAdvert.getID().equals(adv.getID())) {
+                                    getMenuInflater().inflate(R.menu.menu_view_foreign_adv, menu);
+                                    stop = true;
+                                }
+                            }
+                            if (!stop)
+                                getMenuInflater().inflate(R.menu.menu_view_foreign_unfav_adv, menu);
+                        }
 
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.execute(jObject);
+            return true;
         }
         return true;
     }
@@ -163,7 +199,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             //finish();
         }
         else if (id == R.id.action_fav) {
-            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/"+ adv.getID().toString() + "/fav", getApplicationContext()){
+            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/users/"+ adv.getID().toString() + "/fav", getApplicationContext()){
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -187,7 +223,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             Log.i(Constants.DebugTAG, adv.toJSON().toString());
         }
         else if (id == R.id.action_unfav) {
-            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/"+ adv.getID() + "/unfav", getApplicationContext()){
+            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/users/"+ adv.getID() + "/unfav", getApplicationContext()){
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -228,7 +264,8 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     Log.i(Constants.DebugTAG,"onPostExecute");
                         Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
                         adv = Helpers.convertJSONToAdvertisement(jsonObject);
-                        setTitle(adv.getTitle());
+                        Log.i(Constants.DebugTAG, "Vaig a mostrar l'anunci amb titol: " + adv.getTitle());
+                        title.setText(adv.getTitle());
                         fillComponents();
                         //String error = jsonObject.get("error").toString();
                 }
@@ -245,11 +282,16 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     }
 
     private void initComponents() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view_advert);
-        setSupportActionBar(toolbar);
-
         userImage = (ImageView) findViewById(R.id.advert_user_image);
         userImage.setImageDrawable(getDrawable(R.drawable.loading));
+
+        title = (TextView) findViewById(R.id.toolbar_title_view_ad);
+        title.setText(R.string.loading_title);
+        if (Build.VERSION.SDK_INT < 23) {
+            title.setTextAppearance(getApplicationContext(),R.style.normalText);
+        } else {
+            title.setTextAppearance(R.style.normalText);
+        }
 
         imageType = (ImageView) findViewById(R.id.advert_image_type);
         location = (TextView) findViewById(R.id.advert_location);
