@@ -47,7 +47,7 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
         try {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
+            con.setReadTimeout(50000);
             con.setDoInput(true);
             con.setRequestMethod("POST");
             connectUser(con);

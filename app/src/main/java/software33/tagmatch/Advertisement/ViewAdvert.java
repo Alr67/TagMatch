@@ -7,16 +7,20 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.InputType;
 import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,6 +55,8 @@ import software33.tagmatch.ServerConnection.TagMatchDeleteAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetBitmapAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
+import software33.tagmatch.Users.ViewProfile;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
@@ -61,7 +67,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private ViewPager mViewPager;
     private CustomPagerAdapterViewAdvert mCustomPagerAdapterViewAdvert;
     private GoogleMap map;
-    Advertisement adv;
+    private Advertisement adv;
 
     private ChildEventListener mListener;
     private String idChat = "Not exists";
@@ -72,7 +78,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String idProduct;
 
     private boolean myAdv;
-    FloatingActionButton fab;
+    private FloatingActionButton fab;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -105,23 +111,81 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         if (myAdv) getMenuInflater().inflate(R.menu.menu_view_my_adv, menu);
+        else getMenuInflater().inflate(R.menu.menu_view_adv, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
+        switch (item.getItemId()){
+            case R.id.action_report_adv:
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+                builder.setTitle("Report");
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_delete) {
-            AlertDialog alertDialog = createDeleteDialog();
-            alertDialog.show();
+                final EditText input = new EditText(this);
+
+                input.setInputType(InputType.TYPE_CLASS_TEXT);
+                builder.setView(input);
+
+                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        reportAdv(input.getText().toString());
+                    }
+                });
+                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        dialog.cancel();
+                    }
+                });
+
+                builder.show();
+                break;
+
+            case R.id.action_delete:
+                AlertDialog alertDialog = createDeleteDialog();
+                alertDialog.show();
+                break;
+
+            case R.id.tagmatch_exchange:
+                Intent intent = new Intent(getApplicationContext(), Home.class);
+                intent.putExtra("previousActivity", "ex_tagmatch");
+                String url = Constants.IP_SERVER + "/ads/" + adv.getID() + "/tagmatch";
+                intent.putExtra("url", url);
+                startActivity(intent);
+                //finish();
+                break;
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    private void reportAdv(String cause) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("cause", cause);
+            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/" + adv.getID() + "/denounce", this){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        String error = jsonObject.get("error").toString();
+                        Helpers.showError(error, getApplicationContext());
+                    } catch (JSONException ignored) {}
+                }
+            }.execute(jsonObject);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Report send.")
+                    .setCancelable(false)
+                    .setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            //do things
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+        } catch (Exception ignored){}
     }
 
     public void getAdvertisement(Integer id) {
@@ -169,6 +233,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         description = (TextView) findViewById(R.id.advert_description);
 
         map = ((MapFragment) getFragmentManager().findFragmentById(R.id.advert_map)).getMap();
+        map.getUiSettings().setScrollGesturesEnabled(false);
         prepareImages();
     }
 
@@ -265,10 +330,10 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         new TagMatchGetImageAsyncTask(url, this) {
             @Override
             protected void onPostExecute(String url) {
-                Picasso.with(ViewAdvert.this).load(url).error(R.drawable.image0).into(userImage);
                 if (url == null){
                     Picasso.with(ViewAdvert.this).load(R.drawable.image0).into(userImage);
                 }
+                else Picasso.with(ViewAdvert.this).load(url).error(R.drawable.image0).into(userImage);
                 getChats();
                 if(myAdv)prepareEdit();
             }
@@ -334,6 +399,15 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
         imageType.getLayoutParams().height=params.height/5;
         imageType.getLayoutParams().width=params.height/5;
+    }
+
+    public void goToUser(View view) {
+        if(!adv.getOwner().getAlias().equals(Helpers.getActualUser(getApplicationContext()).getAlias())) {
+            Intent intent = new Intent(this, ViewProfile.class);
+            intent.putExtra("username", adv.getOwner().getAlias());
+            startActivity(intent);
+            //finish();
+        }
     }
 
     @Override

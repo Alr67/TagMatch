@@ -26,11 +26,11 @@ import javax.net.ssl.HttpsURLConnection;
 import software33.tagmatch.R;
 import software33.tagmatch.Utils.Constants;
 
-public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
+public class TagMatchGetArrayAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
     private URL url;
     private Context context;
 
-    public TagMatchGetAsyncTask(String url2, Context coming_context) {
+    public TagMatchGetArrayAsyncTask(String url2, Context coming_context) {
         try {
             url = new URL(url2);
             context = coming_context;
@@ -47,10 +47,9 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
 
             String basicAuth;
             basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.NO_WRAP));
-            if (url.getHost().contains("heroku")) {
                 HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-                con.setConnectTimeout(15000);
-                con.setReadTimeout(15000);
+                con.setConnectTimeout(5000);
+                con.setReadTimeout(5000);
                 con.setRequestMethod("GET");
                 con.setInstanceFollowRedirects(true);
 
@@ -72,60 +71,13 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
                     aux.put("arrayResponse",new JSONArray());
                 }
                 else {
-                    if(response.startsWith("[")){
                         aux = new JSONObject();
                         aux.put("arrayResponse", new JSONArray(response));
-                    }
-                    else {
-                        aux = new JSONObject(response);
-                    }
                 }
 
                 con.disconnect();
 
                 return aux;
-            }
-            else {
-                HttpURLConnection con = (HttpURLConnection) url.openConnection();
-           //     con.setConnectTimeout(5000);
-         //       con.setReadTimeout(5000);
-                con.setRequestMethod("GET");
-                con.setInstanceFollowRedirects(true);
-
-                con.setRequestProperty("Authorization", basicAuth);
-
-                JSONObject aux;
-
-                if (con.getResponseCode() >= 400){
-                    Log.i(Constants.DebugTAG,"response code: "+con.getResponseCode());
-                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
-                }
-                else if(con.getResponseCode() == 302) {
-                    aux = new JSONObject();
-                    Log.i(Constants.DebugTAG,"302 redirect: "+con.getURL().toString());
-                    aux.put("302",con.getURL().toString());
-                }
-                else {
-                    String response = iStreamToString(con.getInputStream());
-                    if(response.startsWith("[{")){
-                        aux = new JSONObject();
-                        Log.i(Constants.DebugTAG,"Array JSON REBUT");
-                        aux.put("arrayResponse", new JSONArray(response));
-                    }
-                    else if (response.equals("[]")) {
-                        aux = new JSONObject();
-                        aux.put("arrayResponse",new JSONArray());
-                    }
-                    else {
-                        Log.i(Constants.DebugTAG,"Objecte JSON REBUT");
-                        aux = new JSONObject(response);
-                    }
-                }
-
-                con.disconnect();
-
-                return aux;
-            }
 
         } catch (IOException | JSONException e) {
             Log.e(Constants.DebugTAG, e.getMessage());

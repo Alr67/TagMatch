@@ -9,6 +9,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,18 +18,26 @@ import android.provider.MediaStore;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.json.JSONException;
@@ -39,6 +48,7 @@ import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -51,6 +61,7 @@ import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetBitmapAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetTrendingAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
@@ -61,15 +72,22 @@ import software33.tagmatch.Utils.Helpers;
 public class NewAdvertisement extends AppCompatActivity implements View.OnClickListener {
 
     private Button createButton, newImage;
-    private EditText title,description, tag, wantedTags;
+    private EditText title,description, price_input;
+    private ListView tag, ex_tags;
     private TextInputLayout wantedTagsLayout;
     private CustomPagerAdapterNewAdvert mCustomPagerAdapterNewAdvert;
     private ViewPager mViewPager;
     private String imgExtension;
     private final String DebugTag = "DEBUG ADVERT";
-    Advertisement adv;
+    private Advertisement adv;
     private boolean edit = false;
     private Intent intent;
+    private Integer okImages;
+    private AutoCompleteTextView sugg_hashtags, sugg_hashtags_ex;
+    private ArrayList<String> suggestions, ex_hash, off_hash;
+    private List<Bitmap> images;
+    private String pathfoto;
+    private Spinner categorySpinner, typeSpinner;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,21 +127,196 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         newImage.setOnClickListener(this);
 
         wantedTagsLayout = (TextInputLayout) findViewById(R.id.input_price_textInput);
-
         title = (EditText) findViewById(R.id.input_title);
         description = (EditText) findViewById(R.id.input_description);
-        tag  = (EditText) findViewById(R.id.input_hashtags);
-        wantedTags  = (EditText) findViewById(R.id.input_price);
-        wantedTags.setInputType(InputType.TYPE_CLASS_NUMBER);
+        price_input = (EditText) findViewById(R.id.input_price);
 
         images = new ArrayList<>();
+
+        sugg_hashtags = (AutoCompleteTextView) findViewById(R.id.sugg_hashtag);
+        sugg_hashtags_ex = (AutoCompleteTextView) findViewById(R.id.sugg_hashtag_ex);
+        sugg_hashtags_ex.setVisibility(View.GONE);
+
+        ex_hash = new ArrayList<String>();
+        off_hash = new ArrayList<String>();
+
+
+        /*PETICIO HASHTAGS*/
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
+            e.printStackTrace();
+        }
+        new TagMatchGetTrendingAsyncTask(Constants.IP_SERVER + "/tags/trending", getApplicationContext()) {
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    if (jsonObject.has("status"))
+                        Log.i(Constants.DebugTAG, "status: " + jsonObject.getInt("status"));
+                    Log.i(Constants.DebugTAG, "JSON: \n" + jsonObject);
+                    if (jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                    } else {
+                        String add = jsonObject.getString("200");
+                        add = Helpers.cleanJSON(add);
+                        suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
+                        ArrayAdapter<String> adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.dropdown,suggestions);
+                        sugg_hashtags.setTextColor(Color.BLACK);
+                        sugg_hashtags.setAdapter(adapter);
+                        sugg_hashtags.setThreshold(1);
+                        sugg_hashtags_ex.setTextColor(Color.BLACK);
+                        sugg_hashtags_ex.setAdapter(adapter);
+                        sugg_hashtags_ex.setThreshold(1);
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.execute(jObject);
+        /*PETICIO HASHTAGS*/
+
+        sugg_hashtags.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    off_hash.add(sugg_hashtags.getText().toString());
+                    sugg_hashtags.setText("");
+                    tag.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, off_hash));
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        sugg_hashtags_ex.setOnEditorActionListener(new AutoCompleteTextView.OnEditorActionListener() {
+            @Override
+            public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+                if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
+                    ex_hash.add(sugg_hashtags_ex.getText().toString());
+                    sugg_hashtags_ex.setText("");
+                    ex_tags.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, ex_hash));
+                    return true;
+                }
+                return false;
+            }
+        });
+
+        tag  = (ListView) findViewById(R.id.input_hashtags);
+        ex_tags  = (ListView) findViewById(R.id.input_hashtags2);
+        ex_tags.setVisibility(View.GONE);
+
+        tag.setOnTouchListener(new ListView.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                int action = event.getAction();
+                switch (action)
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+
+                // Handle ListView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });
+
+        tag.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final String pressed = off_hash.get(position);
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int choice) {
+                        switch (choice) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                off_hash.remove(pressed);
+                                Toast.makeText(getApplicationContext(),R.string.succ_delete,Toast.LENGTH_LONG).show();
+                                tag.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, off_hash));
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                };
+
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(new ContextThemeWrapper(NewAdvertisement.this, R.style.myDialog));
+                builder.setMessage(getResources().getString(R.string.delete_hash)).setPositiveButton(R.string.positive_button, dialogClickListener).setNegativeButton(R.string.negative_button, dialogClickListener);
+                builder.show();
+            }
+        });
+
+        ex_tags.setOnTouchListener(new ListView.OnTouchListener()
+        {
+            @Override
+            public boolean onTouch(View v, MotionEvent event)
+            {
+                int action = event.getAction();
+                switch (action)
+                {
+                    case MotionEvent.ACTION_DOWN:
+                        // Disallow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(true);
+                        break;
+
+                    case MotionEvent.ACTION_UP:
+                        // Allow ScrollView to intercept touch events.
+                        v.getParent().requestDisallowInterceptTouchEvent(false);
+                        break;
+                }
+
+                // Handle ListView touch events.
+                v.onTouchEvent(event);
+                return true;
+            }
+        });
+
+        ex_tags.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                final String pressed = ex_hash.get(position);
+                DialogInterface.OnClickListener dialogClickListener = new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int choice) {
+                        switch (choice) {
+                            case DialogInterface.BUTTON_POSITIVE:
+                                ex_hash.remove(pressed);
+                                Toast.makeText(getApplicationContext(),R.string.succ_delete,Toast.LENGTH_LONG).show();
+                                ex_tags.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, ex_hash));
+                                break;
+                            case DialogInterface.BUTTON_NEGATIVE:
+                                break;
+                        }
+                    }
+                };
+
+                android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(new ContextThemeWrapper(NewAdvertisement.this, R.style.myDialog));
+                builder.setMessage(getResources().getString(R.string.delete_hash)).setPositiveButton(R.string.positive_button, dialogClickListener).setNegativeButton(R.string.negative_button, dialogClickListener);
+                builder.show();
+            }
+        });
+
+
 
         mViewPager = (ViewPager) findViewById(R.id.pager);
         DisplayMetrics displayMetrics = new DisplayMetrics();
         WindowManager windowmanager = (WindowManager) getApplicationContext().getSystemService(Context.WINDOW_SERVICE);
         windowmanager.getDefaultDisplay().getMetrics(displayMetrics);
         int deviceHeight = displayMetrics.heightPixels;
-// Changes the height and width to the specified *pixels*
+        // Changes the height and width to the specified *pixels*
         ViewGroup.LayoutParams params = mViewPager.getLayoutParams();
         params.height = deviceHeight/3;
         mViewPager.setLayoutParams(params);
@@ -141,6 +334,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         else setTitle(R.string.new_ad_general_title);
 
     }
+
 
     public void onClick(View view) {
         switch (view.getId()) {
@@ -171,12 +365,12 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         else if(description.getText().toString().replaceAll("\\s","") == "") {
             showBasicErrorMessage(getResources().getString(R.string.noDescription));
         }
-        else if(tag.getText().toString().replaceAll("\\s","") == "") {
+        else if(off_hash.isEmpty()) {
             showBasicErrorMessage(getResources().getString(R.string.noTag));
         }
         else {
-            String tagLine = tag.getText().toString().replace("#","");
-            String[] tags = tagLine.split(" ");
+            String[] tags =  new String[off_hash.size()];
+            tags = off_hash.toArray(tags);
             Advertisement adv = new Advertisement();
             Log.v(DebugTag,"Tipus seleccionat: " + typeSpinner.getSelectedItem());
             //TODO sujeto a cambios cuando implementemos los usuarios
@@ -187,12 +381,12 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                 adv = new AdvGift(owner,title.getText().toString(),images,description.getText().toString(),tags,categorySpinner.getSelectedItem().toString());
             }
             else if(typeSpinner.getSelectedItem().equals(Constants.typeExchange)) {
-                String wantedTagLine = wantedTags.getText().toString().replace("#","");
-                String[] wantedTag =  wantedTagLine.split(" ");
+                String[] wantedTag =  new String[ex_hash.size()];
+                wantedTag = ex_hash.toArray(wantedTag);
                 adv = new AdvChange(owner,title.getText().toString(),images,description.getText().toString(),tags,categorySpinner.getSelectedItem().toString(),wantedTag);
             }
             else if(typeSpinner.getSelectedItem().equals(Constants.typeSell)) {
-                String text = wantedTags.getText().toString();
+                String text = price_input.getText().toString();
                 if(!text.equals("")) {
                     Double price = Double.parseDouble(text);
                     if(price <= 0.0) showBasicErrorMessage(getResources().getString(R.string.zeroPrice));
@@ -212,7 +406,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     private void updateAdvertToServer(Advertisement adv) {
         final Context context = this.getApplicationContext();
-        Toast.makeText(this,"Uploading Advert To server, please whait",Toast.LENGTH_LONG).show();
+        Toast.makeText(this,R.string.upload_ad_to_server,Toast.LENGTH_LONG).show();
         if(edit) {
             //System.out.println("VAMOSSS: " +Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci",0));
             new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci",0), getApplicationContext()){
@@ -238,7 +432,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             Log.i(Constants.DebugTAG, adv.toJSON().toString());
         }
         else {
-            Toast.makeText(this,"Uploading Advert To server, please whait",Toast.LENGTH_LONG).show();
+            Toast.makeText(this,R.string.upload_ad_to_server,Toast.LENGTH_LONG).show();
             new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true){
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
@@ -263,13 +457,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         Log.i(Constants.DebugTAG, adv.toJSON().toString());
     }
 
-    Integer okImages;
     private void postImagesToServer(Integer advId) {
         okImages = 0;
-        if(edit) {
-            Log.i(Constants.DebugTAG,"tenia " + adv.getImagesIDs().length + " fotos" );
-            okImages = adv.getImagesIDs().length;
-        }
         if(images.size() == 0) {
             Log.i(Constants.DebugTAG, "Aquest anunci no te imatges");
             advertUpdated();
@@ -324,31 +513,30 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     /** MARK: Spinner type manager*/
-    private Spinner categorySpinner, typeSpinner;
-
     public void onTypeSpinnerChanged(String newType) {
         if(newType.equals(Constants.typeGift)) {
             wantedTagsLayout.setHint(getString(R.string.input_gift));
-            wantedTags.setEnabled(false);
-            wantedTags.setText("");
+            ex_tags.setVisibility(View.GONE);
+            sugg_hashtags_ex.setVisibility(View.GONE);
+            price_input.setVisibility(View.GONE);
         }
         else if(newType.equals(Constants.typeExchange)) {
             wantedTagsLayout.setHint(getString(R.string.input_wantedHashtags));
-            wantedTags.setEnabled(true);
-            wantedTags.setText("");
-            wantedTags.setInputType(InputType.TYPE_CLASS_TEXT);
+            price_input.setVisibility(View.GONE);
+            sugg_hashtags_ex.setVisibility(View.VISIBLE);
+            ex_tags.setVisibility(View.VISIBLE);
         }
         else if(newType.equals(Constants.typeSell)) {
             wantedTagsLayout.setHint(getString(R.string.input_price));
-            wantedTags.setEnabled(true);
-            wantedTags.setText("");
-            wantedTags.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
+            sugg_hashtags_ex.setVisibility(View.GONE);
+            price_input.setVisibility(View.VISIBLE);
+            price_input.setEnabled(true);
+            price_input.setText("");
+            price_input.setInputType(InputType.TYPE_CLASS_NUMBER | InputType.TYPE_NUMBER_FLAG_DECIMAL);
         }
     }
 
  /** MARK: IMAGES */
-    private List<Bitmap> images;
-
     public void onNewImageClicked() {
         AlertDialog.Builder builder =
                 new AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
@@ -390,8 +578,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }
         else Log.e(DebugTag,"Error en crear la foto");
     }
-
-    private String pathfoto;
 
     private File createImageFile() throws IOException {
         Log.v(DebugTag, "Anem a crear el fitxer de la foto");
@@ -496,24 +682,26 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     private void fillComponents() {
         getAdvertisementImages();
+        if(adv.getTypeDescription().equals(Constants.typeServerEXCHANGE)) {
+            price_input.setVisibility(View.GONE);
+            sugg_hashtags_ex.setVisibility(View.VISIBLE);
+            ex_tags.setVisibility(View.VISIBLE);
+            ex_hash = new ArrayList<String>(Arrays.asList(((AdvChange)adv).getWantedTags()));
+            ex_tags.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, ex_hash));
+        }
+        if(adv.getTypeDescription().equals(Constants.typeServerSELL)) {
+            price_input.setText(((AdvSell)adv).getPrice().toString());
+        }
         title.setText(adv.getTitle());
         description.setText(adv.getDescription());
         int type = Helpers.getIntFromType(adv.getTypeDescription());
         typeSpinner.setSelection(type);
-        if(type == 0) wantedTags.setText(adv.getPrice().toString());
+        if(type == 0) price_input.setText(adv.getPrice().toString());
         categorySpinner.setSelection(Helpers.getIntFromCategory(adv.getCategory()));
-        String sol = new String();
-        for(int q = 0; q < adv.getTags().length; ++q) {
-            sol += "#"+adv.getTags()[q];
-        }
-        tag.setText(sol);
-        if(type == 1) {
-            String next = new String();
-            for(int s = 0; s < ((AdvChange) adv).getWantedTags().length; ++s) {
-                next += ((AdvChange) adv).getWantedTags()[s];
-            }
-            wantedTags.setText(next);
-        }
+
+        off_hash = new ArrayList<String>(Arrays.asList(adv.getTags()));
+        tag.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, off_hash));
+
     }
 
     private void getAdvertisementImages() {
@@ -536,6 +724,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                 protected void onPostExecute(Bitmap image) {
                     mCustomPagerAdapterNewAdvert.addImageBitmap(image);
                     Log.i(Constants.DebugTAG,"image added");
+                    images.add(image);
                 }
             }.execute(jObject);
         }

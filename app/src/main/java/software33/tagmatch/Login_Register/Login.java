@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.firebase.client.Firebase;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -23,10 +24,13 @@ import java.util.ArrayList;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Chat.FirebaseUtils;
+import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchGetArrayAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
@@ -53,6 +57,7 @@ public class Login extends AppCompatActivity {
 
         ArrayList<String> existing_login = new ArrayList<String>();
         existing_login = new Helpers().getPersonalData(getApplicationContext());
+        downloadCategories();
         if(existing_login != null && existing_login.get(0) != null && existing_login.get(1) != null) {
             Intent success = new Intent(this, Home.class); //FAlta guardar en algun puesto l'usuari
             startActivity(success);
@@ -142,7 +147,7 @@ public class Login extends AppCompatActivity {
         Firebase.setAndroidContext(this);
 
         //Guardem les dades de login
-        Helpers.setPersonalData(username.getText().toString(), passw.getText().toString(),this);
+        Helpers.setPersonalData(username.getText().toString(), passw.getText().toString(), this);
         downloadUserFromServer();
 
     }
@@ -151,6 +156,45 @@ public class Login extends AppCompatActivity {
         Intent success = new Intent(this, Home.class);
         startActivity(success);
         finish();
+    }
+
+    private void downloadCategories() {
+        JSONObject jObject = new JSONObject();
+        Log.i(Constants.DebugTAG,"Lets get categories");
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+
+        new TagMatchGetArrayAsyncTask(Constants.IP_SERVER + "/categories", this) {
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Helpers.showError(error,getApplicationContext());
+                    }
+                    else if(jsonObject.has("arrayResponse")) {
+                        try {
+                            JSONArray jsonArray = jsonObject.getJSONArray("arrayResponse");
+                            Constants.categoryList = new ArrayList<>();
+                            for (int n = 0; n < jsonArray.length(); n++) {
+                                Constants.categoryList.add(jsonArray.getString(n));
+                            }
+                            Log.i(Constants.DebugTAG,"Done downloading categories");
+
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                } catch (JSONException ignored) {
+                    Log.i("DEBUG","error al get user");
+                }
+            }
+        }.execute(jObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     private void downloadUserFromServer(){

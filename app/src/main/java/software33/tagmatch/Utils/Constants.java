@@ -22,7 +22,7 @@ public abstract class Constants {
     public static final String favouriteYes = "heart";
 
 
-    public static final List<String> categoryList = new ArrayList<>(Arrays.asList("Videogames","Motos","Videojocs"));
+    public static List<String> categoryList = new ArrayList<>(Arrays.asList("Motor"));
     public static final String typeSell = "Sell";
     public static final String typeExchange = "Exchange";
     public static final String typeGift = "Gift";

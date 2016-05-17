@@ -2,7 +2,7 @@
     <!-- Manifest -->
     <string name="app_name">TagMatch!</string>
     <string name="title_activity_new_advertisement">NewAdvertisement</string>
-    <string name="title_activity_view_profile">ViewProfile</string>
+    <!--<string name="title_activity_view_profile">ViewProfile</string>-->
     <string name="title_activity_view_chat">ViewChat</string>
     <string name="title_activity_view_advert">ViewAdvert</string>
     <string name="title_activity_my_adverts">My Adverts</string>
@@ -16,6 +16,8 @@
     <string name="nav_myAdverts">My Adverts</string>
     <string name="nav_xats">Chats</string>
     <string name="nav_viewAdvert">View Advertisement </string>
+    <string name="nav_discovery_tag">Discovery TagMatch!</string>
+    <string name="settings">User settings</string>
 
     <!-- Desordere total -->
     <string name="action_settings">Settings</string>
@@ -54,6 +56,7 @@
     <string name="hint_single_chat">Write your message…</string>
     <string name="hint_loading_adverts">Loading advertisements from server, please wait</string>
     <string name="hint_no_adverts">You don\'t have any advert, create one!</string>
+    <string name="upload_ad_to_server">"Uploading the advert to our server, please wait"</string>
 
     <!-- Login -->
     <string name="login">Login</string>
@@ -79,16 +82,19 @@
     <string name="noTitle">Insert a title</string>
     <string name="noDescription">Insert a description</string>
     <string name="noTag">Insert a hastag</string>
+    <string name="noExTag">Insert a wanted hastag</string>
     <string name="imagePickTitle">Insert an image</string>
-    <string name="imagePickText">Where do you want to pick the image?</string>
+    <string name="imagePickText">Where do you want to pick the image from?</string>
     <string name="imagePickCamera">From camera</string>
     <string name="imagePickGallery">From gallery</string>
     <string name="title_error_newAdvert">Some fields empty</string>
     <string name="ok">Okay</string>
     <string name="emptyPrice">The price is empty</string>
-    <string name="zeroPrice">The price has to be bigger than zero</string>
+    <string name="zeroPrice">The price has to be greater than zero</string>
     <string name="new_photo">Add image</string>
     <string name="new_ad_general_title">New advert</string>
+    <string name="cat_adv">Ad\'s category</string>
+    <string name="type_ad">Ad\'s type</string>
 
     <!-- Navigation Drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -96,6 +102,9 @@
 
     <!-- Profile -->
     <string name="title_activity_filter">Filter</string>
+    <string name="ed_1">Editing&#160;</string>
+    <string name="ed_2">\'s profile</string>
+    <string name="vw_1">Watching&#160;</string>
 
     <!-- Filters -->
     <string name="filter_title">Search Filter</string>
@@ -105,9 +114,15 @@
     <string name="filter_appliance">Appliances</string>
     <string name="filter_categories">Categories</string>
     <string name="profile_button_advertisement">Advertisements</string>
+    <string name="delete_hash">Delete this hashtag?</string>
+    <string name="positive_button">Yes</string>
+    <string name="negative_button">No</string>
+    <string name="succ_delete">Hashtag succesfully deleted</string>
+    <string name="edit_activity_title">Search</string>
+    <string name="hash_filter">Hashtags to search</string>
 
     <!-- View Adv -->
-    <string name="action_open_chat">Open chat</string>
+    <string name="action_report">Report</string>
     <string name="action_tagmatch">Tagmatch!</string>
     <string name="action_edit_adv">Edit advertisement</string>
     <string name="action_delete_adv">Delete advertisement</string>
@@ -122,6 +137,8 @@
     <string name="hashtags_title">Hashtags:</string>
     <string name="about_user">About the seller</string>
     <string name="user_loc">User location:&#160;</string>
+    <!--<string name="title_activity_edit_profile">EditProfile</string>-->
+    <string name="edit_profile_interests">Interests</string>
 
     <!-- Chat Offer -->
     <string name="dialog_title_send_offer">Send offer</string>

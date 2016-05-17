@@ -44,7 +44,14 @@ public final class NavigationController {
             Intent intent3 = new Intent(parent.getApplicationContext(), Login.class);
             parent.startActivity(intent3);
             parent.finish();
-        }  else {
+        }  else if (id == R.id.nav_discovery_tagmatch) {
+            Intent intent = new Intent(parent.getApplicationContext(), Home.class);
+            intent.putExtra("previousActivity", "disc");
+            String url = Constants.IP_SERVER + "/users/discovery";
+            intent.putExtra("url", url);
+            parent.startActivity(intent);
+            parent.finish();
+        } else {
             Toast.makeText(parent.getApplicationContext(), "TODO", Toast.LENGTH_SHORT).show();
         }
 

@@ -120,8 +120,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         User actualUser = Helpers.getActualUser(this);
         String url = Constants.IP_SERVER;
         try{
-            if(extras.getString("previousActivity").equals("filter"))
+            if(extras.getString("previousActivity").equals("filter") || extras.getString("previousActivity").equals("ex_tagmatch") || extras.getString("previousActivity").equals("disc")) {
                 url = extras.getString("url");
+            }
         } catch (Exception e){
             url += "/ads?idGreaterThan=" + Constants.SERVER_IdGreaterThan + "&limit=" + Constants.SERVER_limitAdverts;
         }

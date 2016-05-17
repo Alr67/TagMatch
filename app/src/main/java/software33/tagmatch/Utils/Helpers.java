@@ -185,4 +185,11 @@ public class Helpers {
         }
         return 0;
     }
+
+    public static String cleanJSON(String input) {
+        input = input.replaceAll("\\[","");
+        input = input.replaceAll("\\]","");
+        input = input.replaceAll("\"","");
+        return input;
+    }
 }
