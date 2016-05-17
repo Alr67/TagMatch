@@ -160,12 +160,11 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                                 }
                                 Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
                                 if (newAdvert.getID().equals(adv.getID())) {
-                                    getMenuInflater().inflate(R.menu.menu_view_foreign_adv, menu);
+                                    getMenuInflater().inflate(R.menu.menu_view_foreign_unfav_adv, menu);
                                     stop = true;
                                 }
                             }
-                            if (!stop)
-                                getMenuInflater().inflate(R.menu.menu_view_foreign_unfav_adv, menu);
+                            if (!stop) getMenuInflater().inflate(R.menu.menu_view_foreign_adv, menu);
                         }
 
                     } catch (JSONException e) {
@@ -235,7 +234,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                         else {
                             if(jsonObject.has("id")) {
                                 Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
-                                Toast.makeText(getApplicationContext(),R.string.added_fav,Toast.LENGTH_LONG).show();
+                                Toast.makeText(getApplicationContext(),R.string.erased_fav,Toast.LENGTH_LONG).show();
                                 getMenuInflater().inflate(R.menu.menu_view_foreign_adv, my_menu);
                             }
                         }
