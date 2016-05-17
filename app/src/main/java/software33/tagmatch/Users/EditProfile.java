@@ -1,6 +1,7 @@
 package software33.tagmatch.Users;
 
 import android.Manifest;
+import software33.tagmatch.Chat.FirebaseUtils;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.view.ContextThemeWrapper;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
@@ -59,6 +61,8 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Domain.User;
@@ -84,6 +88,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
     private String imgExtension;
     private ArrayList<String> listdata, suggestions;
     private AutoCompleteTextView sugg_hashtags;
+    private String myId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -100,6 +105,8 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
 
         listdata = new ArrayList<>();
         iv = (ImageView) findViewById(R.id.edit_profile_imageView);
+
+        myId = FirebaseUtils.getMyId(this);
 
         Bundle extras = getIntent().getExtras();
 
@@ -380,7 +387,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
             Bitmap bm = iv.getDrawingCache();
             ByteArrayOutputStream stream = new ByteArrayOutputStream();
             bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
-            byte[] byteArray = stream.toByteArray();
+            final byte[] byteArray = stream.toByteArray();
 
             JSONObject jObject = new JSONObject();
             jObject.put("profilePhotoId", byteArray);
@@ -392,6 +399,10 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
                         String error = jsonObject.get("error").toString();
                         showError(error);
                     } catch (JSONException ignored) {
+                        Map<String, Object> img = new HashMap<>();
+                        String encodedImage = Base64.encodeToString(byteArray, Base64.DEFAULT);
+                        img.put("img",encodedImage);
+                        FirebaseUtils.getUsersRef().child(myId).updateChildren(img);
                     }
                 }
             }.execute();
