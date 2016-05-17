@@ -79,8 +79,11 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         Firebase.setAndroidContext(this);
 
-        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
-        map.getUiSettings().setScrollGesturesEnabled(false);
+        try {
+            map = ((MapFragment) getFragmentManager().findFragmentById(R.id.profileMap)).getMap();
+            if (map!=null)map.getUiSettings().setScrollGesturesEnabled(false);
+        }
+        catch (Exception ignored){}
 
         title = (TextView) findViewById(R.id.toolbar_title_view_profile);
         if(getIntent().hasExtra("username")) {

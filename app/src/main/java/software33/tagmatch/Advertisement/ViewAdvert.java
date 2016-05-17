@@ -232,8 +232,12 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         tags = (TextView) findViewById(R.id.advert_tags);
         description = (TextView) findViewById(R.id.advert_description);
 
-        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.advert_map)).getMap();
-        map.getUiSettings().setScrollGesturesEnabled(false);
+        try {
+            map = ((MapFragment) getFragmentManager().findFragmentById(R.id.advert_map)).getMap();
+            map.getUiSettings().setScrollGesturesEnabled(false);
+        }
+        catch (Exception ignored){}
+
         prepareImages();
     }
 

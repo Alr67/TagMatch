@@ -336,28 +336,30 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     private void initMap(){
-        map = ((MapFragment) getFragmentManager().findFragmentById(R.id.edit_profile_map)).getMap();
-
         try {
-            map.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 15));
-            map.addMarker(new MarkerOptions().position(userPosition));
-        } catch (Exception ignored) {}
+            map = ((MapFragment) getFragmentManager().findFragmentById(R.id.edit_profile_map)).getMap();
 
-        new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
 
-        map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
-            @Override
-            public void onMapClick(LatLng latLng) {
-                map.clear();
-                userPosition = latLng;
+                map.animateCamera(CameraUpdateFactory.newLatLngZoom(userPosition, 15));
                 map.addMarker(new MarkerOptions().position(userPosition));
-                locationMod = true;
-            }
-        });
+
+
+            new GoogleApiClient.Builder(this)
+                    .addApi(LocationServices.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+
+            map.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+                @Override
+                public void onMapClick(LatLng latLng) {
+                    map.clear();
+                    userPosition = latLng;
+                    map.addMarker(new MarkerOptions().position(userPosition));
+                    locationMod = true;
+                }
+            });
+        } catch (Exception ignored) {}
 
         if (mGoogleApiClient == null) {
             // ATTENTION: This "addApi(AppIndex.API)"was auto-generated to implement the App Indexing API.
