@@ -75,6 +75,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String userId;
     private String imageChat;
     private String myName;
+    private String idProduct;
 
     private boolean myAdv;
     private FloatingActionButton fab;
@@ -191,6 +192,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
         Log.i(Constants.DebugTAG, "Vaig a mostrar l'anunci amb id: " + id);
+        idProduct = id.toString();
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());
@@ -354,19 +356,19 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     }
 
     private void getChats(){
-        Log.i("DEBUG XAT","Xddddd plural");
         FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (!dataSnapshot.hasChildren()) {
                     if (!adv.getOwner().getAlias().equals(myName)) {
                         fab.setClickable(true);
-                        fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
+                        fab.setImageDrawable(getDrawable(R.drawable.chat_add));
                         fab.setOnClickListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View view) {
                                 Intent chat = buttonStartXat(view);
                                 startActivity(chat);
+                                finish();
                             }
                         });
                     }
@@ -427,6 +429,8 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         else b.putString("IdChat", idChat);
         b.putString("IdUser", userId);
 
+        b.putBoolean("FromAdvert",true);
+
         //Get user Image
         Drawable drawable = userImage.getDrawable();
 
@@ -456,13 +460,13 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         users.put(id1, Helpers.getActualUser(this).getAlias());
         users.put(id2, username.getText().toString());
 
-        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(getTitle().toString(), users);
+        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(idProduct, getTitle().toString(), id2, users);
         id.child("info").setValue(chatInfo);
 
         //Set the chats to each user
 
         Map<String, Object> chats1 = new HashMap<>();
-        chats1.put(id.getKey(),"");
+        chats1.put(id.getKey(),true);
         FirebaseUtils.getUsersRef().child(id1).child("chats").updateChildren(chats1);
 
         return id.getKey();
@@ -470,12 +474,11 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
     private void getChat(final String idChat, final long numChats) {
         //Accessing to the chat with idChat ONCE
-        Log.i("DEBUG XAT", "Xd");
         FirebaseUtils.getChatsRef().child(idChat).child("info").addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 FirebaseUtils.ChatInfo c = snapshot.getValue(FirebaseUtils.ChatInfo.class);
-                setButtonXat(c.getIdProduct(), c.getUsers(), idChat, numChats);
+                setButtonXat(c.getIdProduct(), idChat, numChats);
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {
@@ -483,32 +486,19 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private void setButtonXat(String idProduct, Map<String, Object> users, String idChat, long numChats) {
-        String userName = "";
-        for (Object o : users.values()){
-            if (!o.toString().equals(Helpers.getActualUser(this).getAlias())) {
-                userName = o.toString();
-            }
-        }
-        String userId = "";
-        for (String s : users.keySet()){
-            if (!s.equals(FirebaseUtils.getMyId(this))) {
-                userId = s;
-            }
-        }
+    private void setButtonXat(String idProduct, String idChat, long numChats) {
 
         //Restriccions de obrir xat:
-        //      No mateix titul de producte ni id de usuari que ho ha publicat
-        if (idProduct.equals(getTitle().toString()) && userId.equals(this.userId)){
+        if (idProduct.equals(this.idProduct)){
             this.idChat = idChat;
             fab.setClickable(true);
-            //fab.setImageDrawable(getDrawable(R.drawable.existing_chat));
             fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
             fab.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Intent chat = buttonStartXat(view);
                     startActivity(chat);
+                    finish();
                 }
             });
         }
@@ -516,22 +506,17 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             this.idChat = "Not exists";
             if (numChats == 1 && !this.username.getText().toString().equals(myName)){
                 fab.setClickable(true);
-                fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
+                fab.setImageDrawable(getDrawable(R.drawable.chat_add));
                 fab.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         Intent chat = buttonStartXat(view);
                         startActivity(chat);
+                        finish();
                     }
                 });
             }
         }
-
-        Log.i("Debug-Chat","idProd " +idProduct);
-        Log.i("Debug-Chat","getTitle().toString() " +getTitle().toString());
-        Log.i("Debug-Chat","userId " +userId);
-        Log.i("Debug-Chat","this.userId " +this.userId);
-
     }
 
     public AlertDialog createDeleteDialog() {

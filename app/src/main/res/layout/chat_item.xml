@@ -5,7 +5,7 @@
     android:background="@drawable/bar_bg"
     android:paddingTop="0dip" android:layout_gravity="top"
     >
-    <TableRow>
+    <TableRow android:id="@+id/tableItemChat">
         <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:tools="http://schemas.android.com/tools"
             android:layout_width="60dp"
@@ -23,7 +23,7 @@
                 android:layout_gravity="center" />
         </LinearLayout>
         <TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="240dp"
+            android:layout_width="220dp"
             android:layout_height="wrap_content"
             android:paddingTop="0dip" android:layout_gravity="top"
             >
@@ -55,6 +55,40 @@
                     android:gravity="left"/>
             </TableRow>
         </TableLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="30dp"
+            android:layout_height="match_parent"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_gravity="center" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="New Text"
+                android:id="@+id/tvNumMessages"
+                android:gravity="center"
+                android:layout_gravity="center" />
+        </LinearLayout>
+
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:tools="http://schemas.android.com/tools"
+            android:layout_width="75dp"
+            android:layout_height="match_parent"
+            android:paddingTop="5dp"
+            android:paddingBottom="5dp"
+            android:layout_gravity="center" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/mainchat_new_offer"
+                android:id="@+id/tvOffer"
+                android:gravity="center"
+                android:layout_gravity="center" />
+        </LinearLayout>
 
     </TableRow>
 
