@@ -14,6 +14,7 @@
     <string name="nav_mainPage">Main Page</string>
     <string name="nav_viewUser">View User</string>
     <string name="nav_myAdverts">My Adverts</string>
+    <string name="nav_myFAVs">My Favs</string>
     <string name="nav_xats">Chats</string>
     <string name="nav_viewAdvert">View Advertisement </string>
     <string name="nav_discovery_tag">Discovery TagMatch!</string>
@@ -140,6 +141,13 @@
     <string name="user_loc">User location:&#160;</string>
     <!--<string name="title_activity_edit_profile">EditProfile</string>-->
     <string name="edit_profile_interests">Interests</string>
+    <string name="title_activity_view_favs">ViewFavs</string>
+    <string name="title_activity_discovery_ads">DiscoveryAds</string>
 
+    <!-- Discovery -->
+    <string name="title_discovery">Discovery TagMatch!</string>
+
+    <!-- FAVs -->
+    <string name="fav_title">Favorites</string>
 
 </resources>
