@@ -43,6 +43,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.firebase.client.utilities.Utilities;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -54,6 +55,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.Domain.AdvGift;
@@ -104,7 +106,12 @@ public class SingleChatActivity extends AppCompatActivity {
 
     // Yes OR No
     private String canSendOffers;
+
     private boolean isMyAdv = false;
+    private boolean offerHasExchangeID = false;
+    private int offerExchangeID;
+    private boolean rateAvailable = false;
+    private int rateAdvId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -267,7 +274,7 @@ public class SingleChatActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren()) {
                     FirebaseUtils.ChatOffer o = dataSnapshot.getValue(FirebaseUtils.ChatOffer.class);
-                    setOfferData(o.getSenderId(), o.getText(), o.getAccepted(), o.getExchangeID());
+                    setOfferData(o.getSenderId(), o.getText(), o.getAccepted(), o.getExchangeID(), o.getValoration());
                 }
                 else {
                     canSendOffers = "Yes";
@@ -288,7 +295,7 @@ public class SingleChatActivity extends AppCompatActivity {
         chatArrayAdapter.add(message);
     }
 
-    public void setOfferData(String senderId, String text, Boolean accepted, int exchangeID){
+    public void setOfferData(String senderId, String text, Boolean accepted, int exchangeID, final Map<String, Integer> valoration){
         if (!accepted) {
             canSendOffers = "Yes";
             layoutOffer.setVisibility(View.VISIBLE);
@@ -305,7 +312,37 @@ public class SingleChatActivity extends AppCompatActivity {
         }
         else {
             canSendOffers = "No";
-            hideOffer();
+            if (valoration.containsKey(Helpers.getActualUser(this).getAlias())){
+                layoutOffer.setVisibility(View.VISIBLE);
+                bCancelOffer.setVisibility(View.VISIBLE);
+                bAcceptOffer.setVisibility(View.VISIBLE);
+                tvPendingOffer.setVisibility(View.GONE);
+                tvContentOffer.setText(R.string.rate_offer);
+                rateAvailable = true;
+                rateAdvId = valoration.get(Helpers.getActualUser(this).getAlias());
+
+                bCancelOffer.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View arg0) {
+                        createNotValorationDialog(valoration, getString(R.string.dialog_title_not_rate_deal),
+                                getString(R.string.dialog_message_not_rate_deal),
+                                getString(R.string.dialog_confirm_not_rate_deal),
+                                getString(R.string.dialog_cancel_not_rate_deal)).show();
+                    }
+                });
+                bAcceptOffer.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View arg0) {
+                        createValorationDialog().show();
+                    }
+                });
+            }
+            else hideOffer();
+        }
+
+        if (exchangeID != -1) {
+            offerHasExchangeID = true;
+            offerExchangeID = exchangeID;
         }
     }
 
@@ -569,6 +606,12 @@ public class SingleChatActivity extends AppCompatActivity {
         Map<String, Object> values = new HashMap<>();
         values.put("accepted", true);
 
+        //Build the valoration
+        Map<String, Integer> valoration = new HashMap<>();
+        valoration.put(""+userName,Integer.parseInt(idProduct));
+        //if (offerHasExchangeID) valoration.put(""+Helpers.getActualUser(this).getAlias(), offerExchangeID);
+        values.put("valoration",valoration);
+
         offersRef.updateChildren(values);
 
         addMessageOffer(1,"");
@@ -621,6 +664,63 @@ public class SingleChatActivity extends AppCompatActivity {
                         });
 
         return builder.create();
+    }
+
+    public AlertDialog createNotValorationDialog(Map<String, Integer> valoration, String title, String message, String positive, String negative) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        valoration.remove(Helpers.getActualUser(this).getAlias());
+        final Map<String, Object> value = new HashMap<>();
+        value.put("valoration",valoration);
+
+        builder.setTitle(title)
+                .setMessage(message)
+                .setPositiveButton(positive,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                FirebaseUtils.getChatsRef().child(idChat).child("offer").updateChildren(value);
+                            }
+                        })
+                .setNegativeButton(negative,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //onNegativeButtonClick();
+                            }
+                        });
+
+        return builder.create();
+    }
+
+    public AlertDialog createValorationDialog() {
+        // Get the layout inflater
+        LayoutInflater inflater = this.getLayoutInflater();
+
+        final View view = inflater.inflate(R.layout.dialog_rate_deal, null);
+
+        final AlertDialog d = new AlertDialog.Builder(this)
+                .setView(view)
+                .setPositiveButton(android.R.string.ok, null) //Set to null. We override the onclick
+                .setNegativeButton(android.R.string.cancel, null)
+                .create();
+
+        d.setOnShowListener(new DialogInterface.OnShowListener() {
+
+            @Override
+            public void onShow(DialogInterface dialog) {
+
+                Button b = d.getButton(AlertDialog.BUTTON_POSITIVE);
+                b.setOnClickListener(new View.OnClickListener() {
+
+                    @Override
+                    public void onClick(View view) {
+                        d.dismiss();
+                    }
+                });
+            }
+        });
+
+        return d;
     }
 
     public AlertDialog createErrorDialog() {

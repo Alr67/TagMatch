@@ -123,7 +123,7 @@ public abstract class FirebaseUtils {
         String senderId;
         String text;
         Boolean accepted;
-        int exchangeID;
+        int exchangeID = -1;
         Map<String, Integer> valoration = new HashMap<>();
         public ChatOffer() {
             // empty default constructor, necessary for Firebase to be able to deserialize blog posts
