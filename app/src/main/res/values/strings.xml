@@ -14,6 +14,7 @@
     <string name="nav_mainPage">Main Page</string>
     <string name="nav_viewUser">View User</string>
     <string name="nav_myAdverts">My Adverts</string>
+    <string name="nav_myFAVs">My Favs</string>
     <string name="nav_xats">Chats</string>
     <string name="nav_viewAdvert">View Advertisement </string>
     <string name="nav_discovery_tag">Discovery TagMatch!</string>
@@ -126,6 +127,8 @@
     <string name="action_tagmatch">Tagmatch!</string>
     <string name="action_edit_adv">Edit advertisement</string>
     <string name="action_delete_adv">Delete advertisement</string>
+    <string name="added_fav">Advert added as FAV</string>
+    <string name="erased_fav">Advert erased as FAV</string>
 
     <string name="dialog_title_delete_adv">Delete advertisement</string>
     <string name="dialog_message_delete_adv">Are you sure you want to delete this advertisement?</string>
@@ -139,7 +142,10 @@
     <string name="user_loc">User location:&#160;</string>
     <!--<string name="title_activity_edit_profile">EditProfile</string>-->
     <string name="edit_profile_interests">Interests</string>
+    <string name="title_activity_view_favs">ViewFavs</string>
+    <string name="title_activity_discovery_ads">DiscoveryAds</string>
 
+<<<<<<< HEAD
     <!-- Chat Offer -->
     <string name="dialog_title_send_offer">Send offer</string>
     <string name="dialog_select_offer">Select offer:</string>
@@ -180,5 +186,12 @@
     <!-- other user -->
     <string name="view_advertisements">View Advertisements</string>
     <string name="my_advs_title_end">\'s Adverts</string>
+=======
+    <!-- Discovery -->
+    <string name="title_discovery">Discovery TagMatch!</string>
+
+    <!-- FAVs -->
+    <string name="fav_title">Favorites</string>
+>>>>>>> Rafa-FAVs
 
 </resources>

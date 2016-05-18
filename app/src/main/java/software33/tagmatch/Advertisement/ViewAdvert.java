@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
@@ -38,13 +39,17 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.squareup.picasso.Picasso;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.SingleChatActivity;
@@ -63,7 +68,7 @@ import software33.tagmatch.Utils.Helpers;
 public class ViewAdvert extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView imageType, userImage;
-    private TextView description,tags,username,location;
+    private TextView description,tags,username,location, title;
     private ViewPager mViewPager;
     private CustomPagerAdapterViewAdvert mCustomPagerAdapterViewAdvert;
     private GoogleMap map;
@@ -75,7 +80,11 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String userId;
     private String imageChat;
     private String myName;
+
     private String idProduct;
+
+    private Menu my_menu;
+
 
     private boolean myAdv;
     private FloatingActionButton fab;
@@ -86,7 +95,9 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.activity_view_advert);
         myName = Helpers.getActualUser(this).getAlias();
         initComponents();
-        setTitle(R.string.loading_title);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view_advert);
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setDisplayShowTitleEnabled(false);
 
         fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setClickable(false);
@@ -108,54 +119,162 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
+    public boolean onCreateOptionsMenu(final Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
+        my_menu = menu;
         if (myAdv) getMenuInflater().inflate(R.menu.menu_view_my_adv, menu);
-        else getMenuInflater().inflate(R.menu.menu_view_adv, menu);
+        else {
+            JSONObject jObject = new JSONObject();
+            User actualUser = Helpers.getActualUser(this);
+            String url = Constants.IP_SERVER + "/favs";
+            try {
+                jObject.put("username", actualUser.getAlias());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            try {
+                jObject.put("password", actualUser.getPassword());
+            } catch (JSONException e) {
+                e.printStackTrace();
+            }
+            new TagMatchGetAsyncTask(url, this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if (jsonObject.has("status"))
+                            Log.i(Constants.DebugTAG, "status: " + jsonObject.getInt("status"));
+                        Log.i(Constants.DebugTAG, "JSON: \n" + jsonObject);
+                        if (jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                        } else {
+                            Log.i(Constants.DebugTAG, "PUTITA PARA DENTRO");
+                            JSONArray jsonArray = null;
+                            try {
+                                jsonArray = jsonObject.getJSONArray("arrayResponse");
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                            boolean stop = false;
+                            for (int n = 0; n < jsonArray.length() && !stop; n++) {
+                                JSONObject object = null;
+                                try {
+                                    object = jsonArray.getJSONObject(n);
+                                } catch (JSONException e) {
+                                    e.printStackTrace();
+                                }
+
+                                Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
+                                if (newAdvert.getID().equals(adv.getID())) {
+                                    getMenuInflater().inflate(R.menu.menu_view_foreign_unfav_adv, menu);
+                                    stop = true;
+                                }
+                            }
+                            if (!stop){
+                                getMenuInflater().inflate(R.menu.menu_view_foreign_adv, menu);
+                            }
+                        }
+
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.execute(jObject);
+            return true;
+        }
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_report_adv:
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
-                builder.setTitle("Report");
 
-                final EditText input = new EditText(this);
+        int id = item.getItemId();
 
-                input.setInputType(InputType.TYPE_CLASS_TEXT);
-                builder.setView(input);
 
-                builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        reportAdv(input.getText().toString());
+        if(id == R.id.action_report_adv) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setTitle("Report");
+
+            final EditText input = new EditText(this);
+
+            input.setInputType(InputType.TYPE_CLASS_TEXT);
+            builder.setView(input);
+
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    reportAdv(input.getText().toString());
+                }
+            });
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    dialog.cancel();
+                }
+            });
+
+            builder.show();
+        }
+        else if (id == R.id.action_delete) {
+            AlertDialog alertDialog = createDeleteDialog();
+            alertDialog.show();
+        }
+        else if (id == R.id.tagmatch_exchange) {
+            Intent intent = new Intent(getApplicationContext(), Home.class);
+            intent.putExtra("previousActivity", "ex_tagmatch");
+            String url = Constants.IP_SERVER + "/ads/" + adv.getID() + "/tagmatch";
+            intent.putExtra("url", url);
+            startActivity(intent);
+            //finish();
+        }
+        else if (id == R.id.action_fav) {
+            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/users/"+ adv.getID().toString() + "/fav", getApplicationContext()){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if (jsonObject.has("status"))  Log.i(Constants.DebugTAG,"status: "+jsonObject.getInt("status"));
+                        Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                        }
+                        else {
+                            if(jsonObject.has("id")) {
+                                Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
+                                Toast.makeText(getApplicationContext(),R.string.added_fav,Toast.LENGTH_LONG).show();
+                                invalidateOptionsMenu();
+                                getMenuInflater().inflate(R.menu.menu_view_foreign_unfav_adv, my_menu);
+                            }
+                        }
+                    } catch (JSONException ignored){
+
                     }
-                });
-                builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.cancel();
+                }
+            }.execute(adv.toJSON2());
+            Log.i(Constants.DebugTAG, adv.toJSON().toString());
+        }
+        else if (id == R.id.action_unfav) {
+            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/users/"+ adv.getID() + "/unfav", getApplicationContext()){
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if (jsonObject.has("status"))  Log.i(Constants.DebugTAG,"status: "+jsonObject.getInt("status"));
+                        Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                        }
+                        else {
+                            if(jsonObject.has("id")) {
+                                Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
+                                Toast.makeText(getApplicationContext(),R.string.erased_fav,Toast.LENGTH_LONG).show();
+                                invalidateOptionsMenu();
+                                getMenuInflater().inflate(R.menu.menu_view_foreign_adv, my_menu);
+                            }
+                        }
+                    } catch (JSONException ignored){
+
                     }
-                });
-
-                builder.show();
-                break;
-
-            case R.id.action_delete:
-                AlertDialog alertDialog = createDeleteDialog();
-                alertDialog.show();
-                break;
-
-            case R.id.tagmatch_exchange:
-                Intent intent = new Intent(getApplicationContext(), Home.class);
-                intent.putExtra("previousActivity", "ex_tagmatch");
-                String url = Constants.IP_SERVER + "/ads/" + adv.getID() + "/tagmatch";
-                intent.putExtra("url", url);
-                startActivity(intent);
-                //finish();
-                break;
+                }
+            }.execute(adv.toJSON2());
+            Log.i(Constants.DebugTAG, adv.toJSON().toString());
         }
 
         return super.onOptionsItemSelected(item);
@@ -203,7 +322,8 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     Log.i(Constants.DebugTAG,"onPostExecute");
                         Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
                         adv = Helpers.convertJSONToAdvertisement(jsonObject);
-                        setTitle(adv.getTitle());
+                        Log.i(Constants.DebugTAG, "Vaig a mostrar l'anunci amb titol: " + adv.getTitle());
+                        title.setText(adv.getTitle());
                         fillComponents();
                         //String error = jsonObject.get("error").toString();
                 }
@@ -220,11 +340,16 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     }
 
     private void initComponents() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view_advert);
-        setSupportActionBar(toolbar);
-
         userImage = (ImageView) findViewById(R.id.advert_user_image);
         userImage.setImageDrawable(getDrawable(R.drawable.loading));
+
+        title = (TextView) findViewById(R.id.toolbar_title_view_ad);
+        title.setText(R.string.loading_title);
+        if (Build.VERSION.SDK_INT < 23) {
+            title.setTextAppearance(getApplicationContext(),R.style.normalText);
+        } else {
+            title.setTextAppearance(R.style.normalText);
+        }
 
         imageType = (ImageView) findViewById(R.id.advert_image_type);
         location = (TextView) findViewById(R.id.advert_location);

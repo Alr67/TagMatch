@@ -8,10 +8,12 @@ import android.util.Log;
 import android.widget.Toast;
 
 import software33.tagmatch.AdCards.Home;
+import software33.tagmatch.Advertisement.DiscoveryTagmatch;
 import software33.tagmatch.Chat.MainChatActivity;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.Users.MyAdverts;
+import software33.tagmatch.Users.ViewFavs;
 import software33.tagmatch.Users.ViewProfile;
 
 /**
@@ -39,24 +41,23 @@ public final class NavigationController {
             Intent intent = new Intent(parent, MyAdverts.class);
             parent.startActivity(intent);
             parent.finish();
+        }   else if (id == R.id.nav_my_favs) {
+            Intent intent = new Intent(parent, ViewFavs.class);
+            parent.startActivity(intent);
+            parent.finish();
         }  else if (id == R.id.nav_logout) {
             Helpers.logout(parent.getApplicationContext());
             Intent intent3 = new Intent(parent.getApplicationContext(), Login.class);
             parent.startActivity(intent3);
             parent.finish();
         }  else if (id == R.id.nav_discovery_tagmatch) {
-            Intent intent = new Intent(parent.getApplicationContext(), Home.class);
-            intent.putExtra("previousActivity", "disc");
-            String url = Constants.IP_SERVER + "/users/discovery";
-            intent.putExtra("url", url);
+            Intent intent = new Intent(parent.getApplicationContext(), DiscoveryTagmatch.class);
             parent.startActivity(intent);
             parent.finish();
         } else {
             Toast.makeText(parent.getApplicationContext(), "TODO", Toast.LENGTH_SHORT).show();
         }
 
-        DrawerLayout drawer = (DrawerLayout) parent.findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
         return true;
     }
 
