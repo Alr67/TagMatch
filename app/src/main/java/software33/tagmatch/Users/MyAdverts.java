@@ -140,7 +140,12 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
                                     if (newAdvert.getImagesIDs().length > 0)
                                         imageId = newAdvert.getImagesIDs()[0];
                                     else imageId = "";
-                                    items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getOwner().getAlias(), newAdvert.getID()));
+
+                                    //Code to get the sold
+                                    boolean sold = false;
+                                    if(object.has("sold")) sold = object.getBoolean("sold");
+
+                                    items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getOwner().getAlias(), newAdvert.getID(), sold));
                                 }
                                 adapter.notifyDataSetChanged();
                             }

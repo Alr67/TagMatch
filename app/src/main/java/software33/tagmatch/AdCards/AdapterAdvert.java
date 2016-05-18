@@ -1,7 +1,11 @@
 package software33.tagmatch.AdCards;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffColorFilter;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -81,6 +85,12 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
             }
         }
         else viewHolder.imagen.setImageDrawable(context.getDrawable(R.drawable.image_placeholder));
+
+        if (items.get(i).getSold()){
+            Log.i("DebugSold","Sold");
+            PorterDuffColorFilter greyFilter = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
+            viewHolder.imagen.setColorFilter(greyFilter);
+        }
 
         if(typeaux == Constants.typeServerGIFT) {
             viewHolder.type.setImageDrawable(context.getDrawable(R.drawable.advert_gift));

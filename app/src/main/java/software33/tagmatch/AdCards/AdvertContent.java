@@ -18,6 +18,7 @@ public class AdvertContent {
     private Double ad_price;
 
     private String ad_owner;
+    private boolean ad_sold = false;
 
     public AdvertContent(String s, String img, String type) {
         this.ad_name = s;
@@ -33,6 +34,16 @@ public class AdvertContent {
         this.ad_price = price;
         this.ad_owner = ad_owner;
         this.ad_id = id;
+    }
+
+    public AdvertContent( String s, String img, String type, Double price, String ad_owner, Integer id, boolean sold) {
+        this.ad_name = s;
+        this.ad_img_id = img;
+        this.ad_type = type;
+        this.ad_price = price;
+        this.ad_owner = ad_owner;
+        this.ad_id = id;
+        this.ad_sold = sold;
     }
 
     public String getNom() {
@@ -56,4 +67,6 @@ public class AdvertContent {
     public String getOwner() {
         return ad_owner;
     }
+
+    public boolean getSold() { return ad_sold; }
 }
