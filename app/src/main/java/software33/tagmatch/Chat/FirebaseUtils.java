@@ -124,6 +124,7 @@ public abstract class FirebaseUtils {
         String text;
         Boolean accepted;
         int exchangeID;
+        Map<String, Integer> valoration = new HashMap<>();
         public ChatOffer() {
             // empty default constructor, necessary for Firebase to be able to deserialize blog posts
         }
@@ -136,6 +137,9 @@ public abstract class FirebaseUtils {
         public Boolean getAccepted() { return accepted; }
         public int getExchangeID() {
             return exchangeID;
+        }
+        public Map<String, Integer> getValoration(){
+            return valoration;
         }
     }
 

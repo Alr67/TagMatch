@@ -167,6 +167,7 @@
     <string name="mainchat_new_offer">Offer!</string>
     <string name="mainchat_pending_offer">Pending</string>
     <string name="mainchat_closed_offer">Closed</string>
+    <string name="mainchat_rated_offer">Rated</string>
 
     <string name="message_information_offer">Information!\n</string>
     <string name="message_accepted_offer">has accepted your offer</string>

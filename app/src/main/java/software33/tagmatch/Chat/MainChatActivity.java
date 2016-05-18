@@ -233,7 +233,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                 }
                 //if (messages > 0) FirebaseUtils.displayNotification(context);
 
-                //1: Offer 2: Pending 3: Closed
+                //1: Offer 2: Pending 3: Closed 4: Rated
                 int newOffer = 0;
                 if (snapshot.hasChild("offer")){
                     FirebaseUtils.ChatOffer o = snapshot.child("offer").getValue(FirebaseUtils.ChatOffer.class);
@@ -241,7 +241,10 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                         if (!o.getSenderId().equals(myId)) newOffer = 1;
                         else newOffer = 2;
                     }
-                    else newOffer = 3;
+                    else {
+                        if (!o.getValoration().isEmpty()) newOffer = 3;
+                        else newOffer = 4;
+                    }
                 }
 
                 //Get Correct User Between two
