@@ -145,7 +145,6 @@
     <string name="title_activity_view_favs">ViewFavs</string>
     <string name="title_activity_discovery_ads">DiscoveryAds</string>
 
-<<<<<<< HEAD
     <!-- Chat Offer -->
     <string name="dialog_title_send_offer">Send offer</string>
     <string name="dialog_select_offer">Select offer:</string>
@@ -186,12 +185,11 @@
     <!-- other user -->
     <string name="view_advertisements">View Advertisements</string>
     <string name="my_advs_title_end">\'s Adverts</string>
-=======
+
     <!-- Discovery -->
     <string name="title_discovery">Discovery TagMatch!</string>
 
     <!-- FAVs -->
     <string name="fav_title">Favorites</string>
->>>>>>> Rafa-FAVs
 
 </resources>
