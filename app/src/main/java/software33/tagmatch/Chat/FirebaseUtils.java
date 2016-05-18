@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Resources;
+import android.net.Uri;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.util.Pair;
@@ -270,6 +271,11 @@ public abstract class FirebaseUtils {
    /* notificationID allows you to update the notification later on. */
         int notificationID = 10;
         mNotificationManager.notify(notificationID, mBuilder.build());
+    }
+
+    public static void startService(Context context){
+        Intent intent = new Intent(context, FirebaseService.class);
+        context.startService(intent);
     }
 
     public static void startListeners(final String myId, final Context context){
