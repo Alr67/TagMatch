@@ -40,9 +40,6 @@ import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
 
-/**
- * Created by Cristina on 18/04/2016.
- */
 public class MyAdverts extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recycler;
@@ -51,6 +48,9 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
     private List<Advertisement> advertisements;
     private ArrayList<AdvertContent> items;
     private TextView loading;
+    private boolean otherUser;
+    private String username;
+    private TextView title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -67,6 +67,22 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        String title = getString(R.string.vw_1);
+
+        if(getIntent().hasExtra("previousActivity") && getIntent().getExtras().getString("previousActivity").equals("ViewOtherProfile")){
+            otherUser = true;
+            username = getIntent().getExtras().getString("username");
+            title += username;
+        }
+        else {
+            otherUser = false;
+            title += Helpers.getActualUser(this).getAlias();
+        }
+
+        title += getString(R.string.my_advs_title_end);
+        setTitle(title);
+
         initComponents();
     }
 
@@ -86,6 +102,9 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
                 finish();
             }
         });
+
+        if(otherUser)
+            fab.setVisibility(View.GONE);
 
         items = new ArrayList<>();
 
@@ -118,7 +137,11 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
     private void downloadAdvertsFromServer() {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
-        String url = Constants.IP_SERVER+"/users/"+actualUser.getAlias()+"/ads?limit="+Constants.SERVER_limitAdverts;
+        String url;
+        if(otherUser)
+            url = Constants.IP_SERVER+"/users/"+username+"/ads?limit="+Constants.SERVER_limitAdverts;
+        else
+            url = Constants.IP_SERVER+"/users/"+actualUser.getAlias()+"/ads?limit="+Constants.SERVER_limitAdverts;
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());

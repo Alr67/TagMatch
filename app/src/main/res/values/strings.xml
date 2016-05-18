@@ -177,4 +177,8 @@
     <string name="button_dialog_error_create_offer">OK</string>
     <string name="message_dialog_error_create_offer">This advertisement has already accepted an offer</string>
 
+    <!-- other user -->
+    <string name="view_advertisements">View Advertisements</string>
+    <string name="my_advs_title_end">\'s Adverts</string>
+
 </resources>
