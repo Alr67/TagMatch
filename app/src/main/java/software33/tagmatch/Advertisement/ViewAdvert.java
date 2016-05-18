@@ -71,7 +71,6 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private CustomPagerAdapterViewAdvert mCustomPagerAdapterViewAdvert;
     private GoogleMap map;
     private Advertisement adv;
-    private List<Advertisement> advertisements;
 
     private ChildEventListener mListener;
     private String idChat = "Not exists";
@@ -149,22 +148,24 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
-                            advertisements = new ArrayList<>();
                             boolean stop = false;
-                            for (int n = 0; n < jsonArray.length() || stop; n++) {
+                            for (int n = 0; n < jsonArray.length() && !stop; n++) {
                                 JSONObject object = null;
                                 try {
                                     object = jsonArray.getJSONObject(n);
                                 } catch (JSONException e) {
                                     e.printStackTrace();
                                 }
+
                                 Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
                                 if (newAdvert.getID().equals(adv.getID())) {
                                     getMenuInflater().inflate(R.menu.menu_view_foreign_unfav_adv, menu);
                                     stop = true;
                                 }
                             }
-                            if (!stop) getMenuInflater().inflate(R.menu.menu_view_foreign_adv, menu);
+                            if (!stop){
+                                getMenuInflater().inflate(R.menu.menu_view_foreign_adv, menu);
+                            }
                         }
 
                     } catch (JSONException e) {
@@ -211,6 +212,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                             if(jsonObject.has("id")) {
                                 Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
                                 Toast.makeText(getApplicationContext(),R.string.added_fav,Toast.LENGTH_LONG).show();
+                                invalidateOptionsMenu();
                                 getMenuInflater().inflate(R.menu.menu_view_foreign_unfav_adv, my_menu);
                             }
                         }
@@ -235,6 +237,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                             if(jsonObject.has("id")) {
                                 Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
                                 Toast.makeText(getApplicationContext(),R.string.erased_fav,Toast.LENGTH_LONG).show();
+                                invalidateOptionsMenu();
                                 getMenuInflater().inflate(R.menu.menu_view_foreign_adv, my_menu);
                             }
                         }
