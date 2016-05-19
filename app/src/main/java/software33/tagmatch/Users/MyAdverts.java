@@ -215,7 +215,7 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent intent = new Intent(this, Home.class);
+            Intent intent = new Intent(this, MyAdverts.class);
             startActivity(intent);
             finish();
         }

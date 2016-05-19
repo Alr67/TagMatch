@@ -27,7 +27,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clickable="false"
-            android:contextClickable="false">
+            android:contextClickable="false"
+            android:id="@+id/layout_img">
 
             <ImageView
                 android:id="@+id/imagen"
