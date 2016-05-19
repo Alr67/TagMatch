@@ -261,10 +261,12 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                         else newOffer = 2;
                     }
                     else {
-                        if (!o.getValoration().isEmpty()) newOffer = 3;
+                        if (!o.getValoration().isEmpty()) {
+                            if (o.getExchangeID() != -1 && o.getSenderId().equals(myId)) closeAdvert(String.valueOf(o.getExchangeID()), userName, idChat, o.getValoration());
+                            newOffer = 3;
+                        }
                         else newOffer = 4;
 
-                        if (o.getExchangeID() != -1) closeAdvert(String.valueOf(o.getExchangeID()), userName, idChat);
                     }
                 }
 
@@ -387,7 +389,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         return builder.create();
     }
 
-    private void closeAdvert(final String advToClose, final String userToVote, final String idChat) {
+    private void closeAdvert(final String advToClose, final String userToVote, final String idChat, final Map<String, Integer> valoration) {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("sold", true);
@@ -399,7 +401,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 try {
-                    Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
+                    Log.i(Constants.DebugTAG,"JSON1: \n"+jsonObject);
                     if(jsonObject.has("error")) {
                         String error = jsonObject.get("error").toString();
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
@@ -408,7 +410,6 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                         Log.i("Debug-CloseAdv","Closed adv" +advToClose);
 
                         Map<String, Object> values = new HashMap<>();
-                        Map<String, Integer> valoration = new HashMap<>();
                         valoration.put(""+userToVote, Integer.parseInt(advToClose));
                         values.put("valoration",valoration);
                         FirebaseUtils.getChatsRef().child(idChat).child("offer").updateChildren(values);

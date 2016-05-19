@@ -151,7 +151,7 @@
     <string name="dialog_confirm_send_offer">Confirm</string>
     <string name="dialog_cancel_send_offer">Cancel</string>
 
-    <string name="dialog_title_rate_deal">Rate deal</string>
+    <string name="title_rate_deal">Rate deal</string>
 
     <string name="pending_offer">This offer is still pending</string>
     <string name="confirm_offer">Confirm</string>

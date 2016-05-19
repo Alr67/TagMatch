@@ -34,6 +34,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -112,6 +113,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private int offerExchangeID;
     private boolean rateAvailable = false;
     private int rateAdvId;
+    private int starts = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -333,7 +335,7 @@ public class SingleChatActivity extends AppCompatActivity {
                 bAcceptOffer.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View arg0) {
-                        createValorationDialog().show();
+                        createValorationDialog(valoration).show();
                     }
                 });
             }
@@ -692,7 +694,11 @@ public class SingleChatActivity extends AppCompatActivity {
         return builder.create();
     }
 
-    public AlertDialog createValorationDialog() {
+    public AlertDialog createValorationDialog(Map<String, Integer> valoration) {
+        valoration.remove(Helpers.getActualUser(this).getAlias());
+        final Map<String, Object> value = new HashMap<>();
+        value.put("valoration",valoration);
+
         // Get the layout inflater
         LayoutInflater inflater = this.getLayoutInflater();
 
@@ -704,6 +710,19 @@ public class SingleChatActivity extends AppCompatActivity {
                 .setNegativeButton(android.R.string.cancel, null)
                 .create();
 
+        RatingBar ratingBar = (RatingBar) view.findViewById(R.id.ratingBar);
+
+
+        //if rating value is changed,
+        //display the current rating value in the result (textview) automatically
+        ratingBar.setOnRatingBarChangeListener(new RatingBar.OnRatingBarChangeListener() {
+            public void onRatingChanged(RatingBar ratingBar, float rating,
+                                        boolean fromUser) {
+
+                starts = (int)rating;
+            }
+        });
+
         d.setOnShowListener(new DialogInterface.OnShowListener() {
 
             @Override
@@ -714,7 +733,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
                     @Override
                     public void onClick(View view) {
-                        d.dismiss();
+                        sendRateToServer(value, d);
                     }
                 });
             }
@@ -796,7 +815,7 @@ public class SingleChatActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 try {
-                    Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
+                    Log.i(Constants.DebugTAG,"JSON2: \n"+jsonObject);
                     if(jsonObject.has("error")) {
                         String error = jsonObject.get("error").toString();
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
@@ -842,5 +861,33 @@ public class SingleChatActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void sendRateToServer(final Map<String, Object> value, final AlertDialog d){
+        Log.i("DebugRate",String.valueOf(starts));
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("rating", starts);
+        } catch (JSONException e) {
+        }
+        final Context context = this;
+        new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads/"+idProduct+"/rate", this, true){
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    Log.i(Constants.DebugTAG,"JSON2: \n"+jsonObject);
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        FirebaseUtils.getChatsRef().child(idChat).child("offer").updateChildren(value);
+                        d.dismiss();
+                    }
+                } catch (JSONException ignored){
+
+                }
+            }
+        }.execute(jsonObject);
     }
 }
