@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.Helpers;
 
 public abstract class FirebaseUtils {
 
@@ -218,61 +219,6 @@ public abstract class FirebaseUtils {
         });
     }
 
-    public static void displayNotification(Context context) {
-        Log.i("Start", "notification");
-
-   /* Invoking the default notification service */
-        NotificationCompat.Builder  mBuilder = new NotificationCompat.Builder(context);
-
-        mBuilder.setContentTitle("New Message");
-        mBuilder.setContentText("You've received new message.");
-        mBuilder.setTicker("New Message Alert!");
-        mBuilder.setSmallIcon(R.drawable.image0);
-
-   /* Increase notification number every time a new notification arrives */
-        int numMessages = 1;
-        mBuilder.setNumber(++numMessages);
-
-   /* Add Big View Specific Configuration */
-        NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
-
-        String[] events = new String[6];
-        events[0] = new String("This is first line....");
-        events[1] = new String("This is second line...");
-        events[2] = new String("This is third line...");
-        events[3] = new String("This is 4th line...");
-        events[4] = new String("This is 5th line...");
-        events[5] = new String("This is 6th line...");
-
-        // Sets a title for the Inbox style big view
-        inboxStyle.setBigContentTitle("Big Title Details:");
-
-        // Moves events into the big view
-        for (int i=0; i < events.length; i++) {
-            inboxStyle.addLine(events[i]);
-        }
-
-        mBuilder.setStyle(inboxStyle);
-
-   /* Creates an explicit intent for an Activity in your app */
-        Intent resultIntent = new Intent(context, MainChatActivity.class);
-
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(context);
-        stackBuilder.addParentStack(MainChatActivity.class);
-
-   /* Adds the Intent that starts the Activity to the top of the stack */
-        stackBuilder.addNextIntent(resultIntent);
-        PendingIntent resultPendingIntent =stackBuilder.getPendingIntent(0,PendingIntent.FLAG_UPDATE_CURRENT);
-
-        mBuilder.setContentIntent(resultPendingIntent);
-
-        NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
-   /* notificationID allows you to update the notification later on. */
-        int notificationID = 10;
-        mNotificationManager.notify(notificationID, mBuilder.build());
-    }
-
     public static void startService(Context context){
         Intent intent = new Intent(context, FirebaseService.class);
         context.startService(intent);
@@ -280,7 +226,9 @@ public abstract class FirebaseUtils {
 
     public static void startListeners(final String myId, final Context context){
         if (!startedListeners) {
+            Log.i("DebugListeners","Starting listeners");
             startedListeners = true;
+            //final NotificationController notificationController = new NotificationController();
             listener1 = FirebaseUtils.getUsersRef().child(myId).child("chats").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -290,14 +238,21 @@ public abstract class FirebaseUtils {
                                 @Override
                                 public void onDataChange(DataSnapshot snapshot) {
                                     ChatInfo c = snapshot.child("info").getValue(ChatInfo.class);
-                                    int messages = 0;
+                                    ArrayList<String> arrayListMessages = new ArrayList<>((int)snapshot.child("chats").getChildrenCount());
                                     for (DataSnapshot dataSnapshot1 : snapshot.child("messages").getChildren()) {
                                         FirebaseUtils.ChatText ct = dataSnapshot1.getValue(FirebaseUtils.ChatText.class);
                                         if (!ct.getRead() && !ct.getSenderId().equals(myId)) {
-                                            ++messages;
+                                            arrayListMessages.add(ct.getText());
                                         }
                                     }
-                                    if (messages > 0) FirebaseUtils.displayNotification(context);
+                                    String userName = "";
+                                    for (Object o : c.getUsers().values()) {
+                                        if (!o.toString().equals(Helpers.getActualUser(context).getAlias())){
+                                            userName = o.toString();
+                                        }
+                                    }
+                                    //if (arrayListMessages.size() > 0) notificationController.displayNotification(context,c.getTitleProduct(),userName,arrayListMessages);
+                                    //else notificationController.cleanEntry(c.getTitleProduct(),userName);
 
                                     String idUser = "";
                                     for (String s : c.getUsers().keySet()) {

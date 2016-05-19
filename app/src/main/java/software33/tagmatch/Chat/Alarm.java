@@ -10,6 +10,8 @@ import android.os.PowerManager;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.firebase.client.Firebase;
+
 public class Alarm extends BroadcastReceiver
 {
     @Override
@@ -20,8 +22,9 @@ public class Alarm extends BroadcastReceiver
         wl.acquire();
 
         // Put here YOUR code.
-        Log.i("DebugAlarm", "Alarm!!");
-        Toast.makeText(context, "Alarm !!!!!!!!!!", Toast.LENGTH_SHORT).show(); // For example
+        Log.i("DebugAlarm","I'm running the service");
+        //Firebase.setAndroidContext(context);
+        //FirebaseUtils.startListeners(FirebaseUtils.getMyId(context),context);
 
         wl.release();
     }

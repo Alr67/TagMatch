@@ -185,8 +185,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }*/
 
     private void startChatListeners(){
-        //FirebaseUtils.startListeners(FirebaseUtils.getMyId(this), this);
-        FirebaseUtils.startService(this);
+        FirebaseUtils.startListeners(FirebaseUtils.getMyId(this), this);
+        //FirebaseUtils.startService(this);
     }
 
     @Override
