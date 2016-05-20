@@ -228,7 +228,7 @@ public abstract class FirebaseUtils {
         if (!startedListeners) {
             Log.i("DebugListeners","Starting listeners");
             startedListeners = true;
-            //final NotificationController notificationController = new NotificationController();
+            final NotificationController notificationController = new NotificationController();
             listener1 = FirebaseUtils.getUsersRef().child(myId).child("chats").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
@@ -251,8 +251,8 @@ public abstract class FirebaseUtils {
                                             userName = o.toString();
                                         }
                                     }
-                                    //if (arrayListMessages.size() > 0) notificationController.displayNotification(context,c.getTitleProduct(),userName,arrayListMessages);
-                                    //else notificationController.cleanEntry(c.getTitleProduct(),userName);
+                                    if (arrayListMessages.size() > 0) notificationController.displayNotification(context,c.getTitleProduct(),userName,arrayListMessages);
+                                    else notificationController.cleanEntry(c.getTitleProduct(),userName);
 
                                     String idUser = "";
                                     for (String s : c.getUsers().keySet()) {
@@ -285,5 +285,6 @@ public abstract class FirebaseUtils {
                 }
             });
         }
+        else Log.i("DebugListeners","Not starting listeners");
     }
 }

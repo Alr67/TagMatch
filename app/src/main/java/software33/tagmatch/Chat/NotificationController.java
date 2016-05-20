@@ -25,8 +25,6 @@ import software33.tagmatch.R;
 public class NotificationController {
 
     private int idNotification = 100;
-
-    private int numMessages = 0;
     private HashMap<Pair<String, String>, Object[]> messagesForEveryChat = new HashMap<>();
 
     public void cleanEntry(String titleProduct, String author){
@@ -44,10 +42,6 @@ public class NotificationController {
         mBuilder.setTicker("New Message Alert!");
         mBuilder.setSmallIcon(R.drawable.image0);
 
-   /* Increase notification number every time a new notification arrives */
-        numMessages += messages.size();
-        mBuilder.setNumber(numMessages);
-
         /* Add Big View Specific Configuration */
 
         Object[] texts = messages.toArray();
@@ -56,6 +50,8 @@ public class NotificationController {
 
         // Moves events into the big view
         NotificationCompat.InboxStyle inboxStyle = new NotificationCompat.InboxStyle();
+
+        int numMessages = 0;
 
         for (Pair p : messagesForEveryChat.keySet()){
             if (messagesForEveryChat.get(p).length != 0) {
@@ -69,9 +65,15 @@ public class NotificationController {
 
                 for (Object o : messagesForEveryChat.get(p)){
                     inboxStyle.addLine("    "+o.toString());
+                    ++numMessages;
                 }
             }
         }
+
+
+
+        /* Increase notification number every time a new notification arrives */
+        mBuilder.setNumber(numMessages);
 
         mBuilder.setStyle(inboxStyle);
 

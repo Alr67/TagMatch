@@ -14,6 +14,7 @@ import com.firebase.client.Firebase;
 
 public class Alarm extends BroadcastReceiver
 {
+
     @Override
     public void onReceive(Context context, Intent intent)
     {
@@ -22,9 +23,12 @@ public class Alarm extends BroadcastReceiver
         wl.acquire();
 
         // Put here YOUR code.
-        Log.i("DebugAlarm","I'm running the service");
-        //Firebase.setAndroidContext(context);
-        //FirebaseUtils.startListeners(FirebaseUtils.getMyId(context),context);
+        Log.i("DebugAlarm","I'm running the service");/*
+        if (!ServiceController.startedListeners) {
+            Firebase.setAndroidContext(context);
+            FirebaseUtils.startListeners(FirebaseUtils.getMyId(context), context);
+            ServiceController.startedListeners = true;
+        }*/
 
         wl.release();
     }
