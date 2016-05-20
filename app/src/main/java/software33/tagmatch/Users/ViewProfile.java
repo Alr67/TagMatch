@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import com.firebase.client.Firebase;
@@ -52,6 +53,8 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     private User user;
     private FloatingActionButton fab;
     private boolean otherUser;
+    private RatingBar ratingBar;
+    private TextView ratingTV;
 
 
     @Override
@@ -73,6 +76,9 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         Bundle extras = getIntent().getExtras();
 
         user = Helpers.getActualUser(this);
+
+        ratingBar = (RatingBar) findViewById(R.id.profile_rating_bar);
+        ratingTV = (TextView) findViewById(R.id.profile_rating_tv);
 
         tvLocation = (TextView) findViewById(R.id.tvLocation);
         ivUserImage = (ImageView) findViewById(R.id.ivUserImage);
@@ -152,6 +158,10 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                                 }
                             }
                             interests_hash.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, listdata));
+                            double ratingAux = jsonObject.getDouble("rating");
+                            ratingBar.setRating((float) ratingAux);
+                            ratingTV.setText(jsonObject.getString("rating") + "/5.0");
+
                         }
                     } catch (JSONException ignored) {
                         Log.i("DEBUG","error al get user");
@@ -226,6 +236,9 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                                 }
                             }
                             interests_hash.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, listdata));
+                            double ratingAux = jsonObject.getDouble("rating");
+                            ratingBar.setRating((float) ratingAux);
+                            ratingTV.setText(jsonObject.getString("rating") + "/5.0");
                         }
                     } catch (JSONException ignored) {
                         Log.i("DEBUG","error al get user");
