@@ -92,10 +92,11 @@
             android:name=".Users.ViewFavs"
             android:label="@string/title_activity_view_favs"
             android:theme="@style/AppTheme.NoActionBar" />
+
         <activity
             android:name=".Advertisement.DiscoveryTagmatch"
             android:label="@string/title_activity_discovery_ads"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <receiver android:process=":remote" android:name=".Chat.Alarm"></receiver>
 

@@ -151,7 +151,7 @@ public class DiscoveryTagmatch extends AppCompatActivity implements NavigationVi
     }
 
     private void showNotAdvertsMessage() {
-        loading = (TextView) findViewById(R.id.text_loading);
+        loading = (TextView) findViewById(R.id.text_loading_disc);
         ViewGroup.LayoutParams params = loading.getLayoutParams();
         params.height = Helpers.getDisplayHeight(this)/2;
         loading.setGravity(Gravity.BOTTOM|Gravity.FILL_VERTICAL);

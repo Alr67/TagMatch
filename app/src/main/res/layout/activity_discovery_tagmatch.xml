@@ -48,7 +48,7 @@
             android:text=""
             android:textSize="19dp"
             android:textStyle="bold"
-            android:id="@+id/text_loading_favs" />
+            android:id="@+id/text_loading_disc" />
 
     </RelativeLayout>
 

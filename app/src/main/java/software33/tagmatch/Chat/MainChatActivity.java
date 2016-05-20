@@ -74,9 +74,12 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nav_chats);
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_chats);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_chats);
         setSupportActionBar(toolbar);
+
+
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
         drawer.setDrawerListener(toggle);
@@ -438,4 +441,5 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
             finish();
         }
     }
+
 }
