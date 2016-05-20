@@ -378,7 +378,7 @@ public class SingleChatActivity extends AppCompatActivity {
                     chats.put(idChat,true);
                     usersRef.child(idUser).child("chats").updateChildren(chats);
                 }
-                else if (snapshot.child(idChat).getValue() == false) {
+                else if (!(boolean)snapshot.child(idChat).getValue()) {
                     Map<String, Object> chats = new HashMap<>();
                     chats.put(idChat,true);
                     usersRef.child(idUser).child("chats").updateChildren(chats);

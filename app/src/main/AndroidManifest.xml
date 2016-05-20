@@ -61,8 +61,8 @@
         <activity
             android:name=".Advertisement.NewAdvertisement"
             android:label="@string/title_activity_new_advertisement"
-            android:windowSoftInputMode="stateVisible|adjustResize"
-            android:theme="@style/AppTheme.NoActionBar" />
+            android:theme="@style/AppTheme.NoActionBar"
+            android:windowSoftInputMode="stateVisible|adjustResize" />
         <activity
             android:name=".Users.ViewProfile"
             android:label=""
@@ -88,6 +88,14 @@
             android:name=".Users.EditProfile"
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="adjustResize" />
+        <activity
+            android:name=".Users.ViewFavs"
+            android:label="@string/title_activity_view_favs"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Advertisement.DiscoveryTagmatch"
+            android:label="@string/title_activity_discovery_ads"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
 
         <receiver android:process=":remote" android:name=".Chat.Alarm"></receiver>
 

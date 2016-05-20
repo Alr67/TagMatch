@@ -49,8 +49,8 @@ public class TagMatchGetAsyncTask extends AsyncTask<JSONObject, Void, JSONObject
             basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.NO_WRAP));
             if (url.getHost().contains("heroku")) {
                 HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-                con.setConnectTimeout(15000);
-                con.setReadTimeout(15000);
+                con.setConnectTimeout(35000);
+                con.setReadTimeout(35000);
                 con.setRequestMethod("GET");
                 con.setInstanceFollowRedirects(true);
 

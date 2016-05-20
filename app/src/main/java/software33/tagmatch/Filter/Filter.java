@@ -157,7 +157,7 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
                         String error = jsonObject.get("error").toString();
                     } else {
                         String add = jsonObject.getString("200");
-                        add = cleanJSON(add);
+                        add = Helpers.cleanJSON(add);
                         suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
                         adapter = new ArrayAdapter<String>(getApplicationContext(),R.layout.dropdown,suggestions);
                         sugg_hashtags.setTextColor(Color.BLACK);

@@ -4,12 +4,14 @@ import android.content.Context;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffColorFilter;
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -40,6 +42,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
     public static class ReceptesViewHolder extends RecyclerView.ViewHolder {
         public ImageView imagen, type;
         public TextView nombre, preu;
+        public LinearLayout layout;
 
         public ReceptesViewHolder(View v) {
             super(v);
@@ -47,6 +50,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
             type = (ImageView) v.findViewById(R.id.type);
             preu = (TextView) v.findViewById(R.id.preu);
             nombre = (TextView) v.findViewById(R.id.nombre);
+            layout = (LinearLayout) v.findViewById(R.id.layout_img);
         }
     }
     public AdapterAdvert(ArrayList<AdvertContent> items, Context context) {
@@ -74,7 +78,7 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
     public void onBindViewHolder(ReceptesViewHolder viewHolder, int i) {
         viewHolder.imagen.setImageDrawable(context.getDrawable(R.drawable.loading_gif));
         viewHolder.nombre.setText(items.get(i).getNom());
-        //Picasso.with(context).load(R.drawable.loading).into(viewHolder.imagen);
+        Picasso.with(context).load(R.drawable.loading).into(viewHolder.imagen);
 
         String typeaux = items.get(i).getType();
         if(items.get(i).getImgId()!="") {
@@ -90,6 +94,8 @@ public class AdapterAdvert extends RecyclerView.Adapter<AdapterAdvert.ReceptesVi
             Log.i("DebugSold","Sold");
             PorterDuffColorFilter greyFilter = new PorterDuffColorFilter(Color.GRAY, PorterDuff.Mode.MULTIPLY);
             viewHolder.imagen.setColorFilter(greyFilter);
+            viewHolder.layout.setOnClickListener(null);
+            viewHolder.nombre.setTextColor(Color.GRAY);
         }
 
         if(typeaux == Constants.typeServerGIFT) {

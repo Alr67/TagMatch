@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -50,6 +51,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     private LatLng userPosition;
     private User user;
     private FloatingActionButton fab;
+    private boolean otherUser;
 
 
     @Override
@@ -87,9 +89,11 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         title = (TextView) findViewById(R.id.toolbar_title_view_profile);
         if(getIntent().hasExtra("username")) {
+            otherUser = true;
             initOtherUser(extras.getString("username"));
         }
         else {
+            otherUser=false;
             initCurrentUser();
         }
 
@@ -179,7 +183,6 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         });
     }
 
-
     private void initOtherUser(String username) {
 
         title.setText(getResources().getString(R.string.vw_1) + username + getResources().getString(R.string.ed_2));
@@ -267,5 +270,25 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         return  NavigationController.onItemSelected(item.getItemId(),this);
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        if (otherUser) getMenuInflater().inflate(R.menu.view_other_user_advs, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case R.id.view_other_user_advs:
+                Intent intent = new Intent(this, MyAdverts.class);
+                intent.putExtra("previousActivity", "ViewOtherProfile");
+                intent.putExtra("username", getIntent().getExtras().getString("username"));
+                startActivity(intent);
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

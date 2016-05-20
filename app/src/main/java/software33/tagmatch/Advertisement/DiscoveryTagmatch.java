@@ -1,10 +1,12 @@
-package software33.tagmatch.Users;
+package software33.tagmatch.Advertisement;
 
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -18,7 +20,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,7 +41,7 @@ import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
 
-public class MyAdverts extends AppCompatActivity implements View.OnClickListener, NavigationView.OnNavigationItemSelectedListener {
+public class DiscoveryTagmatch extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
     private RecyclerView recycler;
     private AdapterAdvert adapter;
@@ -48,17 +49,19 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
     private List<Advertisement> advertisements;
     private ArrayList<AdvertContent> items;
     private TextView loading;
-    private boolean otherUser;
-    private String username;
-    private TextView title;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.nav_my_adverts);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_my_adverts);
+        setContentView(R.layout.nav_discovery);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-        setTitle(R.string.title_activity_my_adverts);
+
+        getSupportActionBar().setDisplayShowTitleEnabled(false); //Esconder titulo HAMBURGUER
+        TextView app_header = (TextView) toolbar.findViewById(R.id.toolbar_title_disc); //cogemos el textview de la toolbar
+        app_header.setText(R.string.title_discovery);
+        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/LobsterTwo-BoldItalic.ttf");//aplicamos el diseño
+        app_header.setTypeface(face);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -69,43 +72,12 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        String title = getString(R.string.vw_1);
-
-        if(getIntent().hasExtra("previousActivity") && getIntent().getExtras().getString("previousActivity").equals("ViewOtherProfile")){
-            otherUser = true;
-            username = getIntent().getExtras().getString("username");
-            title += username;
-        }
-        else {
-            otherUser = false;
-            title += Helpers.getActualUser(this).getAlias();
-        }
-
-        title += getString(R.string.my_advs_title_end);
-        setTitle(title);
-
         initComponents();
+
     }
 
     private void initComponents() {
-   /*     loading = (TextView) findViewById(R.id.text_loading);
-        ViewGroup.LayoutParams params = loading.getLayoutParams();
-        params.height = Helpers.getDisplayHeight(this)/2;
-        loading.setGravity(Gravity.BOTTOM|Gravity.FILL_VERTICAL);
-        loading.setLayoutParams(params);
-*/
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_my_adverts);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent novaRecepta = new Intent(getApplicationContext(), NewAdvertisement.class);
-                startActivity(novaRecepta);
-                finish();
-            }
-        });
 
-        if(otherUser)
-            fab.setVisibility(View.GONE);
 
         items = new ArrayList<>();
 
@@ -126,7 +98,7 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
             public void onClick(View v) {
                 Integer id = items.get(v.getTag().hashCode()).getAd_id();
                 Intent viewRecepta = new Intent(getApplicationContext(), ViewAdvert.class).putExtra(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT, id);
-                viewRecepta.putExtra(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT,Helpers.getActualUser(getApplicationContext()).getAlias());
+                viewRecepta.putExtra(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT, Helpers.getActualUser(getApplicationContext()).getAlias());
                 startActivity(viewRecepta);
                 finish();
             }
@@ -134,15 +106,10 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
         recycler.setAdapter(adapter);
     }
 
-    //TODO: POSAR ANUNCIS DEL USER
     private void downloadAdvertsFromServer() {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
-        String url;
-        if(otherUser)
-            url = Constants.IP_SERVER+"/users/"+username+"/ads?limit="+Constants.SERVER_limitAdverts;
-        else
-            url = Constants.IP_SERVER+"/users/"+actualUser.getAlias()+"/ads?limit="+Constants.SERVER_limitAdverts;
+        String url = Constants.IP_SERVER + "/users/discovery";
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());
@@ -155,7 +122,7 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
                             JSONArray jsonArray = jsonObject.getJSONArray("arrayResponse");
                             advertisements = new ArrayList<>();
                             if(jsonArray.length()>0) {
-                              //  hideLoading();
+                                //  hideLoading();
                                 for (int n = 0; n < jsonArray.length(); n++) {
                                     JSONObject object = jsonArray.getJSONObject(n);
                                     Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
@@ -164,12 +131,7 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
                                     if (newAdvert.getImagesIDs().length > 0)
                                         imageId = newAdvert.getImagesIDs()[0];
                                     else imageId = "";
-
-                                    //Code to get the sold
-                                    boolean sold = false;
-                                    if(object.has("sold")) sold = object.getBoolean("sold");
-
-                                    items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getOwner().getAlias(), newAdvert.getID(), sold));
+                                    items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getOwner().getAlias(), newAdvert.getID()));
                                 }
                                 adapter.notifyDataSetChanged();
                             }
@@ -197,25 +159,12 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
         loading.setText(getString(R.string.hint_no_adverts));
     }
 
-    /*   private void hideLoading() {
-           ViewGroup.LayoutParams params = loading.getLayoutParams();
-           params.height = 0;
-           loading.setLayoutParams(params);
-       }
-   */
-    @Override
-    public void onClick(View v) {
-        Toast.makeText(this,"NOT IMPLEMENTED YET",Toast.LENGTH_SHORT).show();
-    }
-
-
-    @Override
     public void onBackPressed(){
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
-            Intent intent = new Intent(this, MyAdverts.class);
+            Intent intent = new Intent(this, Home.class);
             startActivity(intent);
             finish();
         }
