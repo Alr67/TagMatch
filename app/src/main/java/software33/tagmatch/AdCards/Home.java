@@ -34,6 +34,7 @@ import java.util.List;
 
 import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
+import software33.tagmatch.Chat.FirebaseService;
 import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.MainChatActivity;
 import software33.tagmatch.Domain.Advertisement;
@@ -185,6 +186,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
     private void startChatListeners(){
         FirebaseUtils.startListeners(FirebaseUtils.getMyId(this), this);
+        //FirebaseUtils.startService(this);
     }
 
     @Override

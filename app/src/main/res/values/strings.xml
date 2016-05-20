@@ -155,14 +155,23 @@
     <string name="dialog_error_send_offer_no_information">You have to set the offer</string>
     <string name="dialog_confirm_send_offer">Confirm</string>
     <string name="dialog_cancel_send_offer">Cancel</string>
+
+    <string name="title_rate_deal">Rate deal</string>
+
     <string name="pending_offer">This offer is still pending</string>
     <string name="confirm_offer">Confirm</string>
     <string name="deny_offer">Deny</string>
+    <string name="rate_offer">Rate the deal!</string>
 
     <string name="dialog_title_deny_offer">Deny offer</string>
     <string name="dialog_message_deny_offer">Are you sure do you want to deny this offer?</string>
     <string name="dialog_confirm_deny_offer">Deny</string>
     <string name="dialog_cancel_deny_offer">No</string>
+
+    <string name="dialog_title_not_rate_deal">Rate deal</string>
+    <string name="dialog_message_not_rate_deal">Are you sure do you not want to rate this deal?</string>
+    <string name="dialog_confirm_not_rate_deal">No, thanks</string>
+    <string name="dialog_cancel_not_rate_deal">Rate</string>
 
     <string name="dialog_title_accept_offer">Accept offer</string>
     <string name="dialog_message_accept_offer">Are you sure do you want to accept this offer?</string>
@@ -172,6 +181,7 @@
     <string name="mainchat_new_offer">Offer!</string>
     <string name="mainchat_pending_offer">Pending</string>
     <string name="mainchat_closed_offer">Closed</string>
+    <string name="mainchat_rated_offer">Rated</string>
 
     <string name="message_information_offer">Information!\n</string>
     <string name="message_accepted_offer">has accepted your offer</string>

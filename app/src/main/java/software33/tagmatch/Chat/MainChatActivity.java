@@ -35,6 +35,9 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,6 +46,8 @@ import java.util.Map;
 
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
+import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
 
@@ -233,17 +238,6 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                 }
                 //if (messages > 0) FirebaseUtils.displayNotification(context);
 
-                //1: Offer 2: Pending 3: Closed
-                int newOffer = 0;
-                if (snapshot.hasChild("offer")){
-                    FirebaseUtils.ChatOffer o = snapshot.child("offer").getValue(FirebaseUtils.ChatOffer.class);
-                    if (!o.getAccepted()) {
-                        if (!o.getSenderId().equals(myId)) newOffer = 1;
-                        else newOffer = 2;
-                    }
-                    else newOffer = 3;
-                }
-
                 //Get Correct User Between two
                 String userName = "";
                 for (Object o : c.getUsers().values()) {
@@ -255,6 +249,24 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                 for (String s : c.getUsers().keySet()) {
                     if (!s.equals(myId)) {
                         idUser = s;
+                    }
+                }
+
+                //1: Offer 2: Pending 3: Closed 4: Rated
+                int newOffer = 0;
+                if (snapshot.hasChild("offer")){
+                    FirebaseUtils.ChatOffer o = snapshot.child("offer").getValue(FirebaseUtils.ChatOffer.class);
+                    if (!o.getAccepted()) {
+                        if (!o.getSenderId().equals(myId)) newOffer = 1;
+                        else newOffer = 2;
+                    }
+                    else {
+                        if (!o.getValoration().isEmpty()) {
+                            if (o.getExchangeID() != -1 && o.getSenderId().equals(myId)) closeAdvert(String.valueOf(o.getExchangeID()), userName, idChat, o.getValoration());
+                            newOffer = 3;
+                        }
+                        else newOffer = 4;
+
                     }
                 }
 
@@ -375,6 +387,38 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                         });
 
         return builder.create();
+    }
+
+    private void closeAdvert(final String advToClose, final String userToVote, final String idChat, final Map<String, Integer> valoration) {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("sold", true);
+        } catch (JSONException e) {
+        }
+
+        final Context context = this.getApplicationContext();
+        new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/"+advToClose, this){
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    Log.i(Constants.DebugTAG,"JSON1: \n"+jsonObject);
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Log.i("Debug-CloseAdv","Closed adv" +advToClose);
+
+                        Map<String, Object> values = new HashMap<>();
+                        valoration.put(""+userToVote, Integer.parseInt(advToClose));
+                        values.put("valoration",valoration);
+                        FirebaseUtils.getChatsRef().child(idChat).child("offer").updateChildren(values);
+                    }
+                } catch (JSONException ignored){
+
+                }
+            }
+        }.execute(jsonObject);
     }
 
     @Override
