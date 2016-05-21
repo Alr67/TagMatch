@@ -64,7 +64,6 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     private Firebase usersRef;
 
     private String myId;
-    private String myName;
 
     //Identified by IdProduct, UserName and have the id of the chat and it's user
     public Map<Pair<String, String>, Pair<String, String>> idChatsUser = new HashMap<>();
@@ -102,7 +101,6 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         //createUser("correu1@xd.com", "contra123");
 
         myId = FirebaseUtils.getMyId(this);
-        myName = Helpers.getActualUser(this).getAlias();
 
         //Accessing to the chats of my user
 
@@ -241,13 +239,6 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                 }
                 //if (messages > 0) FirebaseUtils.displayNotification(context);
 
-                //Get Correct User Between two
-                String userName = "";
-                for (Object o : c.getUsers().values()) {
-                    if (!o.toString().equals(myName)){
-                        userName = o.toString();
-                    }
-                }
                 String idUser = "";
                 for (String s : c.getUsers().keySet()) {
                     if (!s.equals(myId)) {
@@ -265,7 +256,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                     }
                     else {
                         if (!o.getValoration().isEmpty()) {
-                            if (o.getExchangeID() != -1 && o.getSenderId().equals(myId)) closeAdvert(String.valueOf(o.getExchangeID()), userName, idChat, o.getValoration());
+                            if (o.getExchangeID() != -1 && o.getSenderId().equals(myId)) closeAdvert(String.valueOf(o.getExchangeID()), idUser, idChat, o.getValoration());
                             newOffer = 3;
                         }
                         else newOffer = 4;
@@ -273,7 +264,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                     }
                 }
 
-                getUser(idUser, c.getIdProduct(), c.getTitleProduct(), c.getOwner(), userName, idChat, messages, newOffer);
+                getUser(idUser, c.getIdProduct(), c.getTitleProduct(), c.getOwner(), idUser, idChat, messages, newOffer);
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {

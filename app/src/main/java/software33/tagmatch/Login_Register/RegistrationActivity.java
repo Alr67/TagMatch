@@ -86,6 +86,7 @@ public class RegistrationActivity extends AppCompatActivity {
     }
 
     private void continueRegistration(final String email, final String username, final String password) {
+        final Context context = this;
         try {
             JSONObject jObject = new JSONObject();
             jObject.put("username", username);
@@ -98,7 +99,7 @@ public class RegistrationActivity extends AppCompatActivity {
                     try {
                         String error = jsonObject.get("error").toString();
                         showError(error);
-                        removeUser(email,password);
+                        removeUser(context);
 
                     } catch (JSONException ignored) {
                         continueRegistration2(email, username, password);
@@ -148,41 +149,16 @@ public class RegistrationActivity extends AppCompatActivity {
         finish();
     }
 
-    public void removeUser(final String email, final String password){
-        FirebaseUtils.getMyFirebaseRef().removeUser(email, password, null);
+    public void removeUser(Context context){
+        FirebaseUtils.getMyFirebaseRef().child(FirebaseUtils.getMyId(context)).removeValue();
     }
 
     public void createUser(final String email, final String password, final String name, final Map<String, Object> img, final Context context) {
-        FirebaseUtils.getMyFirebaseRef().createUser(email, password, new Firebase.ValueResultHandler<Map<String, Object>>() {
-            @Override
-            public void onSuccess(Map<String, Object> result) {
-                FirebaseUtils.getMyFirebaseRef().authWithPassword(
-                        email,
-                        password,
-                        new Firebase.AuthResultHandler() {
-                            @Override
-                            public void onAuthenticated(AuthData authData) {
-                                FirebaseUtils.getUsersRef().child(authData.getUid()).setValue
-                                        (new FirebaseUtils.User(name,"",new HashMap<String, Object>(),new HashMap<String, Object>()));
-                                FirebaseUtils.setMyId(authData.getUid(),context);
-                                FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(context)).updateChildren(img);
+        FirebaseUtils.getUsersRef().child(name).setValue
+                (new FirebaseUtils.User(name,"",new HashMap<String, Object>(),new HashMap<String, Object>()));
+        FirebaseUtils.setMyId(name,context);
+        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(context)).updateChildren(img);
 
-                                continueRegistration(email, name, password);
-                            }
-
-                            @Override
-                            public void onAuthenticationError(FirebaseError error) {
-                                showError(error.getMessage());
-                            }
-                        }
-                );
-                //setMyId(result.get("uid").toString(), context);
-            }
-
-            @Override
-            public void onError(FirebaseError firebaseError) {
-                showError(firebaseError.getMessage());
-            }
-        });
+        continueRegistration(email, name, password);
     }
 }
