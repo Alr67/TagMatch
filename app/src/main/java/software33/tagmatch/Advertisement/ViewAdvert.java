@@ -550,7 +550,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
         b.putString("UserName", username.getText().toString());
-        b.putString("TitleProduct", getTitle().toString());
+        b.putString("TitleProduct", title.getText().toString());
 
         if (idChat.equals("Not exists")) {
             b.putString("IdChat", createChat());
@@ -589,7 +589,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         users.put(id1, Helpers.getActualUser(this).getAlias());
         users.put(id2, username.getText().toString());
 
-        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(idProduct, getTitle().toString(), id2, users);
+        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(idProduct, title.getText().toString(), id2, users);
         id.child("info").setValue(chatInfo);
 
         //Set the chats to each user
