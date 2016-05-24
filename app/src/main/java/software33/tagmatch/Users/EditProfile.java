@@ -99,6 +99,12 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
 
         imgMod = locationMod = false;
 
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
+        }
+
         listdata = new ArrayList<>();
         iv = (ImageView) findViewById(R.id.edit_profile_imageView);
 
@@ -411,14 +417,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
 
     public void addPhoto(View view) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                startActivityForResult(intent, Constants.codeImagePicker);
-            } else {
-                String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
-                requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
                 Intent intent = new Intent(Intent.ACTION_PICK);
                 intent.setType("image/*");
                 startActivityForResult(intent, Constants.codeImagePicker);
