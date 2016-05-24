@@ -77,6 +77,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
     private LatLng userPosition;
     private ListView interests_hash;
     private GoogleMap map;
+    private Button selectphoto;
     private GoogleApiClient mGoogleApiClient;
     private ImageView iv;
     private TextView title, user_loc_text;
@@ -409,10 +410,19 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     public void addPhoto(View view) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*");
-            startActivityForResult(intent, Constants.codeImagePicker);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                startActivityForResult(intent, Constants.codeImagePicker);
+            } else {
+                String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE};
+                requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                startActivityForResult(intent, Constants.codeImagePicker);
+            }
         }
     }
 
