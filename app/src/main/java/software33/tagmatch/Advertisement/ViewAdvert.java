@@ -440,7 +440,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     else if (jsonObject.has("username")){
                         try {
                             Log.i("Debug-GetUser", jsonObject.toString());
-                            userId = jsonObject.get("firebaseID").toString();
+                            userId = adv.getUser().getAlias();
                             location.setText(jsonObject.get("city").toString());
                             LatLng latLng = new LatLng(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"));
                             CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);

@@ -423,7 +423,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
 
     @Override
     public void onBackPressed(){
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_chats);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
