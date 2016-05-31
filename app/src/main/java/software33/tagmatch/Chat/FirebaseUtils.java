@@ -122,6 +122,7 @@ public abstract class FirebaseUtils {
     }
 
     public static class ChatOffer {
+        String offerID;
         String senderId;
         String text;
         Boolean accepted;
@@ -135,6 +136,9 @@ public abstract class FirebaseUtils {
         }
         public String getText() {
             return text;
+        }
+        public String getOfferId() {
+            return offerID;
         }
         public Boolean getAccepted() { return accepted; }
         public int getExchangeID() {

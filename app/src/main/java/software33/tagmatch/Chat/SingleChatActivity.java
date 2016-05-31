@@ -548,8 +548,7 @@ public class SingleChatActivity extends AppCompatActivity {
                             }
                             else {
                                 tvErrorOffer.setVisibility(View.INVISIBLE);
-                                createOffer(offerList.getSelectedItem().toString(), "");
-                                d.dismiss();
+                                createOffer(offerList.getSelectedItem().toString(), "", d);
                             }
                         }
                         else if (s.isEmpty() || s.equals("")){
@@ -558,8 +557,7 @@ public class SingleChatActivity extends AppCompatActivity {
                         }
                         else {
                             tvErrorOffer.setVisibility(View.INVISIBLE);
-                            createOffer(offerList.getSelectedItem().toString(), s);
-                            d.dismiss();
+                            createOffer(offerList.getSelectedItem().toString(), s, d);
                         }
                     }
                 });
@@ -569,7 +567,7 @@ public class SingleChatActivity extends AppCompatActivity {
         return d;
     }
 
-    private void createOffer(String typeOffer, String content){
+    private void createOffer(String typeOffer, String content, AlertDialog d){
         String senderId = myId;
         Map<String, Object> values = new HashMap<>();
 
@@ -590,9 +588,7 @@ public class SingleChatActivity extends AppCompatActivity {
         values.put("text", content);
         values.put("accepted", false);
 
-        offersRef.setValue(values);
-
-        addMessageOffer(0,content);
+        sendOfferToServer(values, d);
     }
 
     private void denyOffer(){
@@ -882,6 +878,38 @@ public class SingleChatActivity extends AppCompatActivity {
                     }
                     else {
                         FirebaseUtils.getChatsRef().child(idChat).child("offer").updateChildren(value);
+                        d.dismiss();
+                    }
+                } catch (JSONException ignored){
+
+                }
+            }
+        }.execute(jsonObject);
+    }
+
+    private void sendOfferToServer(final Map<String, Object> value, final AlertDialog d){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("destinedUser", userName);
+            jsonObject.put("offerAdvertisement", idProduct);
+            if (value.containsKey("exchangeID")) jsonObject.put("offeredExchangeAdvertisement", value.get("exchangeID"));
+            jsonObject.put("offeredText", value.get("text"));
+        } catch (JSONException e) {
+        }
+        final Context context = this;
+        new TagMatchPostAsyncTask(Constants.IP_SERVER + "/offer", this, true){
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    Log.i("DebugOffer","JSON2: \n"+jsonObject);
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        value.put("offerID",jsonObject.get("offerId").toString());
+                        offersRef.setValue(value);
+                        addMessageOffer(0,value.get("text").toString());
                         d.dismiss();
                     }
                 } catch (JSONException ignored){

@@ -485,35 +485,38 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     }
 
     private void getChats(){
-        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.hasChildren()) {
-                    if (!adv.getOwner().getAlias().equals(myName)) {
-                        fab.setClickable(true);
-                        fab.setImageDrawable(getDrawable(R.drawable.chat_add));
-                        fab.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent chat = buttonStartXat(view);
-                                startActivity(chat);
-                                finish();
-                            }
-                        });
-                    }
-                }
-                else {
-                    long numChats = dataSnapshot.getChildrenCount();
-                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+        if (FirebaseUtils.getMyId(this) != null) {
+            FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.hasChildren()) {
+                        if (!adv.getOwner().getAlias().equals(myName)) {
+                            fab.setClickable(true);
+                            fab.setImageDrawable(getDrawable(R.drawable.chat_add));
+                            fab.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent chat = buttonStartXat(view);
+                                    startActivity(chat);
+                                    finish();
+                                }
+                            });
+                        }
+                    } else {
+                        long numChats = dataSnapshot.getChildrenCount();
+                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
-                        getChat(dataSnapshot1.getKey(), numChats);
-                        --numChats;
+                            getChat(dataSnapshot1.getKey(), numChats);
+                            --numChats;
+                        }
                     }
                 }
-            }
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {}
-        });
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                }
+            });
+        }
     }
 
     public void prepareImages() {

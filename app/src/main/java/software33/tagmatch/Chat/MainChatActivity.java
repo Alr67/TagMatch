@@ -35,6 +35,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -45,7 +46,11 @@ import java.util.Iterator;
 import java.util.Map;
 
 import software33.tagmatch.AdCards.Home;
+import software33.tagmatch.Domain.Advertisement;
+import software33.tagmatch.Domain.Offer;
+import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
@@ -113,32 +118,35 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     }
 
     public void getUserChats(){
-        FirebaseUtils.getUsersRef().child(myId).child("chats").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.hasChildren()){
-                    Resources res =getResources();
-                    adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
-                    list.setAdapter( adapter );
-                }
-                else {
-                    boolean noValidChats = true;
-                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
-                        if (dataSnapshot1.getValue().equals(true)) {
-                            getChat(dataSnapshot1.getKey());
-                            noValidChats = false;
+        if (myId != null) {
+            FirebaseUtils.getUsersRef().child(myId).child("chats").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.hasChildren()) {
+                        Resources res = getResources();
+                        adapter = new CustomListChatAdapter(CustomListView, myId, CustomListViewValuesArr, res);
+                        list.setAdapter(adapter);
+                    } else {
+                        boolean noValidChats = true;
+                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
+                            if (dataSnapshot1.getValue().equals(true)) {
+                                getChat(dataSnapshot1.getKey());
+                                noValidChats = false;
+                            }
+                        }
+                        if (noValidChats) {
+                            Resources res = getResources();
+                            adapter = new CustomListChatAdapter(CustomListView, myId, CustomListViewValuesArr, res);
+                            list.setAdapter(adapter);
                         }
                     }
-                    if (noValidChats){
-                        Resources res =getResources();
-                        adapter=new CustomListChatAdapter( CustomListView, myId, CustomListViewValuesArr,res );
-                        list.setAdapter( adapter );
-                    }
                 }
-            }
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {}
-        });
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                }
+            });
+        }
     }
 
     @Override
@@ -250,21 +258,11 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                 int newOffer = 0;
                 if (snapshot.hasChild("offer")){
                     FirebaseUtils.ChatOffer o = snapshot.child("offer").getValue(FirebaseUtils.ChatOffer.class);
-                    if (!o.getAccepted()) {
-                        if (!o.getSenderId().equals(myId)) newOffer = 1;
-                        else newOffer = 2;
-                    }
-                    else {
-                        if (!o.getValoration().isEmpty()) {
-                            if (o.getExchangeID() != -1 && o.getSenderId().equals(myId)) closeAdvert(String.valueOf(o.getExchangeID()), idUser, idChat, o.getValoration());
-                            newOffer = 3;
-                        }
-                        else newOffer = 4;
-
-                    }
+                    getOfferFromServer(o.getOfferId(), o.getValoration(), idUser, c.getIdProduct(), c.getTitleProduct(), c.getOwner(), idUser, idChat, messages);
                 }
-
-                getUser(idUser, c.getIdProduct(), c.getTitleProduct(), c.getOwner(), idUser, idChat, messages, newOffer);
+                else {
+                    getUser(idUser, c.getIdProduct(), c.getTitleProduct(), c.getOwner(), idUser, idChat, messages, newOffer);
+                }
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {
@@ -413,6 +411,48 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                 }
             }
         }.execute(jsonObject);
+    }
+
+    private void getOfferFromServer(String offerId, final Map<String, Integer> valoration,final String idUser, final String idProduct, final String titleProduct,
+                                    final String owner, final String userName, final String idChat, final int messages){
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        String url = Constants.IP_SERVER+"/offer/"+offerId;
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+            new TagMatchGetAsyncTask(url,this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Helpers.showError(error,getApplicationContext());
+                        }
+                        else if (jsonObject.has("offerId")){
+                            Offer offer = Helpers.convertJSONToOffer(jsonObject);
+                            int newOffer;
+                            if (!offer.isAccepted()) {
+                                if (offer.getDestinedUser().equals(myId)) newOffer = 1;
+                                else newOffer = 2;
+                            }
+                            else {
+                                if (!valoration.isEmpty()) {
+                                    newOffer = 3;
+                                }
+                                else newOffer = 4;
+                            }
+
+                            getUser(idUser, idProduct, titleProduct, owner, userName, idChat, messages, newOffer);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
