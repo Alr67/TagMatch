@@ -1,6 +1,7 @@
 package software33.tagmatch.Utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -25,25 +26,40 @@ import software33.tagmatch.R;
 
 
 public class Helpers {
-    public static final String SH_PREF_NAME = "TagMatch_pref";
 
-    public ArrayList<String> getPersonalData(Context context){
+
+    public static ArrayList<String> getPersonalData(Context context){
         ArrayList<String> data = new ArrayList<>();
-        SharedPreferences prefs = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE);
         data.add(prefs.getString("name", null));
         data.add(prefs.getString("password", null));
         return data;
     }
 
+    public static void saveDeviceToken(Context context, Integer token) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        editor.putInt("device_token", token);
+    }
+
+    public static void eraseDeviceToken(Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        editor.remove("device_token");
+    }
+
+    public static Integer getDeviceToken(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getInt("device_token", -1);
+    }
+
     public static void setPersonalData(String username, String password, Context context){
-        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.putString("name", username);
         editor.putString("password",password);
         editor.commit();
     }
 
     public static User getActualUser(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE);
         User user = new User(prefs.getString("name", null),
                                 prefs.getString("password", null),
                                 prefs.getString("email", null),
@@ -56,7 +72,7 @@ public class Helpers {
 
     public static void saveActualUser(String name, String password, String email,
                                       String photoId, String city, int latitude, int longitude, Context context){
-        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.putString("name", name);
         editor.putString("password", password);
         editor.putString("email", email);
@@ -68,7 +84,7 @@ public class Helpers {
     }
 
     public static void logout(Context context) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.remove("name");
         editor.remove("password");
         FirebaseUtils.removeMyId(context);

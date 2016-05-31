@@ -21,6 +21,7 @@ public abstract class Constants {
     public static final String favouriteNo = "heart";
     public static final String favouriteYes = "heart";
 
+    public static final String SH_PREF_NAME = "TagMatch_pref";
 
     public static List<String> categoryList = new ArrayList<>(Arrays.asList("Motor"));
     public static final String typeSell = "Sell";
