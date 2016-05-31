@@ -61,6 +61,7 @@ import java.util.Objects;
 import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.Domain.AdvGift;
 import software33.tagmatch.Domain.Advertisement;
+import software33.tagmatch.Domain.Offer;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
@@ -94,6 +95,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private String myId;
     private String idUser;
     private String imageChat;
+    private String offerId;
     private boolean fromAdvert = false;
     private ChildEventListener mListener;
     private ValueEventListener mListenerChats;
@@ -276,7 +278,7 @@ public class SingleChatActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren()) {
                     FirebaseUtils.ChatOffer o = dataSnapshot.getValue(FirebaseUtils.ChatOffer.class);
-                    setOfferData(o.getSenderId(), o.getText(), o.getAccepted(), o.getExchangeID(), o.getValoration());
+                    getOfferFromServer(o.getOfferId(), o.getValoration());
                 }
                 else {
                     canSendOffers = "Yes";
@@ -342,7 +344,7 @@ public class SingleChatActivity extends AppCompatActivity {
             else hideOffer();
         }
 
-        if (exchangeID != -1) {
+        if (exchangeID != 0) {
             offerHasExchangeID = true;
             offerExchangeID = exchangeID;
         }
@@ -607,7 +609,7 @@ public class SingleChatActivity extends AppCompatActivity {
         //Build the valoration
         Map<String, Integer> valoration = new HashMap<>();
         valoration.put(""+userName,Integer.parseInt(idProduct));
-        //if (offerHasExchangeID) valoration.put(""+Helpers.getActualUser(this).getAlias(), offerExchangeID);
+        if (offerHasExchangeID) valoration.put(""+Helpers.getActualUser(this).getAlias(), offerExchangeID);
         values.put("valoration",valoration);
 
         offersRef.updateChildren(values);
@@ -650,7 +652,7 @@ public class SingleChatActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (deny1) denyOffer();
-                                else closeAdvert();
+                                else acceptOfferOnServer();
                             }
                         })
                 .setNegativeButton(negative,
@@ -799,15 +801,11 @@ public class SingleChatActivity extends AppCompatActivity {
         finish();
     }
 
-    private void closeAdvert() {
+    private void acceptOfferOnServer() {
         JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("sold", true);
-        } catch (JSONException e) {
-        }
 
         final Context context = this.getApplicationContext();
-        new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/"+idProduct, this){
+        new TagMatchPutAsyncTask(Constants.IP_SERVER + "/offer/"+offerId+"/accept", this){
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 try {
@@ -904,7 +902,7 @@ public class SingleChatActivity extends AppCompatActivity {
                     Log.i("DebugOffer","JSON2: \n"+jsonObject);
                     if(jsonObject.has("error")) {
                         String error = jsonObject.get("error").toString();
-                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, "This advert is already closed", Toast.LENGTH_SHORT).show();
                     }
                     else {
                         value.put("offerID",jsonObject.get("offerId").toString());
@@ -917,5 +915,36 @@ public class SingleChatActivity extends AppCompatActivity {
                 }
             }
         }.execute(jsonObject);
+    }
+
+    private void getOfferFromServer(String offerId, final Map<String, Integer> valoration){
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        String url = Constants.IP_SERVER+"/offer/"+offerId;
+        this.offerId = offerId;
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+            new TagMatchGetAsyncTask(url,this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Helpers.showError(error,getApplicationContext());
+                        }
+                        else if (jsonObject.has("offerId")){
+                            Offer offer = Helpers.convertJSONToOffer(jsonObject);
+                            setOfferData(offer.getUserThatOffers(),offer.getOfferedText(),
+                                    offer.isAccepted(), offer.getOfferedExchangeAdvertisement(), valoration);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 }

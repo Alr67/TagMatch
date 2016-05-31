@@ -560,6 +560,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         }
         else b.putString("IdChat", idChat);
         b.putString("IdUser", userId);
+        b.putString("IdProduct", idProduct);
 
         b.putBoolean("FromAdvert",true);
 

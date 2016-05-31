@@ -160,8 +160,8 @@ public class Helpers {
             if(jsonObject.has("userThatOffers")) userThatOffers = jsonObject.getString("userThatOffers");
             if(jsonObject.has("destinedUser")) destinedUser = jsonObject.getString("destinedUser");
             if(jsonObject.has("offerAdvertisement")) offerAdvertisement = jsonObject.getInt("offerAdvertisement");
-            if(jsonObject.has("offeredExchangeAdvertisement")) offeredExchangeAdvertisement = jsonObject.getInt("offeredExchangeAdvertisement");
-            if(jsonObject.has("offeredText")) offeredText = jsonObject.getString("offeredText");
+            if(jsonObject.has("offeredExchangeAdvertisement") && !jsonObject.isNull("offeredExchangeAdvertisement")) offeredExchangeAdvertisement = jsonObject.getInt("offeredExchangeAdvertisement");
+            if(jsonObject.has("offeredText") && !jsonObject.isNull("offeredText")) offeredText = jsonObject.getString("offeredText");
             if(jsonObject.has("accepted")) accepted = jsonObject.getBoolean("accepted");
             offer = new Offer(offerId,userThatOffers,destinedUser,offerAdvertisement,offeredExchangeAdvertisement,offeredText,accepted);
             return offer;
