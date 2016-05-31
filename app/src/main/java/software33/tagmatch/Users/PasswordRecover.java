@@ -61,13 +61,13 @@ public class PasswordRecover extends AppCompatActivity {
                     @Override
                     protected void onPostExecute(JSONObject jsonObject) {
                         try {
-                            if(jsonObject.has("status") && jsonObject.getInt("status") != 200) Toast.makeText(getApplicationContext(),R.string.error_login,Toast.LENGTH_LONG).show();
+                            if(jsonObject.has("status") && jsonObject.getInt("status") != 200) Toast.makeText(getApplicationContext(),"PUTO ORIOL",Toast.LENGTH_LONG).show();
                             else {
                                 if (jsonObject.has("valid")) {
                                     Helpers.saveDeviceToken(getApplicationContext(),jsonObject.getInt("valid"));
                                     Toast.makeText(getApplicationContext(), "PROVANT " +jsonObject.getInt("valid"), Toast.LENGTH_LONG).show();
                                 } else {
-                                    Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_LONG).show();
+                                    Toast.makeText(getApplicationContext(), "MIERDA ORIOL", Toast.LENGTH_LONG).show();
                                 }
                             }
                         } catch (JSONException e) {
