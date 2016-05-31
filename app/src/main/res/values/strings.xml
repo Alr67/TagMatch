@@ -199,7 +199,14 @@
     <!-- Discovery -->
     <string name="title_discovery">Discovery TagMatch!</string>
 
+    <!-- Recovery -->
+    <string name="title_recovery">Recover your password</string>
+    <string name="recov_button">Recover</string>
+    <string name="forg_button">Forgot your password? Recover it</string>
+
     <!-- FAVs -->
     <string name="fav_title">Favorites</string>
+    <string name="title_activity_gossip">gossip</string>
+    <string name="title_activity_password_recover">PasswordRecover</string>
 
 </resources>
