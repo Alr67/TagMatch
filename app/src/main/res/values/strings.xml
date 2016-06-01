@@ -202,4 +202,9 @@
     <!-- FAVs -->
     <string name="fav_title">Favorites</string>
 
+    <!-- Api Keys -->
+    <string name="facebook_app_id">1703168903269138</string>
+
+
+
 </resources>
