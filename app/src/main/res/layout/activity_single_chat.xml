@@ -13,12 +13,24 @@
             android:id="@+id/layoutOffer"
             android:background="@drawable/bar_bg">
 
-            <TextView
+            <LinearLayout
+                android:orientation="vertical"
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Large Text"
-                android:id="@+id/tvContentOffer" />
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textAppearance="?android:attr/textAppearanceLarge"
+                    android:text="Large Text"
+                    android:id="@+id/tvContentOffer" />
+
+                <Button
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Advert"
+                    android:id="@+id/bAdvOffer" />
+            </LinearLayout>
 
             <LinearLayout
                 android:orientation="horizontal"

@@ -79,6 +79,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private ImageButton buttonSend;
     private LinearLayout layoutOffer;
     private TextView tvContentOffer;
+    private Button bAdvOffer;
     private Button bCancelOffer;
     private Button bAcceptOffer;
     private TextView tvPendingOffer;
@@ -90,7 +91,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private String userName;
     private String titleProduct;
     private String idProduct;
-    Advertisement adv;
+    Advertisement exchangeAdv;
     private String idChat;
     private String myId;
     private String idUser;
@@ -175,6 +176,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
         layoutOffer = (LinearLayout) findViewById(R.id.layoutOffer);
         tvContentOffer = (TextView) findViewById(R.id.tvContentOffer);
+        bAdvOffer = (Button) findViewById(R.id.bAdvOffer);
         bCancelOffer = (Button) findViewById(R.id.bCancelOffert);
         bAcceptOffer = (Button) findViewById(R.id.bAcceptOffer);
         tvPendingOffer = (TextView) findViewById(R.id.tvPendingOffer);
@@ -300,10 +302,29 @@ public class SingleChatActivity extends AppCompatActivity {
     }
 
     public void setOfferData(String senderId, String text, Boolean accepted, int exchangeID, final Map<String, Integer> valoration){
+        if (exchangeID != 0) {
+            offerHasExchangeID = true;
+            offerExchangeID = exchangeID;
+            downloadExchangeAdvertFromServer();
+            bAdvOffer.setVisibility(View.VISIBLE);
+            bAdvOffer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    createAdvExchangeDialog(exchangeAdv).show();
+                }
+            });
+
+            tvContentOffer.setVisibility(View.GONE);
+        }
+        else {
+            tvContentOffer.setVisibility(View.VISIBLE);
+            tvContentOffer.setText(text);
+            bAdvOffer.setVisibility(View.GONE);
+        }
+
         if (!accepted) {
             canSendOffers = "Yes";
             layoutOffer.setVisibility(View.VISIBLE);
-            tvContentOffer.setText(text);
             if (senderId.equals(myId)) {
                 bCancelOffer.setVisibility(View.GONE);
                 bAcceptOffer.setVisibility(View.GONE);
@@ -321,6 +342,7 @@ public class SingleChatActivity extends AppCompatActivity {
                 bCancelOffer.setVisibility(View.VISIBLE);
                 bAcceptOffer.setVisibility(View.VISIBLE);
                 tvPendingOffer.setVisibility(View.GONE);
+                tvContentOffer.setVisibility(View.VISIBLE);
                 tvContentOffer.setText(R.string.rate_offer);
                 rateAvailable = true;
                 rateAdvId = valoration.get(Helpers.getActualUser(this).getAlias());
@@ -342,11 +364,6 @@ public class SingleChatActivity extends AppCompatActivity {
                 });
             }
             else hideOffer();
-        }
-
-        if (exchangeID != 0) {
-            offerHasExchangeID = true;
-            offerExchangeID = exchangeID;
         }
     }
 
@@ -578,18 +595,13 @@ public class SingleChatActivity extends AppCompatActivity {
                 content = content+"€";
                 break;
             case "Offer my advert":
-                values.put("exchangeID", advertisementsIds.get(positionMyAdv));
                 content = advertisementsTitles.get(positionMyAdv);
                 break;
             case "Other offers":
                 break;
         }
 
-
-        values.put("ownerId", senderId);
-        values.put("accepted", false);
-
-        sendOfferToServer(values, content, d);
+        sendOfferToServer(values, advertisementsIds.get(positionMyAdv).toString(), content, d);
     }
 
     private void denyOffer(){
@@ -603,7 +615,6 @@ public class SingleChatActivity extends AppCompatActivity {
 
     private void acceptOffer(){
         Map<String, Object> values = new HashMap<>();
-        values.put("accepted", true);
 
         //Build the valoration
         Map<String, Integer> valoration = new HashMap<>();
@@ -692,6 +703,7 @@ public class SingleChatActivity extends AppCompatActivity {
     }
 
     public AlertDialog createValorationDialog(Map<String, Integer> valoration) {
+        final int idProductToRate = valoration.get(Helpers.getActualUser(this).getAlias());
         valoration.remove(Helpers.getActualUser(this).getAlias());
         final Map<String, Object> value = new HashMap<>();
         value.put("valoration",valoration);
@@ -730,7 +742,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
                     @Override
                     public void onClick(View view) {
-                        sendRateToServer(value, d);
+                        sendRateToServer(value, idProductToRate, d);
                     }
                 });
             }
@@ -778,6 +790,21 @@ public class SingleChatActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    public AlertDialog createAdvExchangeDialog(Advertisement adv) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(adv.getTitle())
+                .setMessage(adv.getDescription())
+                .setPositiveButton("Ok",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+
+        return builder.create();
+    }
+
     private void onPossitiveButtonClick(){
         //Remove from Firebase putting the value to false
         Map<String, Object> value = new HashMap<>();
@@ -812,6 +839,8 @@ public class SingleChatActivity extends AppCompatActivity {
                     if(jsonObject.has("error")) {
                         String error = jsonObject.get("error").toString();
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                        Map<String, Object> value = new HashMap<>();
+                        if (jsonObject.getInt("statusCode") == 401) offersRef.setValue(value);
                     }
                     else {
                         acceptOffer();
@@ -856,7 +885,29 @@ public class SingleChatActivity extends AppCompatActivity {
         }
     }
 
-    private void sendRateToServer(final Map<String, Object> value, final AlertDialog d){
+    private void downloadExchangeAdvertFromServer() {
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+            Log.i(Constants.DebugTAG,"Vaig a fer el get a: "+ Constants.IP_SERVER+"/ads/"+offerExchangeID);
+            new TagMatchGetAsyncTask(Constants.IP_SERVER+"/ads/"+offerExchangeID,this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    Log.i(Constants.DebugTAG,"onPostExecute");
+                    Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
+                    exchangeAdv = Helpers.convertJSONToAdvertisement(jsonObject);
+                    //String error = jsonObject.get("error").toString();
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA");
+            e.printStackTrace();
+        }
+    }
+
+    private void sendRateToServer(final Map<String, Object> value, final int idProductToRate, final AlertDialog d){
         Log.i("DebugRate",String.valueOf(starts));
         JSONObject jsonObject = new JSONObject();
         try {
@@ -864,7 +915,7 @@ public class SingleChatActivity extends AppCompatActivity {
         } catch (JSONException e) {
         }
         final Context context = this;
-        new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads/"+idProduct+"/rate", this, true){
+        new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads/"+idProductToRate+"/rate", this, true){
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 try {
@@ -884,13 +935,13 @@ public class SingleChatActivity extends AppCompatActivity {
         }.execute(jsonObject);
     }
 
-    private void sendOfferToServer(final Map<String, Object> value, final String content, final AlertDialog d){
+    private void sendOfferToServer(final Map<String, Object> value, String exchangeID, final String content, final AlertDialog d){
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("destinedUser", userName);
             jsonObject.put("offerAdvertisement", idProduct);
-            if (value.containsKey("exchangeID")) jsonObject.put("offeredExchangeAdvertisement", value.get("exchangeID"));
-            jsonObject.put("offeredText", content);
+            if (!exchangeID.isEmpty()) jsonObject.put("offeredExchangeAdvertisement", exchangeID);
+            else jsonObject.put("offeredText", content);
         } catch (JSONException e) {
         }
         final Context context = this;
@@ -901,7 +952,7 @@ public class SingleChatActivity extends AppCompatActivity {
                     Log.i("DebugOffer","JSON2: \n"+jsonObject);
                     if(jsonObject.has("error")) {
                         String error = jsonObject.get("error").toString();
-                        Toast.makeText(context, "This advert is already closed", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
                     }
                     else {
                         value.put("offerID",jsonObject.getInt("offerId"));
