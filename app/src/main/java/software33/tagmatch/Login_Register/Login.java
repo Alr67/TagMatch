@@ -213,7 +213,7 @@ public class Login extends AppCompatActivity {
                         }
                         else if (jsonObject.has("username")){
                             Log.i("Debug-GetUser",jsonObject.toString());
-                            FirebaseUtils.setMyId(jsonObject.get("firebaseID").toString(),getApplicationContext());
+                            FirebaseUtils.setMyId(jsonObject.getString("username"),getApplicationContext());
                             endLogin();
                         }
                     } catch (JSONException ignored) {

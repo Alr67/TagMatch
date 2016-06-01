@@ -95,7 +95,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private String myId;
     private String idUser;
     private String imageChat;
-    private String offerId;
+    private int offerId;
     private boolean fromAdvert = false;
     private ChildEventListener mListener;
     private ValueEventListener mListenerChats;
@@ -586,11 +586,10 @@ public class SingleChatActivity extends AppCompatActivity {
         }
 
 
-        values.put("senderId", senderId);
-        values.put("text", content);
+        values.put("ownerId", senderId);
         values.put("accepted", false);
 
-        sendOfferToServer(values, d);
+        sendOfferToServer(values, content, d);
     }
 
     private void denyOffer(){
@@ -885,13 +884,13 @@ public class SingleChatActivity extends AppCompatActivity {
         }.execute(jsonObject);
     }
 
-    private void sendOfferToServer(final Map<String, Object> value, final AlertDialog d){
+    private void sendOfferToServer(final Map<String, Object> value, final String content, final AlertDialog d){
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject.put("destinedUser", userName);
             jsonObject.put("offerAdvertisement", idProduct);
             if (value.containsKey("exchangeID")) jsonObject.put("offeredExchangeAdvertisement", value.get("exchangeID"));
-            jsonObject.put("offeredText", value.get("text"));
+            jsonObject.put("offeredText", content);
         } catch (JSONException e) {
         }
         final Context context = this;
@@ -905,9 +904,9 @@ public class SingleChatActivity extends AppCompatActivity {
                         Toast.makeText(context, "This advert is already closed", Toast.LENGTH_SHORT).show();
                     }
                     else {
-                        value.put("offerID",jsonObject.get("offerId").toString());
+                        value.put("offerID",jsonObject.getInt("offerId"));
                         offersRef.setValue(value);
-                        addMessageOffer(0,value.get("text").toString());
+                        addMessageOffer(0,content);
                         d.dismiss();
                     }
                 } catch (JSONException ignored){
@@ -917,7 +916,7 @@ public class SingleChatActivity extends AppCompatActivity {
         }.execute(jsonObject);
     }
 
-    private void getOfferFromServer(String offerId, final Map<String, Integer> valoration){
+    private void getOfferFromServer(int offerId, final Map<String, Integer> valoration){
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
         String url = Constants.IP_SERVER+"/offer/"+offerId;

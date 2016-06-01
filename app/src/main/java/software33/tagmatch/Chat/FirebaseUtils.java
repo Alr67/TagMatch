@@ -122,22 +122,18 @@ public abstract class FirebaseUtils {
     }
 
     public static class ChatOffer {
-        String offerID;
-        String senderId;
-        String text;
+        int offerID;
+        String ownerId;
         Boolean accepted;
         int exchangeID = -1;
         Map<String, Integer> valoration = new HashMap<>();
         public ChatOffer() {
             // empty default constructor, necessary for Firebase to be able to deserialize blog posts
         }
-        public String getSenderId() {
-            return senderId;
+        public String getOwnerId() {
+            return ownerId;
         }
-        public String getText() {
-            return text;
-        }
-        public String getOfferId() {
+        public int getOfferId() {
             return offerID;
         }
         public Boolean getAccepted() { return accepted; }

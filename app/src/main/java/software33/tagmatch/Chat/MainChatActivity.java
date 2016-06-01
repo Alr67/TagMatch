@@ -118,11 +118,13 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
     }
 
     public void getUserChats(){
+        Log.i("DebugChat","my id is: "+myId);
         if (myId != null) {
             FirebaseUtils.getUsersRef().child(myId).child("chats").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (!dataSnapshot.hasChildren()) {
+                        Log.i("DebugChat","no chats");
                         Resources res = getResources();
                         adapter = new CustomListChatAdapter(CustomListView, myId, CustomListViewValuesArr, res);
                         list.setAdapter(adapter);
@@ -131,10 +133,12 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                         for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
                             if (dataSnapshot1.getValue().equals(true)) {
                                 getChat(dataSnapshot1.getKey());
+                                Log.i("DebugChat","The chat is: "+dataSnapshot1.getValue().toString());
                                 noValidChats = false;
                             }
                         }
                         if (noValidChats) {
+                            Log.i("DebugChat","no valid chats");
                             Resources res = getResources();
                             adapter = new CustomListChatAdapter(CustomListView, myId, CustomListViewValuesArr, res);
                             list.setAdapter(adapter);
@@ -413,7 +417,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         }.execute(jsonObject);
     }
 
-    private void getOfferFromServer(String offerId, final Map<String, Integer> valoration,final String idUser, final String idProduct, final String titleProduct,
+    private void getOfferFromServer(int offerId, final Map<String, Integer> valoration,final String idUser, final String idProduct, final String titleProduct,
                                     final String owner, final String userName, final String idChat, final int messages){
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
