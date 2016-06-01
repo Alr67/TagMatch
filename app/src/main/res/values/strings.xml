@@ -213,5 +213,8 @@
     <string name="change_password_hint_new_password">New Password</string>
     <string name="change_password_hint_repite_new_password">Repite Password</string>
     <string name="password_change_error_password_empty">Fields cannot be empty</string>
+    <string name="change_password_error_password_missmatch">Passwords do not match</string>
+    <string name="change_password_error_incorrect_password">Incorrect Password</string>
+    <string name="change_password_ok">Password Chaged!</string>
 
 </resources>
