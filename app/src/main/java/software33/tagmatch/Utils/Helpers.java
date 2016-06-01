@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import org.json.JSONArray;
@@ -36,9 +37,10 @@ public class Helpers {
         return data;
     }
 
-    public static void saveDeviceToken(Context context, Integer token) {
+    public static void saveDeviceToken(Context context, String token) {
         SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
-        editor.putInt("device_token", token);
+        editor.putString("device_token", token);
+        editor.commit();
     }
 
     public static void eraseDeviceToken(Context context) {
@@ -46,9 +48,9 @@ public class Helpers {
         editor.remove("device_token");
     }
 
-    public static Integer getDeviceToken(Context context) {
+    public static String getDeviceToken(Context context) {
         SharedPreferences prefs = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE);
-        return prefs.getInt("device_token", -1);
+        return prefs.getString("device_token", "ERROR");
     }
 
     public static void setPersonalData(String username, String password, Context context){
@@ -207,5 +209,9 @@ public class Helpers {
         input = input.replaceAll("\\]","");
         input = input.replaceAll("\"","");
         return input;
+    }
+
+    public static boolean isEmpty(EditText myeditText) {
+        return myeditText.getText().toString().trim().length() == 0;
     }
 }

@@ -66,10 +66,14 @@
     <string name="new_user_button">Sing up</string>
     <string name="user_name">User name</string>
     <string name="user_password">Password</string>
+    <string name="rec_user_password">Type a new password</string>
+    <string name="rec2_user_password">Type it again</string>
+    <string name="last_step">Type your new password</string>
     <string name="empty_pass">The password is empty</string>
     <string name="empty_user">The user is empty</string>
-
+    <string name="error_empty_new_pass">You must fill both password fields</string>
     <string name="error_login">User or password incorrect</string>
+    <string name="both_must_be_equal">Both passwords must be equal</string>
 
 
     <!-- New Advertisement -->
@@ -96,6 +100,7 @@
     <string name="new_ad_general_title">New advert</string>
     <string name="cat_adv">Ad\'s category</string>
     <string name="type_ad">Ad\'s type</string>
+    <string name="change">Change</string>
 
     <!-- Navigation Drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -208,5 +213,6 @@
     <string name="fav_title">Favorites</string>
     <string name="title_activity_gossip">gossip</string>
     <string name="title_activity_password_recover">PasswordRecover</string>
+    <string name="title_activity_recover_second_step">RecoverSecondStep</string>
 
 </resources>
