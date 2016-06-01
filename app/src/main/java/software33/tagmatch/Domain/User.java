@@ -7,6 +7,8 @@ import com.google.android.gms.maps.model.LatLng;
 import java.util.ArrayList;
 import java.util.List;
 
+import software33.tagmatch.Utils.Helpers;
+
 /**
  * Created by Cristina on 03/04/2016.
  */
@@ -157,6 +159,4 @@ public class User {
     }
 
     public LatLng getCoord(){return coord;}
-
-    public void setCoord(LatLng coords) {coord = coords;}
 }
