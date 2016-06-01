@@ -14,16 +14,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
-import com.firebase.client.Firebase;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,18 +26,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
-import software33.tagmatch.Chat.FirebaseService;
 import software33.tagmatch.Chat.FirebaseUtils;
-import software33.tagmatch.Chat.MainChatActivity;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.Filter.Filter;
-import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
-import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
@@ -69,6 +58,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+
         getSupportActionBar().setDisplayShowTitleEnabled(false); //Esconder titulo HAMBURGUER
         TextView app_header = (TextView) toolbar.findViewById(R.id.toolbar_title); //cogemos el textview de la toolbar
         Typeface face= Typeface.createFromAsset(getAssets(), "fonts/LobsterTwo-BoldItalic.ttf");//aplicamos el diseño
@@ -76,6 +66,9 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View nav_header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
+        Helpers.setNavHeader(nav_header,getApplicationContext());
+        navigationView.addHeaderView(nav_header);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {

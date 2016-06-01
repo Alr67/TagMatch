@@ -4,10 +4,16 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.Drawable;
 import android.util.Base64;
 import android.util.DisplayMetrics;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
+
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -22,12 +28,14 @@ import software33.tagmatch.Domain.AdvSell;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
+import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
+import software33.tagmatch.Users.ViewProfile;
 
 
 public class Helpers {
     public static final String SH_PREF_NAME = "TagMatch_pref";
 
-    public ArrayList<String> getPersonalData(Context context){
+    public static ArrayList<String> getPersonalData(Context context){
         ArrayList<String> data = new ArrayList<>();
         SharedPreferences prefs = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE);
         data.add(prefs.getString("name", null));
@@ -191,5 +199,30 @@ public class Helpers {
         input = input.replaceAll("\\]","");
         input = input.replaceAll("\"","");
         return input;
+    }
+
+    public static void setNavHeader(final View nav_header, final Context context) {
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("username", Helpers.getActualUser(context).getAlias());
+            jsonObject.put("password", Helpers.getActualUser(context).getPassword());
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(context).getAlias() + "/photo", context) {
+                @Override
+                protected void onPostExecute(String url) {
+                    ImageView contenedor = (ImageView) nav_header.findViewById(R.id.image_nav);
+                    if (url == null){
+                        Picasso.with(context).load(R.drawable.image0).centerCrop().resize(contenedor.getMeasuredWidth(),contenedor.getMeasuredHeight()).into(contenedor);
+                    }
+                    else Picasso.with(context).load(url).error(R.drawable.image0).centerCrop().resize(contenedor.getMeasuredWidth(),contenedor.getMeasuredHeight()).into(contenedor);
+                }
+            }.execute(jsonObject);
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        ((ImageView) nav_header.findViewById(R.id.image_nav)).setImageDrawable(context.getDrawable(R.drawable.loading_gif)); //NO TOCAR NUNCA JAMAS BAJO NINGUNA CIRCUNSTANCIA
+
+        ((TextView) nav_header.findViewById(R.id.user_name_header)).setText(Helpers.getActualUser(context).getAlias());
     }
 }
