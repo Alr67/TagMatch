@@ -201,5 +201,11 @@
 
     <!-- FAVs -->
     <string name="fav_title">Favorites</string>
+    <string name="title_activity_ettings">ettings</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Settings -->
+    <string name="password_change">Change Password</string>
+    <string name="title_activity_password_change">PasswordChange</string>
 
 </resources>
