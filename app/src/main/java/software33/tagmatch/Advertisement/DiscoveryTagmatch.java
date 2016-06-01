@@ -16,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -71,6 +72,9 @@ public class DiscoveryTagmatch extends AppCompatActivity implements NavigationVi
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View nav_header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
+        Helpers.setNavHeader(nav_header,getApplicationContext());
+        navigationView.addHeaderView(nav_header);
 
         initComponents();
 

@@ -11,6 +11,7 @@ import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -72,6 +73,9 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View nav_header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
+        Helpers.setNavHeader(nav_header,getApplicationContext());
+        navigationView.addHeaderView(nav_header);
 
         Bundle extras = getIntent().getExtras();
 
