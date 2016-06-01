@@ -24,6 +24,7 @@ import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.Login_Register.RegistrationActivity;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetQRAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
@@ -50,34 +51,34 @@ public class PasswordRecover extends AppCompatActivity {
         if(!input_user.getText().toString().matches("") ) {
             name = input_user.getText().toString();
 
-            try {
-                JSONObject jObject = new JSONObject();
-                jObject.put("username", name);
+            JSONObject jObject = new JSONObject();
+            //jObject.put("username", name);
 
-                String direcc = Constants.IP_SERVER;
-                direcc += "/users/"+name+"/recovery";
+            String direcc = Constants.IP_SERVER;
+            direcc += "/users/"+name+"/recovery";
 
-                new TagMatchGetAsyncTask(direcc, getApplicationContext()) {
-                    @Override
-                    protected void onPostExecute(JSONObject jsonObject) {
-                        try {
-                            if(jsonObject.has("status") && jsonObject.getInt("status") != 200) Toast.makeText(getApplicationContext(),"PUTO ORIOL",Toast.LENGTH_LONG).show();
-                            else {
-                                if (jsonObject.has("valid")) {
-                                    Helpers.saveDeviceToken(getApplicationContext(),jsonObject.getInt("valid"));
-                                    Toast.makeText(getApplicationContext(), "PROVANT " +jsonObject.getInt("valid"), Toast.LENGTH_LONG).show();
-                                } else {
-                                    Toast.makeText(getApplicationContext(), "MIERDA ORIOL", Toast.LENGTH_LONG).show();
-                                }
+            new TagMatchGetQRAsyncTask(direcc, getApplicationContext()) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        System.out.println("CACA TODO: "+jsonObject);
+                        if(jsonObject.has("status") && jsonObject.getInt("status") != 200) Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_LONG).show();
+
+                        else {
+                            if (jsonObject.has("deviceToken")) {
+                                Helpers.saveDeviceToken(getApplicationContext(),jsonObject.getInt("deviceToken"));
+
+                            } else {
+                                //TODO cambiar el mensaje de error
+                                Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_LONG).show();
                             }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
                         }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                }.execute(jObject);
-            } catch (JSONException e) {
-                e.printStackTrace();
-            }
+                }
+            }.execute(jObject);
+
         }
         else{
             if (input_user.getText().toString().matches("")) {
