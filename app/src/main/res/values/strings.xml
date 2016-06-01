@@ -29,6 +29,7 @@
     <string name="send_message">Send</string>
     <string name="action_send_image">Send image</string>
     <string name="action_send_offer">Send offer</string>
+    <string name="action_give_gift">Give gift</string>
     <string name="action_view_offers">View offers</string>
     <string name="action_block_user">Block user</string>
     <string name="action_delete_chat">Delete chat</string>
@@ -178,6 +179,11 @@
     <string name="dialog_confirm_accept_offer">Accept</string>
     <string name="dialog_cancel_accept_offer">No</string>
 
+    <string name="dialog_title_give_gift">Give gift</string>
+    <string name="dialog_message_give_gift">Are you sure do you want to give your advert?</string>
+    <string name="dialog_confirm_give_gift">Accept</string>
+    <string name="dialog_cancel_give_gift">No</string>
+
     <string name="mainchat_new_offer">Offer!</string>
     <string name="mainchat_pending_offer">Pending</string>
     <string name="mainchat_closed_offer">Closed</string>
@@ -187,6 +193,7 @@
     <string name="message_accepted_offer">has accepted your offer</string>
     <string name="message_denied_offer">has declined your offer</string>
     <string name="message_made_offer">has offered you:</string>
+    <string name="message_give_gift">has given this advert to you</string>
 
     <string name="title_dialog_error_create_offer">Can not create offer</string>
     <string name="button_dialog_error_create_offer">OK</string>

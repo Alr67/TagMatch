@@ -112,11 +112,14 @@ public class SingleChatActivity extends AppCompatActivity {
     private String canSendOffers;
 
     private boolean isMyAdv = false;
+    private boolean isMyAdvGift = false;
     private boolean offerHasExchangeID = false;
     private int offerExchangeID;
     private boolean rateAvailable = false;
     private int rateAdvId;
     private int starts = 0;
+
+    private Menu myMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -412,8 +415,13 @@ public class SingleChatActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        if (isMyAdv) getMenuInflater().inflate(R.menu.menu_option_my_single_chat, menu);
+        if (isMyAdv) {
+            if(isMyAdvGift) getMenuInflater().inflate(R.menu.menu_option_my_single_chat_giveaway, menu);
+            else getMenuInflater().inflate(R.menu.menu_option_my_single_chat, menu);
+        }
         else getMenuInflater().inflate(R.menu.menu_option_single_chat, menu);
+
+        myMenu = menu;
         return true;
     }
 
@@ -446,6 +454,10 @@ public class SingleChatActivity extends AppCompatActivity {
             alertDialog.show();
 
             return true;
+        }
+
+        if (id == R.id.action_give_gift) {
+            if (isMyAdvGift) createGiveGiftDialog().show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -601,7 +613,9 @@ public class SingleChatActivity extends AppCompatActivity {
                 break;
         }
 
-        sendOfferToServer(values, advertisementsIds.get(positionMyAdv).toString(), content, d);
+        String exchangeID = "";
+        if (positionMyAdv != -1 ) exchangeID = advertisementsIds.get(positionMyAdv).toString();
+        sendOfferToServer(values, exchangeID, content, d);
     }
 
     private void denyOffer(){
@@ -641,7 +655,8 @@ public class SingleChatActivity extends AppCompatActivity {
         values.put("senderId", "FirebaseAutoMessage");
         if (status == 0) values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_made_offer)+" "+content);
         else if (status == 1) values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_accepted_offer));
-        else values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_denied_offer));
+        else if (status == 2) values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_denied_offer));
+        else values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_give_gift));
         values.put("read", false);
 
         messagesRef.push().setValue(values);
@@ -805,6 +820,29 @@ public class SingleChatActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    public AlertDialog createGiveGiftDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.dialog_title_give_gift)
+                .setMessage(R.string.dialog_message_give_gift)
+                .setPositiveButton(R.string.dialog_confirm_give_gift,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                closeAdvert();
+                            }
+                        })
+                .setNegativeButton(R.string.dialog_cancel_give_gift,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //onNegativeButtonClick();
+                            }
+                        });
+
+        return builder.create();
+    }
+
     private void onPossitiveButtonClick(){
         //Remove from Firebase putting the value to false
         Map<String, Object> value = new HashMap<>();
@@ -869,6 +907,17 @@ public class SingleChatActivity extends AppCompatActivity {
                                 for (int n = 0; n < jsonArray.length(); n++) {
                                     JSONObject object = jsonArray.getJSONObject(n);
                                     Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
+                                    if (newAdvert.getTypeDescription().equals(Constants.typeServerGIFT)){
+                                        Log.i("DebugAdvIsGift","el chat es dun anunci que es un regal");
+                                        if (object.has("id") && object.getString("id").equals(idProduct)){
+                                            Log.i("DebugAdvIsGift","el regal es meu");
+                                            if (object.has("sold") && !object.getBoolean("sold")) {
+                                                Log.i("DebugAdvIsGift","el regal no esta venut");
+                                                isMyAdvGift = true;
+                                                getMenuInflater().inflate(R.menu.menu_option_my_single_chat_giveaway, myMenu);
+                                            }
+                                        }
+                                    }
                                     advertisementsTitles.add(newAdvert.getTitle());
                                     advertisementsIds.add(newAdvert.getID());
                                 }
@@ -996,5 +1045,34 @@ public class SingleChatActivity extends AppCompatActivity {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void closeAdvert() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("sold", true);
+        } catch (JSONException e) {
+        }
+
+        final Context context = this.getApplicationContext();
+        new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/"+idProduct, this){
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    Log.i(Constants.DebugTAG,"JSON1: \n"+jsonObject);
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Log.i("Debug-CloseAdv","Closed adv" +idProduct);
+                        isMyAdvGift = false;
+                        addMessageOffer(3,"");
+                    }
+                } catch (JSONException ignored){
+
+                }
+            }
+        }.execute(jsonObject);
     }
 }

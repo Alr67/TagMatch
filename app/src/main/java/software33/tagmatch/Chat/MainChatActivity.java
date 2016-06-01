@@ -385,38 +385,6 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         return builder.create();
     }
 
-    private void closeAdvert(final String advToClose, final String userToVote, final String idChat, final Map<String, Integer> valoration) {
-        JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("sold", true);
-        } catch (JSONException e) {
-        }
-
-        final Context context = this.getApplicationContext();
-        new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/"+advToClose, this){
-            @Override
-            protected void onPostExecute(JSONObject jsonObject) {
-                try {
-                    Log.i(Constants.DebugTAG,"JSON1: \n"+jsonObject);
-                    if(jsonObject.has("error")) {
-                        String error = jsonObject.get("error").toString();
-                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-                    }
-                    else {
-                        Log.i("Debug-CloseAdv","Closed adv" +advToClose);
-
-                        Map<String, Object> values = new HashMap<>();
-                        valoration.put(""+userToVote, Integer.parseInt(advToClose));
-                        values.put("valoration",valoration);
-                        FirebaseUtils.getChatsRef().child(idChat).child("offer").updateChildren(values);
-                    }
-                } catch (JSONException ignored){
-
-                }
-            }
-        }.execute(jsonObject);
-    }
-
     private void getOfferFromServer(int offerId, final Map<String, Integer> valoration,final String idUser, final String idProduct, final String titleProduct,
                                     final String owner, final String userName, final String idChat, final int messages){
         JSONObject jObject = new JSONObject();
