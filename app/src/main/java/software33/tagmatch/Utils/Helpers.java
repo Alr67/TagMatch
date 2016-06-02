@@ -1,6 +1,7 @@
 package software33.tagmatch.Utils;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,8 +10,12 @@ import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
+
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import android.widget.EditText;
+
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
@@ -33,25 +38,40 @@ import software33.tagmatch.Users.ViewProfile;
 
 
 public class Helpers {
-    public static final String SH_PREF_NAME = "TagMatch_pref";
 
     public static ArrayList<String> getPersonalData(Context context){
         ArrayList<String> data = new ArrayList<>();
-        SharedPreferences prefs = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE);
         data.add(prefs.getString("name", null));
         data.add(prefs.getString("password", null));
         return data;
     }
 
+    public static void saveDeviceToken(Context context, String token) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        editor.putString("device_token", token);
+        editor.commit();
+    }
+
+    public static void eraseDeviceToken(Context context) {
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        editor.remove("device_token");
+    }
+
+    public static String getDeviceToken(Context context) {
+        SharedPreferences prefs = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getString("device_token", "ERROR");
+    }
+
     public static void setPersonalData(String username, String password, Context context){
-        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.putString("name", username);
         editor.putString("password",password);
         editor.commit();
     }
 
     public static User getActualUser(Context context) {
-        SharedPreferences prefs = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences prefs = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE);
         User user = new User(prefs.getString("name", null),
                                 prefs.getString("password", null),
                                 prefs.getString("email", null),
@@ -64,7 +84,7 @@ public class Helpers {
 
     public static void saveActualUser(String name, String password, String email,
                                       String photoId, String city, int latitude, int longitude, Context context){
-        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.putString("name", name);
         editor.putString("password", password);
         editor.putString("email", email);
@@ -76,7 +96,7 @@ public class Helpers {
     }
 
     public static void logout(Context context) {
-        SharedPreferences.Editor editor = context.getSharedPreferences(SH_PREF_NAME, Context.MODE_PRIVATE).edit();
+        SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.remove("name");
         editor.remove("password");
         FirebaseUtils.removeMyId(context);
@@ -210,10 +230,10 @@ public class Helpers {
                 @Override
                 protected void onPostExecute(String url) {
                     ImageView contenedor = (ImageView) nav_header.findViewById(R.id.image_nav);
-                    if (url == null){
-                        Picasso.with(context).load(R.drawable.image0).centerCrop().resize(contenedor.getMeasuredWidth(),contenedor.getMeasuredHeight()).into(contenedor);
-                    }
-                    else Picasso.with(context).load(url).error(R.drawable.image0).centerCrop().resize(contenedor.getMeasuredWidth(),contenedor.getMeasuredHeight()).into(contenedor);
+                    if (url == null) {
+                        Picasso.with(context).load(R.drawable.image0).centerCrop().resize(contenedor.getMeasuredWidth(), contenedor.getMeasuredHeight()).into(contenedor);
+                    } else
+                        Picasso.with(context).load(url).error(R.drawable.image0).centerCrop().resize(contenedor.getMeasuredWidth(), contenedor.getMeasuredHeight()).into(contenedor);
                 }
             }.execute(jsonObject);
 
@@ -224,5 +244,8 @@ public class Helpers {
         ((ImageView) nav_header.findViewById(R.id.image_nav)).setImageDrawable(context.getDrawable(R.drawable.loading_gif)); //NO TOCAR NUNCA JAMAS BAJO NINGUNA CIRCUNSTANCIA
 
         ((TextView) nav_header.findViewById(R.id.user_name_header)).setText(Helpers.getActualUser(context).getAlias());
+    }
+    public static boolean isEmpty(EditText myeditText) {
+        return myeditText.getText().toString().trim().length() == 0;
     }
 }

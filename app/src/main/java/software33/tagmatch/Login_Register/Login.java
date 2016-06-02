@@ -32,6 +32,7 @@ import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetArrayAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.Users.PasswordRecover;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
@@ -39,7 +40,7 @@ public class Login extends AppCompatActivity {
     /*Declaracions ButterKnife*/
     @Bind(R.id.btn_login) Button login;
     @Bind(R.id.link_signup) TextView reg;
-    //@Bind(R.id.forg) Button forg;
+    @Bind(R.id.link_forg) TextView forg;
 
     @Bind(R.id.input_email) EditText username;
     @Bind(R.id.input_password) EditText passw;
@@ -138,10 +139,13 @@ public class Login extends AppCompatActivity {
         finish();
     }
 
-    /*@OnClick(R.id.forg)
+    @OnClick(R.id.link_forg)
     protected void intent_forg() {
-        Toast.makeText(getApplicationContext(),username.getText().toString(),Toast.LENGTH_SHORT).show();
-    }*/
+        Firebase.setAndroidContext(this);
+        Intent intent = new Intent(this, PasswordRecover.class);
+        startActivity(intent);
+        finish();
+    }
 
     private void continueLogin() {
         Firebase.setAndroidContext(this);

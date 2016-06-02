@@ -119,6 +119,14 @@
             android:name=".Settings.PasswordChange"
             android:label="@string/title_activity_password_change"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".Users.PasswordRecover"
+            android:label="@string/title_activity_password_recover"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Users.RecoverSecondStep"
+            android:label="@string/title_activity_recover_second_step"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
     </application>
 
 </manifest>
