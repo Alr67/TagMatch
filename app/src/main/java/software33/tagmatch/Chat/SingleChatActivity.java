@@ -45,6 +45,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.firebase.client.utilities.Utilities;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -166,11 +167,10 @@ public class SingleChatActivity extends AppCompatActivity {
         ImageView image = (ImageView) findViewById(R.id.singleChatImage);
 
         if (imageChat == null || imageChat.equals("")){
-            image.setImageResource(R.drawable.image0);
+            Picasso.with(this).load(R.drawable.image0).into(image);
         }
         else {
-            byte[] imageAsBytes = Base64.decode(imageChat, Base64.DEFAULT);
-            image.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
+            Picasso.with(this).load(imageChat).error(R.drawable.image0).into(image);
         }
         /****************************************************/
 

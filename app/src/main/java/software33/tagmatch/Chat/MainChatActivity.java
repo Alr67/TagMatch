@@ -34,6 +34,7 @@ import com.firebase.client.DataSnapshot;
 import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,6 +52,7 @@ import software33.tagmatch.Domain.Offer;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
@@ -280,7 +282,8 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
             @Override
             public void onDataChange(DataSnapshot snapshot) {
                 FirebaseUtils.User u = snapshot.getValue(FirebaseUtils.User.class);
-                setListData(idUser, idProduct, titleProduct, owner, userName, idChat, u.getImg(), messages, newOffer);
+                setListData(idUser, idProduct, titleProduct, owner, userName, idChat, "", messages, newOffer);
+                downloadImageFromServer(idUser, idProduct, titleProduct, owner, userName, idChat, messages, newOffer);
             }
             @Override
             public void onCancelled(FirebaseError firebaseError) {}
@@ -422,6 +425,24 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
                     }
                 }
             }.execute(jObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void downloadImageFromServer(final String idUser, final String idProduct, final String titleProduct,
+                                    final String owner, final String userName, final String idChat, final int messages, final int newOffer){
+        try {
+            JSONObject jsonObject = new JSONObject();
+            jsonObject.put("username", Helpers.getActualUser(this).getAlias());
+            jsonObject.put("password", Helpers.getActualUser(this).getPassword());
+
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + userName + "/photo", this) {
+                @Override
+                protected void onPostExecute(String url) {
+                    setListData(idUser, idProduct, titleProduct, owner, userName, idChat, url, messages, newOffer);
+                }
+            }.execute(jsonObject);
         } catch (JSONException e) {
             e.printStackTrace();
         }

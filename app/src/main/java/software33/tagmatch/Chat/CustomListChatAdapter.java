@@ -17,6 +17,8 @@ import android.widget.LinearLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
 
+import com.squareup.picasso.Picasso;
+
 import org.w3c.dom.Text;
 
 import java.util.ArrayList;
@@ -125,7 +127,7 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
             holder.text.setText( tempValues.getUserName().substring(0, Math.min(tempValues.getUserName().length(),16)));
             holder.text1.setText( tempValues.getTitleProduct().substring(0, Math.min(tempValues.getTitleProduct().length(),16)));
 
-            if (tempValues.getImage().equals("")){
+            if (tempValues.getImage() != null && tempValues.getImage().equals("")){
                 holder.image.setImageResource(
                         res.getIdentifier(
                                 "software33.tagmatch:drawable/"+ Constants.defaultImage
@@ -133,8 +135,13 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
             }
             else {
                 //Set image Base64
-                byte[] imageAsBytes = Base64.decode(tempValues.getImage(), Base64.DEFAULT);
-                holder.image.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
+
+                if (tempValues.getImage() == null){
+                    Picasso.with(activity).load(R.drawable.image0).into(holder.image);
+                }
+                else {
+                    Picasso.with(activity).load(tempValues.getImage()).error(R.drawable.image0).into(holder.image);
+                }
             }
 
             if (tempValues.getMessages()==0) {

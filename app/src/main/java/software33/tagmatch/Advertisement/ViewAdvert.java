@@ -82,6 +82,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String myName;
 
     private String idProduct;
+    private String urlImage = "";
 
     private Menu my_menu;
 
@@ -459,10 +460,12 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         new TagMatchGetImageAsyncTask(url, this) {
             @Override
             protected void onPostExecute(String url) {
-                if (url == null){
+                if (url == null) {
                     Picasso.with(ViewAdvert.this).load(R.drawable.image0).into(userImage);
+                } else {
+                    Picasso.with(ViewAdvert.this).load(url).error(R.drawable.image0).into(userImage);
+                    urlImage = url;
                 }
-                else Picasso.with(ViewAdvert.this).load(url).error(R.drawable.image0).into(userImage);
                 getChats();
                 if(myAdv)prepareEdit();
             }
@@ -564,20 +567,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
 
         b.putBoolean("FromAdvert",true);
 
-        //Get user Image
-        Drawable drawable = userImage.getDrawable();
-
-        BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
-        Bitmap bitmap = bitmapDrawable .getBitmap();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] imageInByte = stream.toByteArray();
-
-        String encodedImage = Base64.encodeToString(imageInByte, Base64.DEFAULT);
-
-        imageChat = encodedImage;
-
-        FirebaseUtils.setChatImage(imageChat,this);
+        FirebaseUtils.setChatImage(urlImage,this);
         intent.putExtras(b);
 
         return intent;
