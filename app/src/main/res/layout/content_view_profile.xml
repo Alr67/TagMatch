@@ -2,16 +2,18 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:fitsSystemWindows="true" >
+    android:fitsSystemWindows="true"
+    android:paddingTop="55dp">
 
     <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingTop="30dp"
+        android:paddingTop="50dp"
         android:paddingLeft="24dp"
         android:paddingRight="24dp"
-        android:weightSum="1">
+        android:weightSum="1"
+        android:paddingBottom="15dp">
 
         <ImageView
             android:layout_width="match_parent"
@@ -135,7 +137,7 @@
             android:name="com.google.android.gms.maps.MapFragment"
             android:id="@+id/profileMap"
             android:layout_width="match_parent"
-            android:layout_height="115dp"
+            android:layout_height="150dp"
             android:layout_gravity="center"
             android:layout_below="@+id/tvLocation"
             android:layout_alignParentEnd="true" />
