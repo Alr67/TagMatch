@@ -208,6 +208,7 @@
     <string name="title_recovery">Recover your password</string>
     <string name="recov_button">Recover</string>
     <string name="forg_button">Forgot your password? Recover it</string>
+    <string name="success_recov">Password successfully modified</string>
 
     <!-- FAVs -->
     <string name="fav_title">Favorites</string>

@@ -63,11 +63,14 @@ public class RecoverSecondStep extends AppCompatActivity {
                             if(jsonObject.has("error")) {
                                 String error = jsonObject.get("error").toString();
                                 Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
-                                //Hacer q vaya al home
+
                             }
                             else {
-                                Toast.makeText(getApplicationContext(), "SUCCESS", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(getApplicationContext(), R.string.success_recov, Toast.LENGTH_SHORT).show();
                                 Helpers.eraseDeviceToken(getApplicationContext());
+                                Intent success = new Intent(RecoverSecondStep.this, Login.class);
+                                startActivity(success);
+                                finish();
                             }
                         } catch (JSONException ignored){
 
