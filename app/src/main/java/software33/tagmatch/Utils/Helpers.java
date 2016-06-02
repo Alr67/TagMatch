@@ -1,5 +1,6 @@
 package software33.tagmatch.Utils;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -224,7 +225,7 @@ public class Helpers {
         return input;
     }
 
-    public static void setNavHeader(final View nav_header, final Context context) {
+    public static void setNavHeader(final View nav_header, final Context context, final Activity parent) {
         try {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", Helpers.getActualUser(context).getAlias());
@@ -244,7 +245,14 @@ public class Helpers {
             e.printStackTrace();
         }
 
-        //((ImageView) nav_header.findViewById(R.id.image_nav)).setImageDrawable(context.getDrawable(R.drawable.loading_gif)); //NO TOCAR NUNCA JAMAS BAJO NINGUNA CIRCUNSTANCIA
+        ((ImageView) nav_header.findViewById(R.id.image_nav)).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(parent, ViewProfile.class);
+                parent.startActivity(intent);
+                parent.finish();
+            }
+        });
 
         ((TextView) nav_header.findViewById(R.id.user_name_header)).setText(Helpers.getActualUser(context).getAlias());
     }
