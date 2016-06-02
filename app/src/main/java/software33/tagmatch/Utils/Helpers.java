@@ -28,6 +28,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 import software33.tagmatch.Chat.FirebaseUtils;
@@ -258,6 +263,30 @@ public class Helpers {
     }
     public static boolean isEmpty(EditText myeditText) {
         return myeditText.getText().toString().trim().length() == 0;
+    }
+
+    public static String iStreamToString(InputStream is1) {
+        BufferedReader rd = new BufferedReader(new InputStreamReader(is1), 4096);
+        String line;
+        StringBuilder sb = new StringBuilder();
+        try {
+            while ((line = rd.readLine()) != null) {
+                sb.append(line);
+            }
+            rd.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        String contentOfMyInputStream = sb.toString();
+        return contentOfMyInputStream;
+    }
+
+    public static void connectUser(HttpURLConnection c, Context context) {
+        User actualUser = Helpers.getActualUser(context);
+        String userPass = actualUser.getAlias() + ":" + actualUser.getPassword();
+        c.setRequestProperty("Authorization", "Basic " +
+                new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT)));
     }
 
 }

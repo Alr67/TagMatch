@@ -50,7 +50,7 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
             con.setReadTimeout(350000);
             con.setDoInput(true);
             con.setRequestMethod("POST");
-            connectUser(con);
+            Helpers.connectUser(con);
             Log.i(Constants.DebugTAG,"Envio Content-Type->image/"+imgExtension);
             con.setRequestProperty("Content-Type", "image/" + imgExtension);
 
@@ -68,9 +68,9 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
             Log.i(Constants.DebugTAG,"PostImg responseCode: "+ Integer.toString(con.getResponseCode()));
 
             if (con.getResponseCode() >= 400)
-                aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                aux = new JSONObject(Helpers.iStreamToString(con.getErrorStream()));
             else
-                aux = new JSONObject(iStreamToString(con.getInputStream()));
+                aux = new JSONObject(Helpers.iStreamToString(con.getInputStream()));
 
             con.disconnect();
 
@@ -91,31 +91,5 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
             return new JSONObject(map);
         }
     }
-
-    private void connectUser(HttpURLConnection c) {
-        User actualUser = Helpers.getActualUser(context);
-        String userPass = actualUser.getAlias() + ":" + actualUser.getPassword();
-        c.setRequestProperty("Authorization", "Basic " +
-                new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT)));
-    }
-
-    public String iStreamToString(InputStream is1) {
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is1), 4096);
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try {
-            while ((line = rd.readLine()) != null) {
-                sb.append(line);
-            }
-            rd.close();
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        String contentOfMyInputStream = sb.toString();
-        return contentOfMyInputStream;
-    }
-
 
 }
