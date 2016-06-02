@@ -69,6 +69,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         TextView app_header = (TextView) toolbar.findViewById(R.id.toolbar_title); //cogemos el textview de la toolbar
         Typeface face= Typeface.createFromAsset(getAssets(), "fonts/LobsterTwo-BoldItalic.ttf");//aplicamos el diseño
         app_header.setTypeface(face);
+        app_header.setTextColor(getResources().getColor(R.color.reg_color));
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);

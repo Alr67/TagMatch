@@ -252,5 +252,6 @@
 
     <!-- Loading -->
     <string name="loading">Please wait...</string>
+    <string name="logged_as">Logged as&#160;</string>
 
 </resources>

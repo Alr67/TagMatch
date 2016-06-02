@@ -4,27 +4,27 @@
     <group android:checkableBehavior="single">
         <item
             android:id="@+id/nav_main"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@mipmap/ic_view_day_black_24dp"
             android:title="@string/nav_mainPage" />
         <item
             android:id="@+id/nav_discovery_tagmatch"
-            android:icon="@drawable/ic_menu_slideshow"
+            android:icon="@mipmap/dtm"
             android:title="@string/nav_discovery_tag" />
         <item
             android:id="@+id/nav_viewUser"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@mipmap/ic_person_black_24dp"
             android:title="@string/nav_viewUser" />
         <item
             android:id="@+id/nav_my_adverts"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@mipmap/ic_collections_bookmark_black_24dp"
             android:title="@string/nav_myAdverts" />
         <item
             android:id="@+id/nav_my_favs"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@mipmap/ic_star_black_24dp"
             android:title="@string/nav_myFAVs" />
         <item
             android:id="@+id/nav_xats"
-            android:icon="@drawable/ic_menu_gallery"
+            android:icon="@mipmap/ic_comment_black_24dp"
             android:title="@string/nav_xats" />
     </group>
 
@@ -36,7 +36,7 @@
                 android:title="@string/nav_settings" />
             <item
                 android:id="@+id/nav_logout"
-                android:icon="@drawable/ic_menu_send"
+                android:icon="@mipmap/ic_exit_to_app_black_24dp"
                 android:title="@string/nav_logout" />
         </menu>
     </item>

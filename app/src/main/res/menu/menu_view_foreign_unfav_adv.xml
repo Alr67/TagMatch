@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/action_unfav"
         android:title="@string/search_preview"
-        android:icon="@drawable/fav1"
+        android:icon="@mipmap/ic_star_black_24dp"
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
     <item

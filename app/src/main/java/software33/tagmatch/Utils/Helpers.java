@@ -259,7 +259,7 @@ public class Helpers {
             }
         });
 
-        ((TextView) nav_header.findViewById(R.id.user_name_header)).setText(Helpers.getActualUser(context).getAlias());
+        ((TextView) nav_header.findViewById(R.id.user_name_header)).setText(context.getResources().getString(R.string.logged_as) + Helpers.getActualUser(context).getAlias());
     }
 
     public static void setDefaultAdvertisementNumber(Context context, int value){
