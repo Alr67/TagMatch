@@ -1,6 +1,8 @@
 package software33.tagmatch.AdCards;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -58,6 +60,10 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        // COMPROBAR SI HAY NUMERO DE ANUNCIOS POR DEFECTO
+        // Y PONER UN NUMERO EN CASO NEGATIVO
+        if(Helpers.getDefaultAdvertisementNumber(this) == -1)
+            Helpers.setDefaultAdvertisementNumber(this, 40);
 
         getSupportActionBar().setDisplayShowTitleEnabled(false); //Esconder titulo HAMBURGUER
         TextView app_header = (TextView) toolbar.findViewById(R.id.toolbar_title); //cogemos el textview de la toolbar
@@ -118,7 +124,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 url = extras.getString("url");
             }
         } catch (Exception e){
-            url += "/ads?idGreaterThan=" + Constants.SERVER_IdGreaterThan + "&limit=" + Constants.SERVER_limitAdverts;
+            url += "/ads?idGreaterThan=" + Constants.SERVER_IdGreaterThan + "&limit=" + Helpers.getDefaultAdvertisementNumber(this);
         }
         Log.i("url", url);
         try {

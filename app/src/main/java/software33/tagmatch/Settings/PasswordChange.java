@@ -67,12 +67,12 @@ public class PasswordChange extends AppCompatActivity implements NavigationView.
     }
 
     private void validatePassword(final View view) {
-        String oldPassword = ((TextView) findViewById(R.id._change_password_old_password)).getText().toString();
-        final String newPassword = ((TextView) findViewById(R.id._change_password_new_password)).getText().toString();
-        String repitedPassword = ((TextView) findViewById(R.id._change_password_repite_new_password)).getText().toString();
+        String oldPassword = ((TextView) findViewById(R.id.change_password_old_password)).getText().toString();
+        final String newPassword = ((TextView) findViewById(R.id.change_password_new_password)).getText().toString();
+        String repitedPassword = ((TextView) findViewById(R.id.change_password_repite_new_password)).getText().toString();
 
         if(oldPassword.equals("") || newPassword.equals("") || repitedPassword.equals(""))
-            Snackbar.make(view, getString(R.string.password_change_error_password_empty), Snackbar.LENGTH_LONG).show();
+            Snackbar.make(view, getString(R.string.change_password_error_password_empty), Snackbar.LENGTH_LONG).show();
         else if (!Helpers.getActualUser(this).getPassword().equals(oldPassword))
             Snackbar.make(view, getString(R.string.change_password_error_incorrect_password), Snackbar.LENGTH_LONG).show();
         else if(!newPassword.equals(repitedPassword))

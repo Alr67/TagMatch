@@ -54,7 +54,6 @@ public abstract class Constants {
     /* Home advert server preferences */
     public static final Integer SERVER_IdGreaterThan = 0;
     public static final Integer SERVER_IdSmallerThan = 5;
-    public static final Integer SERVER_limitAdverts = 40;
 
     /** A ELIMINAR */
     public static final User testUser = new User("test","test");

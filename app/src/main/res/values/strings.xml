@@ -206,13 +206,15 @@
 
     <!-- Settings -->
     <string name="password_change">Change Password</string>
+    <string name="settings_wrong_default_advs_number">Number of adverts cannot be less than 1</string>
+    <string name="settings_default_num_advs">Default number of adverts to show</string>
 
     <!-- Password Change -->
     <string name="title_activity_password_change">PasswordChange</string>
     <string name="change_password_hint_old_password">Old Password</string>
     <string name="change_password_hint_new_password">New Password</string>
     <string name="change_password_hint_repite_new_password">Repite Password</string>
-    <string name="password_change_error_password_empty">Fields cannot be empty</string>
+    <string name="change_password_error_password_empty">Fields cannot be empty</string>
     <string name="change_password_error_password_missmatch">Passwords do not match</string>
     <string name="change_password_error_incorrect_password">Incorrect Password</string>
     <string name="change_password_ok">Password Chaged!</string>
