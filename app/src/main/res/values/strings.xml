@@ -1,9 +1,270 @@
 <resources>
+    <!-- Manifest -->
     <string name="app_name">TagMatch!</string>
+    <string name="title_activity_new_advertisement">NewAdvertisement</string>
+    <!--<string name="title_activity_view_profile">ViewProfile</string>-->
+    <string name="title_activity_view_chat">ViewChat</string>
+    <string name="title_activity_view_advert">ViewAdvert</string>
+    <string name="title_activity_my_adverts">My Adverts</string>
+
+    <!-- Nav Drawer -->
+    <string name="nav_newAdvert">New Advertisement</string>
+    <string name="nav_logout">Logout</string>
+    <string name="nav_settings">Settings</string>
+    <string name="nav_mainPage">Main Page</string>
+    <string name="nav_viewUser">View User</string>
+    <string name="nav_myAdverts">My Adverts</string>
+    <string name="nav_myFAVs">My Favs</string>
+    <string name="nav_xats">Chats</string>
+    <string name="nav_viewAdvert">View Advertisement </string>
+    <string name="nav_discovery_tag">Discovery TagMatch!</string>
+    <string name="settings">User settings</string>
+
+    <!-- Desordere total -->
     <string name="action_settings">Settings</string>
-    <string name="chat_button">Xats</string>
-    <string name="search_preview">Buscar xat</string>
-    <string name="main_chat_activity_title">Xats</string>
-    <string name="empty_chat_list">No existeix cap xat encara</string>
-    <string name="send_message">Enviar</string>
+    <string name="chat_button">Chats</string>
+    <string name="search_preview">Find chat…</string>
+    <string name="main_chat_activity_title">Chats</string>
+    <string name="empty_chat_list">You have no chats yet</string>
+    <string name="send_message">Send</string>
+    <string name="action_send_image">Send image</string>
+    <string name="action_send_offer">Send offer</string>
+    <string name="action_give_gift">Give gift</string>
+    <string name="action_view_offers">View offers</string>
+    <string name="action_block_user">Block user</string>
+    <string name="action_delete_chat">Delete chat</string>
+    <string name="dialog_title_delete_chat">Delete chat</string>
+    <string name="dialog_message_delete_chat">Are you sure you want to delete a chat?</string>
+    <string name="dialog_confirm_delete_chat">Yes</string>
+    <string name="dialog_cancel_delete_chat">Cancel</string>
+    <string name="registration_title">Registration</string>
+    <string name="registration_button">Send</string>
+    <string name="registration_hint_username">User</string>
+    <string name="registration_hint_mail">Email</string>
+    <string name="registration_hint_password">Password</string>
+    <string name="registration_hint_password_confirm">Password confirmation</string>
+    <string name="registration_wrong_username">This username already exists.</string>
+    <string name="registration_wrong_password_missmatch">The password is not the same.</string>
+    <string name="registration_wrong_mail">This email already exists.</string>
+    <string name="registration_search_button">Find photo</string>
+    <string name="registration_end_registrer">Sign up</string>
+    <string name="registration_login">Already a member? Log in</string>
+    <string name="registration_wrong_mail_match">Put a correct email</string>
+    <string name="registration_wrong_username_void">User can\'t be empty</string>
+    <string name="registration_profile_foto">Profile photo</string>
+    <string name="registration_default_sell_location">Where is your location?</string>
+    <string name="no_network_connection">No connection to network</string>
+    <string name="connection_timeout">Connection timeout</string>
+    <string name="hint_single_chat">Write your message…</string>
+    <string name="hint_loading_adverts">Loading advertisements from server, please wait</string>
+    <string name="hint_no_adverts">You don\'t have any advert, create one!</string>
+    <string name="hint_no_hash">You don\'t have any interest in your profile, add some to enjoy Discovery TagMatch!</string>
+    <string name="hint_no_fav">You don\'t have any favorite advert. If you add one, it will be shown here</string>
+    <string name="upload_ad_to_server">"Uploading the advert to our server, please wait"</string>
+
+    <!-- Registro -->
+    <string name="no_photo">You must upload a pic for your profile</string>
+    <string name="succ_reg">User succesfully created</string>
+    <string name="upload_img">Uploading image...</string>
+    
+    <!-- Login -->
+    <string name="login">Login</string>
+    <string name="forgotten">I forgot my password</string>
+    <string name="new_user_text">New user? Sign up</string>
+    <string name="new_user_button">Sign up</string>
+    <string name="user_name">User name</string>
+    <string name="user_password">Password</string>
+    <string name="rec_user_password">Type a new password</string>
+    <string name="rec2_user_password">Type it again</string>
+    <string name="last_step">Type your new password</string>
+    <string name="empty_pass">The password is empty</string>
+    <string name="empty_user">The user is empty</string>
+    <string name="error_empty_new_pass">You must fill both password fields</string>
+    <string name="error_login">User or password incorrect</string>
+    <string name="both_must_be_equal">Both passwords must be equal</string>
+
+
+    <!-- New Advertisement -->
+    <string name="input_title">Title</string>
+    <string name="input_description">Description</string>
+    <string name="input_hashtags">Hashtags</string>
+    <string name="input_wantedHashtags">Hashtags what you want to trade</string>
+    <string name="input_price">Price</string>
+    <string name="input_gift">Thanks for your donation!</string>
+    <string name="but_new_advert">Create</string>
+    <string name="noTitle">Insert a title</string>
+    <string name="noDescription">Insert a description</string>
+    <string name="noTag">Insert a hastag</string>
+    <string name="noExTag">Insert a wanted hastag</string>
+    <string name="imagePickTitle">Insert an image</string>
+    <string name="imagePickText">Where do you want to pick the image from?</string>
+    <string name="imagePickCamera">From camera</string>
+    <string name="imagePickGallery">From gallery</string>
+    <string name="title_error_newAdvert">Some fields empty</string>
+    <string name="ok">Okay</string>
+    <string name="emptyPrice">The price is empty</string>
+    <string name="zeroPrice">The price has to be greater than zero</string>
+    <string name="new_photo">Add image</string>
+    <string name="new_ad_general_title">New advert</string>
+    <string name="cat_adv">Ad\'s category</string>
+    <string name="type_ad">Ad\'s type</string>
+    <string name="change">Change</string>
+    <string name="succ_edit">Ad successfully updated</string>
+    <string name="succ_upload">Ad successfully uploaded</string>
+    <string name="please_add_photo">Please, add at least 1 photo</string>
+    <string name="settings_title">Settings</string>
+    <string name="creating_user">Please wait, creating user...</string>
+
+    <!-- Navigation Drawer -->
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+
+    <!-- Profile -->
+    <string name="title_activity_filter">Filter</string>
+    <string name="ed_1">Editing&#160;</string>
+    <string name="ed_2">\'s profile</string>
+    <string name="vw_1">Watching&#160;</string>
+
+    <!-- Filters -->
+    <string name="filter_title">Search Filter</string>
+    <string name="filter_same_city">Same city</string>
+    <string name="filter_car">Cars</string>
+    <string name="filter_videogames">Videogames</string>
+    <string name="filter_appliance">Appliances</string>
+    <string name="filter_categories">Categories</string>
+    <string name="profile_button_advertisement">Advertisements</string>
+    <string name="delete_hash">Delete this hashtag?</string>
+    <string name="positive_button">Yes</string>
+    <string name="negative_button">No</string>
+    <string name="succ_delete">Hashtag succesfully deleted</string>
+    <string name="edit_activity_title">Search</string>
+    <string name="hash_filter">Hashtags to search</string>
+
+    <!-- View Adv -->
+    <string name="action_report">Report</string>
+    <string name="action_tagmatch">Tagmatch!</string>
+    <string name="action_edit_adv">Edit advertisement</string>
+    <string name="action_delete_adv">Delete advertisement</string>
+    <string name="added_fav">Advert added as FAV</string>
+    <string name="erased_fav">Advert erased as FAV</string>
+
+    <string name="dialog_title_delete_adv">Delete advertisement</string>
+    <string name="dialog_message_delete_adv">Are you sure you want to delete this advertisement?</string>
+    <string name="dialog_confirm_delete_adv">Yes</string>
+    <string name="dialog_cancel_delete_adv">Cancel</string>
+    <string name="wait_chat">Wait, setting up some things</string>
+    <string name="text_edit_button">Save changes</string>
+    <string name="loading_title">Loading...</string>
+    <string name="hashtags_title">Hashtags:</string>
+    <string name="about_user">About the seller</string>
+    <string name="user_loc">User location:&#160;</string>
+    <!--<string name="title_activity_edit_profile">EditProfile</string>-->
+    <string name="edit_profile_interests">Interests</string>
+    <string name="title_activity_view_favs">ViewFavs</string>
+    <string name="title_activity_discovery_ads">DiscoveryAds</string>
+
+    <!-- Chat Offer -->
+    <string name="dialog_title_send_offer">Send offer</string>
+    <string name="dialog_select_offer">Select offer:</string>
+    <string name="dialog_information_offer">Set the offer:</string>
+    <string name="dialog_money_information_offer">enter a € quantity</string>
+    <string name="dialog_other_information_offer">enter a some commentary</string>
+    <string name="dialog_error_send_offer_no_offer">You have to select an offer</string>
+    <string name="dialog_error_send_offer_no_information">You have to set the offer</string>
+    <string name="dialog_confirm_send_offer">Confirm</string>
+    <string name="dialog_cancel_send_offer">Cancel</string>
+
+    <string name="title_rate_deal">Rate deal</string>
+
+    <string name="pending_offer">This offer is still pending</string>
+    <string name="confirm_offer">Confirm</string>
+    <string name="deny_offer">Deny</string>
+    <string name="rate_offer">Rate the deal!</string>
+
+    <string name="dialog_title_deny_offer">Deny offer</string>
+    <string name="dialog_message_deny_offer">Are you sure do you want to deny this offer?</string>
+    <string name="dialog_confirm_deny_offer">Deny</string>
+    <string name="dialog_cancel_deny_offer">No</string>
+
+    <string name="dialog_title_not_rate_deal">Rate deal</string>
+    <string name="dialog_message_not_rate_deal">Are you sure do you not want to rate this deal?</string>
+    <string name="dialog_confirm_not_rate_deal">No, thanks</string>
+    <string name="dialog_cancel_not_rate_deal">Rate</string>
+
+    <string name="dialog_title_accept_offer">Accept offer</string>
+    <string name="dialog_message_accept_offer">Are you sure do you want to accept this offer?</string>
+    <string name="dialog_confirm_accept_offer">Accept</string>
+    <string name="dialog_cancel_accept_offer">No</string>
+
+    <string name="dialog_title_give_gift">Give gift</string>
+    <string name="dialog_message_give_gift">Are you sure do you want to give your advert?</string>
+    <string name="dialog_confirm_give_gift">Accept</string>
+    <string name="dialog_cancel_give_gift">No</string>
+
+    <string name="mainchat_new_offer">Offer!</string>
+    <string name="mainchat_pending_offer">Pending</string>
+    <string name="mainchat_closed_offer">Closed</string>
+    <string name="mainchat_rated_offer">Rated</string>
+
+    <string name="message_information_offer">Information!\n</string>
+    <string name="message_accepted_offer">has accepted your offer</string>
+    <string name="message_denied_offer">has declined your offer</string>
+    <string name="message_made_offer">has offered you:</string>
+    <string name="message_give_gift">has given this advert to you</string>
+
+    <string name="title_dialog_error_create_offer">Can not create offer</string>
+    <string name="button_dialog_error_create_offer">OK</string>
+    <string name="message_dialog_error_create_offer">This advertisement has already accepted an offer</string>
+
+    <!-- other user -->
+    <string name="view_advertisements">View Advertisements</string>
+    <string name="my_advs_title_end">\'s Adverts</string>
+
+    <!-- Discovery -->
+    <string name="title_discovery">Discovery TagMatch!</string>
+
+    <!-- Recovery -->
+    <string name="title_recovery">Recover your password</string>
+    <string name="recov_button">Recover</string>
+    <string name="forg_button">Forgot your password? Recover it</string>
+    <string name="success_recov">Password successfully modified</string>
+
+    <!-- FAVs -->
+    <string name="fav_title">Favorites</string>
+    <string name="title_activity_ettings">ettings</string>
+    <string name="title_activity_settings">Settings</string>
+
+    <!-- Settings -->
+    <string name="password_change">Change Password</string>
+    <string name="settings_wrong_default_advs_number">Number of adverts cannot be less than 1</string>
+    <string name="settings_default_num_advs">Default number of adverts to be shown</string>
+
+    <!-- Password Change -->
+    <string name="title_activity_password_change">PasswordChange</string>
+    <string name="change_password_hint_old_password">Old Password</string>
+    <string name="change_password_hint_new_password">New Password</string>
+    <string name="change_password_hint_repite_new_password">Repite Password</string>
+    <string name="change_password_error_password_empty">Fields cannot be empty</string>
+    <string name="change_password_hint_repeat_new_password">Repeat Password</string>
+    <string name="change_password_error_password_missmatch">Passwords do not match</string>
+    <string name="change_password_error_incorrect_password">Incorrect Password</string>
+    <string name="change_password_ok">Password Chaged!</string>
+    <string name="change_password_btn">Change Password</string>
+    <string name="changing_pass">Changing your password...</string>
+    <string name="changing_title">Change your password</string>
+
+
+    <string name="title_activity_gossip">gossip</string>
+    <string name="title_activity_password_recover">PasswordRecover</string>
+    <string name="title_activity_recover_second_step">RecoverSecondStep</string>
+
+    <!-- Loading -->
+    <string name="loading">Please wait...</string>
+    <string name="logged_as">Logged as&#160;</string>
+
+    <!-- Api Keys -->
+    <string name="facebook_app_id">1703168903269138</string>
+
+
+
 </resources>

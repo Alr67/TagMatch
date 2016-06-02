@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <group android:checkableBehavior="single">
+        <item
+            android:id="@+id/nav_main"
+            android:icon="@mipmap/ic_view_day_black_24dp"
+            android:title="@string/nav_mainPage" />
+        <item
+            android:id="@+id/nav_discovery_tagmatch"
+            android:icon="@mipmap/dtm"
+            android:title="@string/nav_discovery_tag" />
+        <item
+            android:id="@+id/nav_viewUser"
+            android:icon="@mipmap/ic_person_black_24dp"
+            android:title="@string/nav_viewUser" />
+        <item
+            android:id="@+id/nav_my_adverts"
+            android:icon="@mipmap/ic_collections_bookmark_black_24dp"
+            android:title="@string/nav_myAdverts" />
+        <item
+            android:id="@+id/nav_my_favs"
+            android:icon="@mipmap/ic_star_black_24dp"
+            android:title="@string/nav_myFAVs" />
+        <item
+            android:id="@+id/nav_xats"
+            android:icon="@mipmap/ic_comment_black_24dp"
+            android:title="@string/nav_xats" />
+    </group>
+
+    <item android:title="@string/settings">
+        <menu>
+            <item
+                android:id="@+id/nav_settings"
+                android:icon="@drawable/ic_menu_manage"
+                android:title="@string/nav_settings" />
+            <item
+                android:id="@+id/nav_logout"
+                android:icon="@mipmap/ic_exit_to_app_black_24dp"
+                android:title="@string/nav_logout" />
+        </menu>
+    </item>
+
+</menu>

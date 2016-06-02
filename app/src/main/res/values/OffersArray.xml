@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="offers_array">
+        <item>No offer selected</item>
+        <item>Offer money</item>
+        <item>Offer my advert</item>
+        <item>Other offers</item>
+    </string-array>
+</resources>
