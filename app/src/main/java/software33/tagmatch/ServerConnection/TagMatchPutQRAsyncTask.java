@@ -40,8 +40,8 @@ public abstract class TagMatchPutQRAsyncTask extends AsyncTask<JSONObject, Void,
     protected JSONObject doInBackground(JSONObject... params) {
         try {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setConnectTimeout(15000);
-            con.setReadTimeout(15000);
+            con.setConnectTimeout(35000);
+            con.setReadTimeout(35000);
             con.setDoInput(true);
             con.setRequestMethod("PUT");
             con.setRequestProperty("Content-Type", "application/json");

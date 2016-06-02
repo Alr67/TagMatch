@@ -60,9 +60,9 @@ public class Login extends AppCompatActivity {
 
         ArrayList<String> existing_login = new ArrayList<String>();
         existing_login = new Helpers().getPersonalData(getApplicationContext());
-        downloadCategories();
-        if(existing_login != null && existing_login.get(0) != null && existing_login.get(1) != null) {
-            Intent success = new Intent(this, Home.class); //FAlta guardar en algun puesto l'usuari
+
+        if(!existing_login.isEmpty() && existing_login.get(0) != null && existing_login.get(1) != null) {
+            Intent success = new Intent(this, Home.class);
             startActivity(success);
             finish();
         }
@@ -107,7 +107,7 @@ public class Login extends AppCompatActivity {
                     protected void onPreExecute() {
                         super.onPreExecute();
                         mDialog = new ProgressDialog(Login.this);
-                        mDialog.setMessage("Please wait...");
+                        mDialog.setMessage(getString(R.string.loading));
                         mDialog.show();
                     }
                     @Override
@@ -196,6 +196,7 @@ public class Login extends AppCompatActivity {
                             for (int n = 0; n < jsonArray.length(); n++) {
                                 Constants.categoryList.add(jsonArray.getString(n));
                             }
+                            endLogin();
                             Log.i(Constants.DebugTAG,"Done downloading categories");
 
                         } catch (JSONException e) {
@@ -229,7 +230,7 @@ public class Login extends AppCompatActivity {
                         else if (jsonObject.has("username")){
                             Log.i("Debug-GetUser",jsonObject.toString());
                             FirebaseUtils.setMyId(jsonObject.get("firebaseID").toString(),getApplicationContext());
-                            endLogin();
+                            downloadCategories();
                         }
                     } catch (JSONException ignored) {
                         Log.i("DEBUG","error al get user");

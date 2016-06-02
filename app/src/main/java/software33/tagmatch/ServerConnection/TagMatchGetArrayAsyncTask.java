@@ -48,8 +48,8 @@ public class TagMatchGetArrayAsyncTask extends AsyncTask<JSONObject, Void, JSONO
             String basicAuth;
             basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.NO_WRAP));
                 HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
+                con.setConnectTimeout(35000);
+                con.setReadTimeout(35000);
                 con.setRequestMethod("GET");
                 con.setInstanceFollowRedirects(true);
 

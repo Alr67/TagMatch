@@ -1,5 +1,6 @@
 package software33.tagmatch.Users;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -56,7 +57,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     private boolean otherUser;
     private RatingBar ratingBar;
     private TextView ratingTV;
-
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -137,6 +138,13 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
             new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(ViewProfile.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
+                @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
                         if(jsonObject.has("error")) {
@@ -165,6 +173,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                             double ratingAux = jsonObject.getDouble("rating");
                             ratingBar.setRating((float) ratingAux);
                             ratingTV.setText(jsonObject.getString("rating") + "/5.0");
+                            mDialog.dismiss();
 
                         }
                     } catch (JSONException ignored) {

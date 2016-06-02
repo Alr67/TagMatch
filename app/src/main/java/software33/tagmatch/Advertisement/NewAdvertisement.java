@@ -4,6 +4,7 @@ import android.Manifest;
 import android.app.AlertDialog;
 import android.app.DialogFragment;
 import android.app.FragmentTransaction;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -90,6 +91,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private List<Bitmap> images;
     private String pathfoto;
     private Spinner categorySpinner, typeSpinner;
+    private ProgressDialog mDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -415,6 +418,13 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             //System.out.println("VAMOSSS: " +Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci",0));
             new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci",0), getApplicationContext()){
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(NewAdvertisement.this);
+                    mDialog.setMessage(getString(R.string.upload_ad_to_server));
+                    mDialog.show();
+                }
+                @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
                         if (jsonObject.has("status"))  Log.i(Constants.DebugTAG,"status: "+jsonObject.getInt("status"));
@@ -436,8 +446,15 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             Log.i(Constants.DebugTAG, adv.toJSON().toString());
         }
         else {
-            Toast.makeText(this,R.string.upload_ad_to_server,Toast.LENGTH_LONG).show();
+            //Toast.makeText(this,R.string.upload_ad_to_server,Toast.LENGTH_LONG).show();
             new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true){
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(NewAdvertisement.this);
+                    mDialog.setMessage(getString(R.string.upload_ad_to_server));
+                    mDialog.show();
+                }
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -509,8 +526,9 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     }
 
     private void advertUpdated() {
-        if(edit) Toast.makeText(getApplicationContext(), "Congratulations, advertisement updated", Toast.LENGTH_SHORT).show();
-        Toast.makeText(getApplicationContext(), "Congratulations, advertisement created", Toast.LENGTH_SHORT).show();
+        mDialog.dismiss();
+        if(edit) Toast.makeText(getApplicationContext(), R.string.succ_edit, Toast.LENGTH_SHORT).show();
+        Toast.makeText(getApplicationContext(), R.string.succ_upload, Toast.LENGTH_SHORT).show();
         Intent intent = new Intent(getApplicationContext(), Home.class);
         startActivity(intent);
         finish();
@@ -669,6 +687,13 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             Log.i(Constants.DebugTAG,"Vaig a fer el get a: "+ Constants.IP_SERVER+"/ads/"+id.toString());
             new TagMatchGetAsyncTask(Constants.IP_SERVER+"/ads/"+id.toString(),this) {
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(NewAdvertisement.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
+                @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     Log.i(Constants.DebugTAG,"onPostExecute");
                     Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
@@ -705,6 +730,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
         off_hash = new ArrayList<String>(Arrays.asList(adv.getTags()));
         tag.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, off_hash));
+        mDialog.dismiss();
 
     }
 

@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Path;
+import android.graphics.Rect;
 import android.graphics.drawable.Drawable;
 import android.util.Base64;
 import android.util.DisplayMetrics;
@@ -231,9 +234,9 @@ public class Helpers {
                 protected void onPostExecute(String url) {
                     ImageView contenedor = (ImageView) nav_header.findViewById(R.id.image_nav);
                     if (url == null) {
-                        Picasso.with(context).load(R.drawable.image0).centerCrop().resize(contenedor.getMeasuredWidth(), contenedor.getMeasuredHeight()).into(contenedor);
+                        Picasso.with(context).load(R.drawable.image0).transform(new CircleTransform()).into(contenedor);
                     } else
-                        Picasso.with(context).load(url).error(R.drawable.image0).centerCrop().resize(contenedor.getMeasuredWidth(), contenedor.getMeasuredHeight()).into(contenedor);
+                        Picasso.with(context).load(url).error(R.drawable.image0).transform(new CircleTransform()).into(contenedor);
                 }
             }.execute(jsonObject);
 
@@ -241,11 +244,12 @@ public class Helpers {
             e.printStackTrace();
         }
 
-        ((ImageView) nav_header.findViewById(R.id.image_nav)).setImageDrawable(context.getDrawable(R.drawable.loading_gif)); //NO TOCAR NUNCA JAMAS BAJO NINGUNA CIRCUNSTANCIA
+        //((ImageView) nav_header.findViewById(R.id.image_nav)).setImageDrawable(context.getDrawable(R.drawable.loading_gif)); //NO TOCAR NUNCA JAMAS BAJO NINGUNA CIRCUNSTANCIA
 
         ((TextView) nav_header.findViewById(R.id.user_name_header)).setText(Helpers.getActualUser(context).getAlias());
     }
     public static boolean isEmpty(EditText myeditText) {
         return myeditText.getText().toString().trim().length() == 0;
     }
+
 }

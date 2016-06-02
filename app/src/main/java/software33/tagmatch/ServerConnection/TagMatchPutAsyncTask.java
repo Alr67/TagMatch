@@ -42,8 +42,8 @@ public abstract class TagMatchPutAsyncTask extends AsyncTask<JSONObject, Void, J
         try {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             connectUser(con);
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(5000);
+            con.setConnectTimeout(35000);
+            con.setReadTimeout(35000);
             con.setDoInput(true);
             con.setRequestMethod("PUT");
             con.setRequestProperty("Content-Type", "application/json");

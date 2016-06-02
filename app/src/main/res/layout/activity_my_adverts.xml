@@ -40,6 +40,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text=""
+            android:textSize="19dp"
+            android:textStyle="bold"
             android:id="@+id/text_loading" />
 
     </RelativeLayout>

@@ -46,7 +46,7 @@
     <string name="registration_wrong_password_missmatch">The password is not the same.</string>
     <string name="registration_wrong_mail">This email already exists.</string>
     <string name="registration_search_button">Find photo</string>
-    <string name="registration_end_registrer">Finalize</string>
+    <string name="registration_end_registrer">Sign up</string>
     <string name="registration_login">Already a member? Log in</string>
     <string name="registration_wrong_mail_match">Put a correct email</string>
     <string name="registration_wrong_username_void">User can\'t be empty</string>
@@ -57,13 +57,20 @@
     <string name="hint_single_chat">Write your message…</string>
     <string name="hint_loading_adverts">Loading advertisements from server, please wait</string>
     <string name="hint_no_adverts">You don\'t have any advert, create one!</string>
+    <string name="hint_no_hash">You don\'t have any interest in your profile, add some to enjoy Discovery TagMatch!</string>
+    <string name="hint_no_fav">You don\'t have any favorite advert. If you add one, it will be shown here</string>
     <string name="upload_ad_to_server">"Uploading the advert to our server, please wait"</string>
 
+    <!-- Registro -->
+    <string name="no_photo">You must upload a pic for your profile</string>
+    <string name="succ_reg">User succesfully created</string>
+    <string name="upload_img">Uploading image...</string>
+    
     <!-- Login -->
     <string name="login">Login</string>
     <string name="forgotten">I forgot my password</string>
-    <string name="new_user_text">New user? Sing up</string>
-    <string name="new_user_button">Sing up</string>
+    <string name="new_user_text">New user? Sign up</string>
+    <string name="new_user_button">Sign up</string>
     <string name="user_name">User name</string>
     <string name="user_password">Password</string>
     <string name="rec_user_password">Type a new password</string>
@@ -101,6 +108,8 @@
     <string name="cat_adv">Ad\'s category</string>
     <string name="type_ad">Ad\'s type</string>
     <string name="change">Change</string>
+    <string name="succ_edit">Ad successfully updated</string>
+    <string name="succ_upload">Ad successfully uploaded</string>
 
     <!-- Navigation Drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>
@@ -231,5 +240,7 @@
     <string name="title_activity_password_recover">PasswordRecover</string>
     <string name="title_activity_recover_second_step">RecoverSecondStep</string>
 
+    <!-- Loading -->
+    <string name="loading">Please wait...</string>
 
 </resources>
