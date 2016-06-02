@@ -492,7 +492,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private void getChats(){
+    private void getChats() {
         if (FirebaseUtils.getMyId(this) != null) {
             FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
                 @Override
@@ -514,15 +514,18 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                         long numChats = dataSnapshot.getChildrenCount();
                         for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
-                        getChat(dataSnapshot1.getKey(), numChats);
-                        --numChats;
+                            getChat(dataSnapshot1.getKey(), numChats);
+                            --numChats;
+                        }
                     }
                 }
-            }
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {}
-        });
-        mDialog.dismiss();
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                }
+            });
+            mDialog.dismiss();
+        }
     }
 
     public void prepareImages() {
