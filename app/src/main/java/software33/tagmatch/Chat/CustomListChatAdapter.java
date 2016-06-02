@@ -122,8 +122,8 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
                 holder.table.setBackgroundColor(activity.getResources().getColor(R.color.my_chat_color));
             else holder.table.setBackgroundResource(R.drawable.bar_bg);
 
-            holder.text.setText( tempValues.getUserName() );
-            holder.text1.setText( tempValues.getTitleProduct() );
+            holder.text.setText( tempValues.getUserName().substring(0, Math.min(tempValues.getUserName().length(),16)));
+            holder.text1.setText( tempValues.getTitleProduct().substring(0, Math.min(tempValues.getTitleProduct().length(),16)));
 
             if (tempValues.getImage().equals("")){
                 holder.image.setImageResource(
@@ -137,17 +137,25 @@ public class CustomListChatAdapter extends BaseAdapter implements View.OnClickLi
                 holder.image.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
             }
 
-            if (tempValues.getMessages()==0) holder.tvNumMessages.setText("");
-            else holder.tvNumMessages.setText(String.valueOf(tempValues.getMessages()));
+            if (tempValues.getMessages()==0) {
+                holder.tvNumMessages.setText("");
+                holder.tvNumMessages.setVisibility(View.INVISIBLE);
+            }
+            else {
+                holder.tvNumMessages.setText(String.valueOf(tempValues.getMessages()));
+                holder.tvNumMessages.setVisibility(View.VISIBLE);
+            }
 
             if (tempValues.getNewOffer()!= 0){
                 if (tempValues.getNewOffer() == 1) holder.tvOffer.setText(R.string.mainchat_new_offer);
                 else if (tempValues.getNewOffer() == 2) holder.tvOffer.setText(R.string.mainchat_pending_offer);
                 else if (tempValues.getNewOffer() == 3) holder.tvOffer.setText(R.string.mainchat_closed_offer);
                 else holder.tvOffer.setText(R.string.mainchat_rated_offer);
+                holder.tvOffer.setVisibility(View.VISIBLE);
             }
             else {
                 holder.tvOffer.setText("");
+                holder.tvOffer.setVisibility(View.INVISIBLE);
             }
             /******** Set Item Click Listner for LayoutInflater for each row *******/
 
