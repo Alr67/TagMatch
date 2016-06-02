@@ -1,20 +1,14 @@
 package software33.tagmatch.Settings;
-
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
-
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-
-import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
-
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -23,13 +17,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
-
 import android.widget.Toast;
-
 import android.view.WindowManager;
 import android.widget.EditText;
-
-
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
@@ -43,17 +33,13 @@ import com.twitter.sdk.android.core.TwitterAuthConfig;
 import com.twitter.sdk.android.core.TwitterException;
 import com.twitter.sdk.android.core.TwitterSession;
 import com.twitter.sdk.android.core.identity.TwitterLoginButton;
-
 import org.json.JSONException;
 import org.json.JSONObject;
-
 import io.fabric.sdk.android.Fabric;
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.R;
-
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.Constants;
-
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
 
@@ -96,11 +82,10 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
         toggle.syncState();
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_settings);
-        navigationView.setNavigationItemSelectedListener(this);
 
         navigationView.setNavigationItemSelectedListener(this);
         View nav_header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
-        Helpers.setNavHeader(nav_header,getApplicationContext());
+        Helpers.setNavHeader(nav_header,getApplicationContext(),Settings.this);
         navigationView.addHeaderView(nav_header);
 
         callbackManager = CallbackManager.Factory.create();
