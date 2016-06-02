@@ -1,6 +1,7 @@
 package software33.tagmatch.Users;
-
 import android.Manifest;
+import android.app.ProgressDialog;
+
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Build;
@@ -9,7 +10,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
+import android.support.v4.widget.DrawerLayout;s
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -69,6 +70,8 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     private TextView ratingTV;
     private LoginButton loginButton;
     CallbackManager callbackManager;
+    private ProgressDialog mDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -176,6 +179,13 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
 
             new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(ViewProfile.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
+                @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
                         if(jsonObject.has("error")) {
@@ -204,6 +214,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                             double ratingAux = jsonObject.getDouble("rating");
                             ratingBar.setRating((float) ratingAux);
                             ratingTV.setText(jsonObject.getString("rating") + "/5.0");
+                            mDialog.dismiss();
 
                         }
                     } catch (JSONException ignored) {

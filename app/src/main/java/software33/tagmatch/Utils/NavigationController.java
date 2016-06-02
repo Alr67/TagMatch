@@ -12,13 +12,11 @@ import software33.tagmatch.Advertisement.DiscoveryTagmatch;
 import software33.tagmatch.Chat.MainChatActivity;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
+import software33.tagmatch.Settings.Settings;
 import software33.tagmatch.Users.MyAdverts;
 import software33.tagmatch.Users.ViewFavs;
 import software33.tagmatch.Users.ViewProfile;
 
-/**
- * Created by Cristina on 12/04/2016.
- */
 public final class NavigationController {
 
     
@@ -52,6 +50,10 @@ public final class NavigationController {
             parent.finish();
         }  else if (id == R.id.nav_discovery_tagmatch) {
             Intent intent = new Intent(parent.getApplicationContext(), DiscoveryTagmatch.class);
+            parent.startActivity(intent);
+            parent.finish();
+        } else if(id == R.id.nav_settings) {
+            Intent intent = new Intent(parent.getApplicationContext(), Settings.class);
             parent.startActivity(intent);
             parent.finish();
         } else {

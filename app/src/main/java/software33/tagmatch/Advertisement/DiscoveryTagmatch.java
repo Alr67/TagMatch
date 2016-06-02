@@ -1,5 +1,6 @@
 package software33.tagmatch.Advertisement;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
@@ -50,6 +51,8 @@ public class DiscoveryTagmatch extends AppCompatActivity implements NavigationVi
     private List<Advertisement> advertisements;
     private ArrayList<AdvertContent> items;
     private TextView loading;
+    private ProgressDialog mDialog;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -120,6 +123,13 @@ public class DiscoveryTagmatch extends AppCompatActivity implements NavigationVi
             Log.i(Constants.DebugTAG,"Vaig a demanar un get a la url: "+url);
             new TagMatchGetAsyncTask(url,this) {
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(DiscoveryTagmatch.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
+                @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     if(jsonObject.has("arrayResponse")) {
                         try {
@@ -138,6 +148,8 @@ public class DiscoveryTagmatch extends AppCompatActivity implements NavigationVi
                                     items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getOwner().getAlias(), newAdvert.getID()));
                                 }
                                 adapter.notifyDataSetChanged();
+                                mDialog.dismiss();
+
                             }
                             else {
                                 showNotAdvertsMessage();
@@ -160,7 +172,8 @@ public class DiscoveryTagmatch extends AppCompatActivity implements NavigationVi
         params.height = Helpers.getDisplayHeight(this)/2;
         loading.setGravity(Gravity.BOTTOM|Gravity.FILL_VERTICAL);
         loading.setLayoutParams(params);
-        loading.setText(getString(R.string.hint_no_adverts));
+        loading.setText(getString(R.string.hint_no_hash));
+        mDialog.dismiss();
     }
 
     public void onBackPressed(){

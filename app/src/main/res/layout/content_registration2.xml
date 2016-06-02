@@ -22,12 +22,14 @@
         android:textColor="@color/app_header_color" />
 
     <ImageView
-        android:layout_width="125dp"
+        android:layout_width="match_parent"
         android:layout_height="125dp"
         android:id="@+id/imageView"
         android:layout_gravity="center_horizontal"
         android:baselineAlignBottom="false"
-        android:contextClickable="false" />
+        android:contextClickable="false"
+        android:layout_marginTop="10dp"
+        android:layout_marginBottom="10dp" />
 
     <Button
         android:layout_width="fill_parent"
@@ -39,46 +41,28 @@
         android:background="@color/login_button_color"
         android:textColor="@color/app_header_color" />
 
-    <Space
+    <LinearLayout
+        android:orientation="vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0.40" />
+        android:layout_height="match_parent"
+        android:paddingTop="15dp">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceMedium"
-        android:text="@string/registration_default_sell_location"
-        android:id="@+id/textView4"
-        android:layout_gravity="center_horizontal"
-        android:textColor="@color/app_header_color" />
+        <fragment xmlns:android="http://schemas.android.com/apk/res/android"
+            android:name="com.google.android.gms.maps.MapFragment"
+            android:id="@+id/registrationMap"
+            android:layout_width="match_parent"
+            android:layout_height="250dp" />
 
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.1" />
-
-    <fragment xmlns:android="http://schemas.android.com/apk/res/android"
-        android:name="com.google.android.gms.maps.MapFragment"
-        android:id="@+id/registrationMap"
-        android:layout_width="match_parent"
-        android:layout_height="250dp" />
-
-    <Space
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
-        android:layout_weight="0.1" />
-
-    <Button
-        android:layout_width="fill_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/registration_end_registrer"
-        android:id="@+id/endRegister"
-        android:layout_gravity="center_horizontal"
-        android:background="@color/login_button_color"
-        android:onClick="endRegistrer"
-        android:textColor="@color/app_header_color" />
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/registration_end_registrer"
+            android:id="@+id/endRegister"
+            android:layout_gravity="center_horizontal"
+            android:background="@color/login_button_color"
+            android:onClick="endRegistrer"
+            android:textColor="@color/app_header_color"
+            android:layout_marginTop="10dp" />
+    </LinearLayout>
 
 </LinearLayout>
