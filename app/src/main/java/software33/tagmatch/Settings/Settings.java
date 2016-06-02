@@ -66,7 +66,7 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
     @Override
     public void onBackPressed() {
         if (saveNewDefaultAdvertLimit()) {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_settings);
             if (drawer.isDrawerOpen(GravityCompat.START)) {
                 drawer.closeDrawer(GravityCompat.START);
             } else {
