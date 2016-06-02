@@ -88,7 +88,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View nav_header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
-        Helpers.setNavHeader(nav_header,getApplicationContext());
+        Helpers.setNavHeader(nav_header,getApplicationContext(),this);
         navigationView.addHeaderView(nav_header);
 
         setTitle(R.string.main_chat_activity_title);
