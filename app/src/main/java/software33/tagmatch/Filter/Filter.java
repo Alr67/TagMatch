@@ -196,7 +196,7 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void makeURL() {
-        String url = Constants.IP_SERVER + "/ads/search?limit=" + Constants.SERVER_limitAdverts + "&idGreaterThan=" + Constants.SERVER_IdGreaterThan;
+        String url = Constants.IP_SERVER + "/ads/search?limit=" + Helpers.getDefaultAdvertisementNumber(this) + "&idGreaterThan=" + Constants.SERVER_IdGreaterThan;
 
         String tags = null;
         for (String s : hash_search)

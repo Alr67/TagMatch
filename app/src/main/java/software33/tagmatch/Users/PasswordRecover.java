@@ -1,8 +1,10 @@
 package software33.tagmatch.Users;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
@@ -12,6 +14,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -40,6 +43,8 @@ public class PasswordRecover extends AppCompatActivity {
 
     @Bind(R.id.btn_recov) Button recov;
     @Bind(R.id.input_user_recov) EditText input_user;
+    @Bind(R.id.app_header_recov) TextView recov_text;
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,11 +54,18 @@ public class PasswordRecover extends AppCompatActivity {
 
         String[] permissions = {Manifest.permission.CAMERA};
 
+        /* MÈTODE PER FER SERVIR FONTS EXTERNES*/
+        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/LobsterTwo-BoldItalic.ttf");
+        recov_text.setTypeface(face);
+        /* MÈTODE PER FER SERVIR FONTS EXTERNES*/
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
             }
         }
+        //para que no se abra el teclado al entrar en la activity
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
     }
 
@@ -72,6 +84,13 @@ public class PasswordRecover extends AppCompatActivity {
 
             new TagMatchGetQRAsyncTask(direcc, getApplicationContext()) {
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(PasswordRecover.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
+                @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
                         if(jsonObject.has("status") && jsonObject.getInt("status") != 200) Toast.makeText(getApplicationContext(),"ERROR",Toast.LENGTH_LONG).show();
@@ -80,11 +99,14 @@ public class PasswordRecover extends AppCompatActivity {
                             if (jsonObject.has("deviceToken")) {
                                 Log.i(Constants.DebugTAG,"URL: \n"+jsonObject.getString("deviceToken"));
                                 Helpers.saveDeviceToken(getApplicationContext(),jsonObject.getString("deviceToken"));
+                                mDialog.dismiss();
                                 IntentIntegrator scanIntegrator = new IntentIntegrator(PasswordRecover.this);
                                 scanIntegrator.initiateScan();
                             } else {
+                                mDialog.dismiss();
                                 //TODO cambiar el mensaje de error
                                 Toast.makeText(getApplicationContext(), "ERROR", Toast.LENGTH_LONG).show();
+
                             }
                         }
                     } catch (JSONException e) {

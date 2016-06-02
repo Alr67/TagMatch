@@ -72,7 +72,7 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View nav_header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
-        Helpers.setNavHeader(nav_header,getApplicationContext());
+        Helpers.setNavHeader(nav_header,getApplicationContext(),this);
         navigationView.addHeaderView(nav_header);
 
         String title = getString(R.string.vw_1);
@@ -146,9 +146,9 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
         User actualUser = Helpers.getActualUser(this);
         String url;
         if(otherUser)
-            url = Constants.IP_SERVER+"/users/"+username+"/ads?limit="+Constants.SERVER_limitAdverts;
+            url = Constants.IP_SERVER+"/users/"+username+"/ads?limit="+Helpers.getDefaultAdvertisementNumber(this);
         else
-            url = Constants.IP_SERVER+"/users/"+actualUser.getAlias()+"/ads?limit="+Constants.SERVER_limitAdverts;
+            url = Constants.IP_SERVER+"/users/"+actualUser.getAlias()+"/ads?limit="+Helpers.getDefaultAdvertisementNumber(this);
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());

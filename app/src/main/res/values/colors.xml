@@ -14,4 +14,5 @@
     <color name="default_color">#ffffff</color>
     <color name="pressed_color">#04ffe2</color>
     <color name="gossip">#ff69b4</color>
+    <color name="sky">#87CEFA</color>
 </resources>

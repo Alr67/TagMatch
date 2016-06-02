@@ -3,13 +3,13 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/action_unfav"
         android:title="@string/search_preview"
-        android:icon="@drawable/fav1"
+        android:icon="@mipmap/ic_star_black_24dp"
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_report_adv"
         android:orderInCategory="100"
-        android:icon="@drawable/ic_menu_slideshow"
+        android:icon="@mipmap/report"
         android:title="@string/action_report"
         app:showAsAction="ifRoom" />
 </menu>

@@ -17,6 +17,8 @@ import java.net.URL;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import software33.tagmatch.Utils.Helpers;
+
 /**
  * Created by rafax on 05/05/2016.
  */
@@ -53,7 +55,7 @@ public class TagMatchGetTrendingAsyncTask extends AsyncTask<JSONObject, Void, JS
                 JSONObject aux;
 
                 if (con.getResponseCode() >= 400) {
-                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                    aux = new JSONObject(Helpers.iStreamToString(con.getErrorStream()));
                 }
                 else if (con.getResponseCode() == 302) {
                     aux = new JSONObject();
@@ -61,7 +63,7 @@ public class TagMatchGetTrendingAsyncTask extends AsyncTask<JSONObject, Void, JS
                 }
                 else if (con.getResponseCode() == 200) {
                     aux = new JSONObject();
-                    aux.put("200", iStreamToString(con.getInputStream()));
+                    aux.put("200", Helpers.iStreamToString(con.getInputStream()));
                 }
                 else {
                     aux = new JSONObject();
@@ -82,7 +84,7 @@ public class TagMatchGetTrendingAsyncTask extends AsyncTask<JSONObject, Void, JS
                 JSONObject aux;
 
                 if (con.getResponseCode() >= 400) {
-                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                    aux = new JSONObject(Helpers.iStreamToString(con.getErrorStream()));
                 }
                 else if (con.getResponseCode() == 302) {
                     aux = new JSONObject();
@@ -98,7 +100,6 @@ public class TagMatchGetTrendingAsyncTask extends AsyncTask<JSONObject, Void, JS
                 }
 
                 con.disconnect();
-                System.out.println("CACAAAAAAAAA" + aux);
                 return aux;
             }
         } catch (IOException | JSONException e) {
@@ -107,20 +108,4 @@ public class TagMatchGetTrendingAsyncTask extends AsyncTask<JSONObject, Void, JS
         }
     }
 
-    public String iStreamToString(InputStream is1) {
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is1), 4096);
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try {
-            while ((line = rd.readLine()) != null) {
-                sb.append(line);
-            }
-            rd.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        String contentOfMyInputStream = sb.toString();
-        return contentOfMyInputStream;
-    }
 }

@@ -3,12 +3,18 @@ package software33.tagmatch.Settings;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+<<<<<<< HEAD
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+=======
+import android.os.Bundle;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+>>>>>>> e82a68f9fef93f29783a32c29566d4efbb0e68f4
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
@@ -17,7 +23,12 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+<<<<<<< HEAD
 import android.widget.Toast;
+=======
+import android.view.WindowManager;
+import android.widget.EditText;
+>>>>>>> e82a68f9fef93f29783a32c29566d4efbb0e68f4
 
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -39,8 +50,11 @@ import org.json.JSONObject;
 import io.fabric.sdk.android.Fabric;
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.R;
+<<<<<<< HEAD
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.Constants;
+=======
+>>>>>>> e82a68f9fef93f29783a32c29566d4efbb0e68f4
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
 
@@ -54,6 +68,8 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
     // Note: Your consumer key and secret should be obfuscated in your source code before shipping.
     private static final String TWITTER_KEY = "hGoEDMHh7OIOFJGZIQFEeiILX";
     private static final String TWITTER_SECRET = "qE0fbRktylzz0KGUxmph9Hs76ywJ6CAMUp1ylBkR2EKtsGxdV3";
+
+    private EditText numberOfAdvs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,6 +88,7 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
         loginButton = (LoginButton) findViewById(R.id.Fblogin_button);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_settings);
         setSupportActionBar(toolbar);
+        setTitle(R.string.settings_title);
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_settings);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
@@ -81,6 +98,7 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_settings);
         navigationView.setNavigationItemSelectedListener(this);
+<<<<<<< HEAD
         navigationView.setNavigationItemSelectedListener(this);
         View nav_header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
         Helpers.setNavHeader(nav_header,getApplicationContext());
@@ -124,6 +142,14 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
             twitterLoginButton.setText("Logged in as "+ username);
             twitterLoginButton.setClickable(false);
         }
+=======
+
+        //para que no se abra el teclado al entrar en la activity
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        numberOfAdvs = (EditText) findViewById(R.id.settings_default_advertisement_number);
+        numberOfAdvs.setText(Integer.toString(Helpers.getDefaultAdvertisementNumber(this)));
+>>>>>>> e82a68f9fef93f29783a32c29566d4efbb0e68f4
     }
 
     public void goToPasswordChange(View view){
@@ -132,11 +158,29 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
         finish();
     }
 
+    private boolean saveNewDefaultAdvertLimit() {
+        if (!numberOfAdvs.getText().toString().equals("")) {
+            if (Integer.parseInt(numberOfAdvs.getText().toString()) <= 0) {
+                Helpers.showError(getString(R.string.settings_wrong_default_advs_number), this);
+                return false;
+            } else
+                Helpers.setDefaultAdvertisementNumber(this, Integer.parseInt(numberOfAdvs.getText().toString()));
+        }
+        return true;
+    }
+
     @Override
     public void onBackPressed() {
-        Intent intent = new Intent(this, Home.class);
-        startActivity(intent);
-        finish();
+        if (saveNewDefaultAdvertLimit()) {
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_settings);
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                Intent intent = new Intent(this, Home.class);
+                startActivity(intent);
+                finish();
+            }
+        }
     }
 
     @Override

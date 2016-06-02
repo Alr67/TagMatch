@@ -35,6 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="@string/user_name"
+                android:textColor="@color/app_header_color"
                 android:inputType="textPersonName" />
         </android.support.design.widget.TextInputLayout>
 
@@ -47,6 +48,7 @@
             <EditText android:id="@+id/input_password"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:textColor="@color/app_header_color"
                 android:inputType="textPassword"
                 android:hint="@string/user_password"/>
         </android.support.design.widget.TextInputLayout>

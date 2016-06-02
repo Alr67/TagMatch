@@ -1,6 +1,7 @@
 package software33.tagmatch.Users;
 
 import android.content.Intent;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -8,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -31,12 +33,20 @@ public class RecoverSecondStep extends AppCompatActivity {
     @Bind(R.id.btn_last_step) Button recov;
     @Bind(R.id.input_password_rec1) EditText primera;
     @Bind(R.id.input_password_rec2) EditText segunda;
+    @Bind(R.id.app_header_secondstep) TextView header;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_recover_second_step);
         ButterKnife.bind(this);
+        //para que no se abra el teclado al entrar en la activity
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        /* MÈTODE PER FER SERVIR FONTS EXTERNES*/
+        Typeface face= Typeface.createFromAsset(getAssets(), "fonts/LobsterTwo-BoldItalic.ttf");
+        header.setTypeface(face);
+        /* MÈTODE PER FER SERVIR FONTS EXTERNES*/
 
     }
 

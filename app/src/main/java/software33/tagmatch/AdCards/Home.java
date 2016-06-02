@@ -60,16 +60,21 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        // COMPROBAR SI HAY NUMERO DE ANUNCIOS POR DEFECTO
+        // Y PONER UN NUMERO EN CASO NEGATIVO
+        if(Helpers.getDefaultAdvertisementNumber(this) == -1)
+            Helpers.setDefaultAdvertisementNumber(this, 40);
 
         getSupportActionBar().setDisplayShowTitleEnabled(false); //Esconder titulo HAMBURGUER
         TextView app_header = (TextView) toolbar.findViewById(R.id.toolbar_title); //cogemos el textview de la toolbar
         Typeface face= Typeface.createFromAsset(getAssets(), "fonts/LobsterTwo-BoldItalic.ttf");//aplicamos el diseño
         app_header.setTypeface(face);
+        app_header.setTextColor(getResources().getColor(R.color.reg_color));
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         View nav_header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
-        Helpers.setNavHeader(nav_header,getApplicationContext());
+        Helpers.setNavHeader(nav_header,getApplicationContext(),this);
         navigationView.addHeaderView(nav_header);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
@@ -120,7 +125,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 url = extras.getString("url");
             }
         } catch (Exception e){
-            url += "/ads?idGreaterThan=" + Constants.SERVER_IdGreaterThan + "&limit=" + Constants.SERVER_limitAdverts;
+            url += "/ads?idGreaterThan=" + Constants.SERVER_IdGreaterThan + "&limit=" + Helpers.getDefaultAdvertisementNumber(this);
         }
         Log.i("url", url);
         try {
@@ -162,30 +167,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             e.printStackTrace();
         }
     }
-
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, Login.class);
-            startActivity(intent);
-            finish();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 
     private void startChatListeners(){
         FirebaseUtils.startListeners(FirebaseUtils.getMyId(this), this);

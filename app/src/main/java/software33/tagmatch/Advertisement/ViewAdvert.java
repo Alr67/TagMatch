@@ -101,7 +101,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         fab.setImageDrawable(getDrawable(R.drawable.loading));
         Bundle b = getIntent().getExtras();
         if(b != null) {
-            Log.i(Constants.DebugTAG,"Bundle not emptu");
+            Log.i(Constants.DebugTAG,"Bundle not empty");
             if (b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT) != null && b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT).equals(Helpers.getActualUser(this).getAlias())){
                 myAdv = true;
             }
@@ -569,7 +569,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Drawable drawable = userImage.getDrawable();
 
         BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
-        Bitmap bitmap = bitmapDrawable .getBitmap();
+        Bitmap bitmap = bitmapDrawable.getBitmap();
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
         byte[] imageInByte = stream.toByteArray();
