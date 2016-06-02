@@ -35,6 +35,9 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
 
         <activity
             android:name=".AdCards.Home"
@@ -92,26 +95,44 @@
             android:name=".Users.ViewFavs"
             android:label="@string/title_activity_view_favs"
             android:theme="@style/AppTheme.NoActionBar" />
-
         <activity
             android:name=".Advertisement.DiscoveryTagmatch"
             android:label="@string/title_activity_discovery_ads"
             android:theme="@style/AppTheme.NoActionBar" />
 
-        <receiver android:process=":remote" android:name=".Chat.Alarm"></receiver>
-
+        <receiver
+            android:name=".Chat.Alarm"
+            android:process=":remote" />
         <receiver android:name=".Chat.AutoStart">
             <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED"></action>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
 
         <service
             android:name=".Chat.FirebaseService"
             android:enabled="true"
-            android:process=":firebase_service" >
-        </service>
+            android:process=":firebase_service" />
 
+        <activity
+            android:name=".Settings.Settings"
+            android:label="@string/title_activity_settings"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Settings.PasswordChange"
+            android:label="@string/title_activity_password_change"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <activity
+            android:name=".Users.PasswordRecover"
+            android:label="@string/title_activity_password_recover"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".Users.RecoverSecondStep"
+            android:label="@string/title_activity_recover_second_step"
+            android:theme="@style/AppTheme.NoActionBar"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="76047eec93cd1095a8abf70c10689498c39942d5" />
     </application>
 
 </manifest>

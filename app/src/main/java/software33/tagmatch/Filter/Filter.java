@@ -1,5 +1,5 @@
 package software33.tagmatch.Filter;
-
+//rafa descargame
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -176,10 +176,17 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
                 if (actionId == EditorInfo.IME_ACTION_SEARCH || actionId == EditorInfo.IME_ACTION_DONE || event.getAction() == KeyEvent.ACTION_DOWN && event.getKeyCode() == KeyEvent.KEYCODE_ENTER) {
-                    hash_search.add(sugg_hashtags.getText().toString());
-                    sugg_hashtags.setText("");
-                    con_search.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, hash_search));
-                    return true;
+                    /*(sugg_hashtags.getText().toString().equals("gossip")) {
+                        Intent intent = new Intent(getApplicationContext(), gossip.class);
+                        startActivity(intent);
+                        finish();
+                    }
+                    else {*/
+                        hash_search.add(sugg_hashtags.getText().toString());
+                        sugg_hashtags.setText("");
+                        con_search.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, hash_search));
+                        return true;
+                    //}
                 }
                 return false;
             }
@@ -189,7 +196,7 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
     }
 
     private void makeURL() {
-        String url = Constants.IP_SERVER + "/ads/search?limit=" + Constants.SERVER_limitAdverts + "&idGreaterThan=" + Constants.SERVER_IdGreaterThan;
+        String url = Constants.IP_SERVER + "/ads/search?limit=" + Helpers.getDefaultAdvertisementNumber(this) + "&idGreaterThan=" + Constants.SERVER_IdGreaterThan;
 
         String tags = null;
         for (String s : hash_search)
@@ -321,13 +328,6 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
         Intent novaRecepta = new Intent(getApplicationContext(), Home.class);
         startActivity(novaRecepta);
         finish();
-    }
-
-    private String cleanJSON(String input) {
-        input = input.replaceAll("\\[","");
-        input = input.replaceAll("\\]","");
-        input = input.replaceAll("\"","");
-        return input;
     }
 
 }

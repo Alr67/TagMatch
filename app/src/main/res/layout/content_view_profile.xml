@@ -27,6 +27,41 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal">
+
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/loggedWithFb"
+                android:layout_gravity="center_horizontal"
+                android:maxHeight="35dp"
+                android:maxWidth="35dp"
+                android:paddingRight="5dp" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/loggedWithTwitter"
+                android:layout_gravity="center_horizontal"
+                android:maxHeight="35dp"
+                android:maxWidth="35dp"
+                android:paddingRight="5dp" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/loggedWithMail"
+                android:layout_gravity="center_horizontal"
+                android:maxHeight="40dp"
+                android:maxWidth="40dp"
+                android:paddingRight="5dp" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content">
 
             <RatingBar
@@ -40,9 +75,11 @@
                 android:layout_width="wrap_content"
                 android:layout_height="match_parent"
                 android:textAppearance="?android:attr/textAppearanceMedium"
-                android:id="@+id/profile_rating_tv" />
+                android:id="@+id/profile_rating_tv"
+                android:gravity="center_vertical" />
 
         </LinearLayout>
+
 
         <TextView
             android:layout_width="wrap_content"

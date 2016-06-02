@@ -1,5 +1,6 @@
 package software33.tagmatch.AdCards;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
@@ -14,16 +15,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
-
-import com.firebase.client.Firebase;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
-import com.google.android.gms.maps.model.LatLng;
-import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -32,18 +27,13 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
-import software33.tagmatch.Advertisement.NewAdvertisement;
 import software33.tagmatch.Advertisement.ViewAdvert;
-import software33.tagmatch.Chat.FirebaseService;
 import software33.tagmatch.Chat.FirebaseUtils;
-import software33.tagmatch.Chat.MainChatActivity;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.Filter.Filter;
-import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
-import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
@@ -55,6 +45,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private RecyclerView.LayoutManager lManager;
     private List<Advertisement> advertisements;
     private ArrayList<AdvertContent> items;
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,13 +60,22 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
         drawer.setDrawerListener(toggle);
         toggle.syncState();
 
+        // COMPROBAR SI HAY NUMERO DE ANUNCIOS POR DEFECTO
+        // Y PONER UN NUMERO EN CASO NEGATIVO
+        if(Helpers.getDefaultAdvertisementNumber(this) == -1)
+            Helpers.setDefaultAdvertisementNumber(this, 40);
+
         getSupportActionBar().setDisplayShowTitleEnabled(false); //Esconder titulo HAMBURGUER
         TextView app_header = (TextView) toolbar.findViewById(R.id.toolbar_title); //cogemos el textview de la toolbar
         Typeface face= Typeface.createFromAsset(getAssets(), "fonts/LobsterTwo-BoldItalic.ttf");//aplicamos el diseño
         app_header.setTypeface(face);
+        app_header.setTextColor(getResources().getColor(R.color.reg_color));
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View nav_header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
+        Helpers.setNavHeader(nav_header,getApplicationContext(),this);
+        navigationView.addHeaderView(nav_header);
 
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -125,13 +125,20 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                 url = extras.getString("url");
             }
         } catch (Exception e){
-            url += "/ads?idGreaterThan=" + Constants.SERVER_IdGreaterThan + "&limit=" + Constants.SERVER_limitAdverts;
+            url += "/ads?idGreaterThan=" + Constants.SERVER_IdGreaterThan + "&limit=" + Helpers.getDefaultAdvertisementNumber(this);
         }
         Log.i("url", url);
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());
             new TagMatchGetAsyncTask(url,this) {
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(Home.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     if(jsonObject.has("arrayResponse")) {
@@ -148,6 +155,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getOwner().getAlias(), newAdvert.getID()));
                             }
                             adapter.notifyDataSetChanged();
+                            mDialog.dismiss();
 
                         } catch (JSONException e) {
                             e.printStackTrace();
@@ -159,30 +167,6 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             e.printStackTrace();
         }
     }
-
-   /* @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            Intent intent = new Intent(this, Login.class);
-            startActivity(intent);
-            finish();
-        }
-
-        return super.onOptionsItemSelected(item);
-    }*/
 
     private void startChatListeners(){
         FirebaseUtils.startListeners(FirebaseUtils.getMyId(this), this);

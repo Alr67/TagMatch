@@ -1,5 +1,6 @@
 package software33.tagmatch.Users;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
 import android.os.Bundle;
@@ -15,6 +16,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +50,7 @@ public class ViewFavs extends AppCompatActivity implements  NavigationView.OnNav
     private List<Advertisement> advertisements;
     private ArrayList<AdvertContent> items;
     private TextView loading;
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,9 @@ public class ViewFavs extends AppCompatActivity implements  NavigationView.OnNav
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View nav_header = LayoutInflater.from(this).inflate(R.layout.nav_header_main, null);
+        Helpers.setNavHeader(nav_header,getApplicationContext(),this);
+        navigationView.addHeaderView(nav_header);
 
 
         initComponents();
@@ -108,6 +114,13 @@ public class ViewFavs extends AppCompatActivity implements  NavigationView.OnNav
             Log.i(Constants.DebugTAG,"Vaig a demanar un get a la url: "+url);
             new TagMatchGetAsyncTask(url,this) {
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(ViewFavs.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
+                @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     if(jsonObject.has("arrayResponse")) {
                         try {
@@ -126,6 +139,7 @@ public class ViewFavs extends AppCompatActivity implements  NavigationView.OnNav
                                     items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getOwner().getAlias(), newAdvert.getID()));
                                 }
                                 adapter.notifyDataSetChanged();
+                                mDialog.dismiss();
                             }
                             else {
                                 showNotAdvertsMessage();
@@ -148,7 +162,8 @@ public class ViewFavs extends AppCompatActivity implements  NavigationView.OnNav
         params.height = Helpers.getDisplayHeight(this)/2;
         loading.setGravity(Gravity.BOTTOM|Gravity.FILL_VERTICAL);
         loading.setLayoutParams(params);
-        loading.setText(getString(R.string.hint_no_adverts));
+        loading.setText(getString(R.string.hint_no_fav));
+        mDialog.dismiss();
     }
 
     @Override

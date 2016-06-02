@@ -1,6 +1,7 @@
 package software33.tagmatch.Login_Register;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -37,6 +38,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -52,6 +54,7 @@ import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPostImgAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchPutAsyncTask;
 import software33.tagmatch.Utils.BitmapWorkerTask;
+import software33.tagmatch.Utils.CircleTransform;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
@@ -65,7 +68,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     private LatLng userMarker;
     private String imgExtension;
-
+    private ProgressDialog mDialog;
     private String email;
     private String username;
     private String password;
@@ -87,8 +90,12 @@ public class RegistrationActivity2 extends AppCompatActivity implements
 
         String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
+        getInfo(getIntent().getExtras());
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
+            }
         }
 
         iv = (ImageView) findViewById(R.id.imageView);
@@ -125,7 +132,6 @@ public class RegistrationActivity2 extends AppCompatActivity implements
                     .addApi(LocationServices.API)
                     .addApi(AppIndex.API).build();
         }
-        getInfo(getIntent().getExtras());
     }
 
     private void getInfo(Bundle bundle) {
@@ -178,16 +184,17 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     }
 
     public void endRegistrer(View view) {
-        Helpers.setPersonalData(username, password, this);
-
         if (imgExtension != null) {
+            Helpers.setPersonalData(username, password, getApplicationContext());
+            Log.i("REGISTRO",Helpers.getPersonalData(getApplicationContext()).get(0));
             updateIMG();
+            /** Set img user in Firebase **/
+            FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).updateChildren(img);
+            updateUser();
         }
-
-        /** Set img user in Firebase **/
-        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).updateChildren(img);
-
-        updateUser();
+        else {
+            Toast.makeText(getApplicationContext(),R.string.no_photo,Toast.LENGTH_LONG).show();
+        }
     }
 
     private void updateIMG() {
@@ -234,7 +241,14 @@ public class RegistrationActivity2 extends AppCompatActivity implements
 
             Log.i("updateLoc", "he entrado");
 
-            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/users", this) {
+            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/users", getApplicationContext()) {
+                @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(RegistrationActivity2.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -242,6 +256,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
                         showError(error);
                     } catch (JSONException ignored) {
                         backToLogin();
+                        mDialog.dismiss();
                     }
                 }
             }.execute(jObject);
@@ -298,8 +313,11 @@ public class RegistrationActivity2 extends AppCompatActivity implements
 
     @Override
     public void onConnected(Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}; //ESTO ESTA AQUI PORQ SINO SE QUEJA
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
+            }
         }
         Location pos = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
@@ -331,13 +349,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
     }
 
     private void showError(String msg) {
-        Context context = getApplicationContext();
-        CharSequence text = msg;
-        int duration = Toast.LENGTH_SHORT;
-
-        Toast toast = Toast.makeText(context, text, duration);
-        toast.show();
-        return;
+        Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
     }
 }
 

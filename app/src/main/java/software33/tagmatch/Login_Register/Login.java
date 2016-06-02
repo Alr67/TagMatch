@@ -1,5 +1,6 @@
 package software33.tagmatch.Login_Register;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -32,6 +33,7 @@ import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetArrayAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
+import software33.tagmatch.Users.PasswordRecover;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 
@@ -39,11 +41,12 @@ public class Login extends AppCompatActivity {
     /*Declaracions ButterKnife*/
     @Bind(R.id.btn_login) Button login;
     @Bind(R.id.link_signup) TextView reg;
-    //@Bind(R.id.forg) Button forg;
+    @Bind(R.id.link_forg) TextView forg;
 
     @Bind(R.id.input_email) EditText username;
     @Bind(R.id.input_password) EditText passw;
 
+    private ProgressDialog mDialog;
     private static final String SH_PREF_NAME = "TagMatch_pref";
 
 
@@ -57,9 +60,9 @@ public class Login extends AppCompatActivity {
 
         ArrayList<String> existing_login = new ArrayList<String>();
         existing_login = new Helpers().getPersonalData(getApplicationContext());
-        downloadCategories();
-        if(existing_login != null && existing_login.get(0) != null && existing_login.get(1) != null) {
-            Intent success = new Intent(this, Home.class); //FAlta guardar en algun puesto l'usuari
+
+        if(!existing_login.isEmpty() && existing_login.get(0) != null && existing_login.get(1) != null) {
+            Intent success = new Intent(this, Home.class);
             startActivity(success);
             finish();
         }
@@ -101,6 +104,13 @@ public class Login extends AppCompatActivity {
 
                 new TagMatchGetAsyncTask(direcc, getApplicationContext()) {
                     @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        mDialog = new ProgressDialog(Login.this);
+                        mDialog.setMessage(getString(R.string.loading));
+                        mDialog.show();
+                    }
+                    @Override
                     protected void onPostExecute(JSONObject jsonObject) {
                         try {
                             if(jsonObject.has("status") && jsonObject.getInt("status") != 200) Toast.makeText(getApplicationContext(),R.string.error_login,Toast.LENGTH_LONG).show();
@@ -108,6 +118,7 @@ public class Login extends AppCompatActivity {
                                 if (jsonObject.has("valid") && jsonObject.getBoolean("valid")) {
                                     continueLogin();
                                 } else {
+                                    mDialog.dismiss();
                                     Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_LONG).show();
                                 }
                             }
@@ -138,10 +149,13 @@ public class Login extends AppCompatActivity {
         finish();
     }
 
-    /*@OnClick(R.id.forg)
+    @OnClick(R.id.link_forg)
     protected void intent_forg() {
-        Toast.makeText(getApplicationContext(),username.getText().toString(),Toast.LENGTH_SHORT).show();
-    }*/
+        Firebase.setAndroidContext(this);
+        Intent intent = new Intent(this, PasswordRecover.class);
+        startActivity(intent);
+        finish();
+    }
 
     private void continueLogin() {
         Firebase.setAndroidContext(this);
@@ -153,6 +167,7 @@ public class Login extends AppCompatActivity {
     }
 
     private void endLogin() {
+        mDialog.dismiss();
         Intent success = new Intent(this, Home.class);
         startActivity(success);
         finish();
@@ -181,6 +196,7 @@ public class Login extends AppCompatActivity {
                             for (int n = 0; n < jsonArray.length(); n++) {
                                 Constants.categoryList.add(jsonArray.getString(n));
                             }
+                            endLogin();
                             Log.i(Constants.DebugTAG,"Done downloading categories");
 
                         } catch (JSONException e) {

@@ -1,5 +1,6 @@
 package software33.tagmatch.Advertisement;
 
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -73,20 +74,17 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private CustomPagerAdapterViewAdvert mCustomPagerAdapterViewAdvert;
     private GoogleMap map;
     private Advertisement adv;
-
     private ChildEventListener mListener;
     private String idChat = "Not exists";
     //TODO: hardcoded userId
     private String userId;
     private String imageChat;
     private String myName;
-
     private String idProduct;
     private String urlImage = "";
 
+    private ProgressDialog mDialog;
     private Menu my_menu;
-
-
     private boolean myAdv;
     private FloatingActionButton fab;
 
@@ -105,7 +103,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         fab.setImageDrawable(getDrawable(R.drawable.loading));
         Bundle b = getIntent().getExtras();
         if(b != null) {
-            Log.i(Constants.DebugTAG,"Bundle not emptu");
+            Log.i(Constants.DebugTAG,"Bundle not empty");
             if (b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT) != null && b.getString(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT).equals(Helpers.getActualUser(this).getAlias())){
                 myAdv = true;
             }
@@ -319,6 +317,13 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             Log.i(Constants.DebugTAG,"Vaig a fer el get a: "+ Constants.IP_SERVER+"/ads/"+id.toString());
             new TagMatchGetAsyncTask(Constants.IP_SERVER+"/ads/"+id.toString(),this) {
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(ViewAdvert.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
+                @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     Log.i(Constants.DebugTAG,"onPostExecute");
                         Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
@@ -509,17 +514,15 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                         long numChats = dataSnapshot.getChildrenCount();
                         for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
-                            getChat(dataSnapshot1.getKey(), numChats);
-                            --numChats;
-                        }
+                        getChat(dataSnapshot1.getKey(), numChats);
+                        --numChats;
                     }
                 }
-
-                @Override
-                public void onCancelled(FirebaseError firebaseError) {
-                }
-            });
-        }
+            }
+            @Override
+            public void onCancelled(FirebaseError firebaseError) {}
+        });
+        mDialog.dismiss();
     }
 
     public void prepareImages() {

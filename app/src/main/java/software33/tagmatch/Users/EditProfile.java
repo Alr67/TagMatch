@@ -98,8 +98,13 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayShowTitleEnabled(false);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab_edit_profile);
-        fab.setVisibility(View.GONE);
+        String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
+            }
+        }
 
         imgMod = locationMod = false;
 
@@ -114,7 +119,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
         user_loc_text.setText(extras.getString("city"));
 
         title = (TextView) findViewById(R.id.toolbar_title_edit_prof);
-        title.setText(getResources().getString(R.string.ed_1) + extras.getString("username") + getResources().getString(R.string.ed_2));
+        title.setText(getResources().getString(R.string.ed_1) + Helpers.getActualUser(getApplicationContext()).getAlias() + getResources().getString(R.string.ed_2));
         if (Build.VERSION.SDK_INT < 23) {
             title.setTextAppearance(getApplicationContext(),R.style.normalText);
         } else {
@@ -172,33 +177,6 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
                     return true;
                 }
                 return false;
-            }
-        });
-
-
-        //PER EVITAR SCROLL
-        interests_hash.setOnTouchListener(new ListView.OnTouchListener()
-        {
-            @Override
-            public boolean onTouch(View v, MotionEvent event)
-            {
-                int action = event.getAction();
-                switch (action)
-                {
-                    case MotionEvent.ACTION_DOWN:
-                        // Disallow ScrollView to intercept touch events.
-                        v.getParent().requestDisallowInterceptTouchEvent(true);
-                        break;
-
-                    case MotionEvent.ACTION_UP:
-                        // Allow ScrollView to intercept touch events.
-                        v.getParent().requestDisallowInterceptTouchEvent(false);
-                        break;
-                }
-
-                // Handle ListView touch events.
-                v.onTouchEvent(event);
-                return true;
             }
         });
 
@@ -422,10 +400,12 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     public void addPhoto(View view) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-            Intent intent = new Intent(Intent.ACTION_PICK);
-            intent.setType("image/*");
-            startActivityForResult(intent, Constants.codeImagePicker);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
+                Intent intent = new Intent(Intent.ACTION_PICK);
+                intent.setType("image/*");
+                startActivityForResult(intent, Constants.codeImagePicker);
+            }
         }
     }
 
