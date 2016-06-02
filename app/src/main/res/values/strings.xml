@@ -110,6 +110,7 @@
     <string name="change">Change</string>
     <string name="succ_edit">Ad successfully updated</string>
     <string name="succ_upload">Ad successfully uploaded</string>
+    <string name="please_add_photo">Plase, add at least 1 photo</string>
 
     <!-- Navigation Drawer -->
     <string name="navigation_drawer_open">Open navigation drawer</string>

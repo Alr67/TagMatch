@@ -123,10 +123,39 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         typeSpinner.setOnItemSelectedListener(new CustomSpinnerOnItemSelectedListener(this));
 
         categorySpinner = (Spinner) findViewById(R.id.categorySpinner);
-        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(this,android.R.layout.simple_spinner_item,Constants.categoryList);
-        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        categorySpinner.setAdapter(categoryAdapter);
-        categorySpinner.setOnItemSelectedListener(new CustomSpinnerOnItemSelectedListener(this));
+
+        JSONObject jObject2 = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject2.put("username", actualUser.getAlias());
+            jObject2.put("password", actualUser.getPassword());
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
+            e.printStackTrace();
+        }
+        new TagMatchGetTrendingAsyncTask(Constants.IP_SERVER + "/categories", getApplicationContext()) {
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    if (jsonObject.has("status"))
+                        Log.i(Constants.DebugTAG, "status: " + jsonObject.getInt("status"));
+                    Log.i(Constants.DebugTAG, "JSON: \n" + jsonObject);
+                    if (jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                    } else {
+                        String add = jsonObject.getString("200");
+                        add = Helpers.cleanJSON(add);
+                        suggestions = new ArrayList<String>(Arrays.asList(add.split(",")));
+                        ArrayAdapter<String> categoryAdapter = new ArrayAdapter<String>(NewAdvertisement.this,android.R.layout.simple_spinner_item,suggestions);
+                        categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        categorySpinner.setAdapter(categoryAdapter);
+                        categorySpinner.setOnItemSelectedListener(new CustomSpinnerOnItemSelectedListener(NewAdvertisement.this));
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        }.execute(jObject2);
 
         createButton = (Button) findViewById(R.id.btn_newAdvert);
         createButton.setOnClickListener(this);
@@ -150,10 +179,10 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
         /*PETICIO HASHTAGS*/
         JSONObject jObject = new JSONObject();
-        User actualUser = Helpers.getActualUser(this);
+        User actualUser2 = Helpers.getActualUser(this);
         try {
-            jObject.put("username", actualUser.getAlias());
-            jObject.put("password", actualUser.getPassword());
+            jObject.put("username", actualUser2.getAlias());
+            jObject.put("password", actualUser2.getPassword());
         } catch (JSONException e) {
             Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
             e.printStackTrace();
@@ -413,67 +442,72 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     private void updateAdvertToServer(Advertisement adv) {
         final Context context = this.getApplicationContext();
-        Toast.makeText(this,R.string.upload_ad_to_server,Toast.LENGTH_LONG).show();
-        if(edit) {
-            //System.out.println("VAMOSSS: " +Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci",0));
-            new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci",0), getApplicationContext()){
-                @Override
-                protected void onPreExecute() {
-                    super.onPreExecute();
-                    mDialog = new ProgressDialog(NewAdvertisement.this);
-                    mDialog.setMessage(getString(R.string.upload_ad_to_server));
-                    mDialog.show();
-                }
-                @Override
-                protected void onPostExecute(JSONObject jsonObject) {
-                    try {
-                        if (jsonObject.has("status"))  Log.i(Constants.DebugTAG,"status: "+jsonObject.getInt("status"));
-                        Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
-                        if(jsonObject.has("error")) {
-                            String error = jsonObject.get("error").toString();
-                        }
-                        else {
-                            if(jsonObject.has("id")) {
-                                Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
-                                postImagesToServer(jsonObject.getInt("id"));
-                            }
-                        }
-                    } catch (JSONException ignored){
-
-                    }
-                }
-            }.execute(adv.toJSON2());
-            Log.i(Constants.DebugTAG, adv.toJSON().toString());
+        //Toast.makeText(this,R.string.upload_ad_to_server,Toast.LENGTH_LONG).show();
+        if(images.size() == 0) {
+            Toast.makeText(getApplicationContext(),R.string.please_add_photo,Toast.LENGTH_LONG).show();
         }
         else {
-            //Toast.makeText(this,R.string.upload_ad_to_server,Toast.LENGTH_LONG).show();
-            new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true){
-                @Override
-                protected void onPreExecute() {
-                    super.onPreExecute();
-                    mDialog = new ProgressDialog(NewAdvertisement.this);
-                    mDialog.setMessage(getString(R.string.upload_ad_to_server));
-                    mDialog.show();
-                }
-                @Override
-                protected void onPostExecute(JSONObject jsonObject) {
-                    try {
-                        Log.i(Constants.DebugTAG,"JSON: \n"+jsonObject);
-                        if(jsonObject.has("error")) {
-                            String error = jsonObject.get("error").toString();
-                            Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
-                        }
-                        else {
-                            if(jsonObject.has("id")) {
-                                Log.i(Constants.DebugTAG,"Advert data updated to server, proceed to update image");
-                                postImagesToServer(jsonObject.getInt("id"));
-                            }
-                        }
-                    } catch (JSONException ignored){
-
+            if (edit) {
+                //System.out.println("VAMOSSS: " +Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci",0));
+                new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci", 0), getApplicationContext()) {
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        mDialog = new ProgressDialog(NewAdvertisement.this);
+                        mDialog.setMessage(getString(R.string.upload_ad_to_server));
+                        mDialog.show();
                     }
-                }
-            }.execute(adv.toJSON());
+
+                    @Override
+                    protected void onPostExecute(JSONObject jsonObject) {
+                        try {
+                            if (jsonObject.has("status"))
+                                Log.i(Constants.DebugTAG, "status: " + jsonObject.getInt("status"));
+                            Log.i(Constants.DebugTAG, "JSON: \n" + jsonObject);
+                            if (jsonObject.has("error")) {
+                                String error = jsonObject.get("error").toString();
+                            } else {
+                                if (jsonObject.has("id")) {
+                                    Log.i(Constants.DebugTAG, "Advert data updated to server, proceed to update image");
+                                    postImagesToServer(jsonObject.getInt("id"));
+                                }
+                            }
+                        } catch (JSONException ignored) {
+
+                        }
+                    }
+                }.execute(adv.toJSON2());
+                Log.i(Constants.DebugTAG, adv.toJSON().toString());
+            } else {
+                //Toast.makeText(this,R.string.upload_ad_to_server,Toast.LENGTH_LONG).show();
+                new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads", this, true) {
+                    @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        mDialog = new ProgressDialog(NewAdvertisement.this);
+                        mDialog.setMessage(getString(R.string.upload_ad_to_server));
+                        mDialog.show();
+                    }
+
+                    @Override
+                    protected void onPostExecute(JSONObject jsonObject) {
+                        try {
+                            Log.i(Constants.DebugTAG, "JSON: \n" + jsonObject);
+                            if (jsonObject.has("error")) {
+                                String error = jsonObject.get("error").toString();
+                                Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                            } else {
+                                if (jsonObject.has("id")) {
+                                    Log.i(Constants.DebugTAG, "Advert data updated to server, proceed to update image");
+                                    postImagesToServer(jsonObject.getInt("id"));
+                                }
+                            }
+                        } catch (JSONException ignored) {
+
+                        }
+                    }
+                }.execute(adv.toJSON());
+            }
         }
         Log.i(Constants.DebugTAG, adv.toJSON().toString());
     }
