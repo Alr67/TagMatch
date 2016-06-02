@@ -45,6 +45,7 @@ import com.firebase.client.Firebase;
 import com.firebase.client.FirebaseError;
 import com.firebase.client.ValueEventListener;
 import com.firebase.client.utilities.Utilities;
+import com.squareup.picasso.Picasso;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -61,6 +62,7 @@ import java.util.Objects;
 import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.Domain.AdvGift;
 import software33.tagmatch.Domain.Advertisement;
+import software33.tagmatch.Domain.Offer;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
@@ -78,6 +80,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private ImageButton buttonSend;
     private LinearLayout layoutOffer;
     private TextView tvContentOffer;
+    private Button bAdvOffer;
     private Button bCancelOffer;
     private Button bAcceptOffer;
     private TextView tvPendingOffer;
@@ -89,11 +92,12 @@ public class SingleChatActivity extends AppCompatActivity {
     private String userName;
     private String titleProduct;
     private String idProduct;
-    Advertisement adv;
+    Advertisement exchangeAdv;
     private String idChat;
     private String myId;
     private String idUser;
     private String imageChat;
+    private int offerId;
     private boolean fromAdvert = false;
     private ChildEventListener mListener;
     private ValueEventListener mListenerChats;
@@ -109,11 +113,14 @@ public class SingleChatActivity extends AppCompatActivity {
     private String canSendOffers;
 
     private boolean isMyAdv = false;
+    private boolean isMyAdvGift = false;
     private boolean offerHasExchangeID = false;
     private int offerExchangeID;
     private boolean rateAvailable = false;
     private int rateAdvId;
     private int starts = 0;
+
+    private Menu myMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -160,11 +167,10 @@ public class SingleChatActivity extends AppCompatActivity {
         ImageView image = (ImageView) findViewById(R.id.singleChatImage);
 
         if (imageChat == null || imageChat.equals("")){
-            image.setImageResource(R.drawable.image0);
+            Picasso.with(this).load(R.drawable.image0).into(image);
         }
         else {
-            byte[] imageAsBytes = Base64.decode(imageChat, Base64.DEFAULT);
-            image.setImageBitmap(BitmapFactory.decodeByteArray(imageAsBytes, 0, imageAsBytes.length));
+            Picasso.with(this).load(imageChat).error(R.drawable.image0).into(image);
         }
         /****************************************************/
 
@@ -173,6 +179,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
         layoutOffer = (LinearLayout) findViewById(R.id.layoutOffer);
         tvContentOffer = (TextView) findViewById(R.id.tvContentOffer);
+        bAdvOffer = (Button) findViewById(R.id.bAdvOffer);
         bCancelOffer = (Button) findViewById(R.id.bCancelOffert);
         bAcceptOffer = (Button) findViewById(R.id.bAcceptOffer);
         tvPendingOffer = (TextView) findViewById(R.id.tvPendingOffer);
@@ -276,7 +283,7 @@ public class SingleChatActivity extends AppCompatActivity {
             public void onDataChange(DataSnapshot dataSnapshot) {
                 if (dataSnapshot.hasChildren()) {
                     FirebaseUtils.ChatOffer o = dataSnapshot.getValue(FirebaseUtils.ChatOffer.class);
-                    setOfferData(o.getSenderId(), o.getText(), o.getAccepted(), o.getExchangeID(), o.getValoration());
+                    getOfferFromServer(o.getOfferId(), o.getValoration());
                 }
                 else {
                     canSendOffers = "Yes";
@@ -298,10 +305,29 @@ public class SingleChatActivity extends AppCompatActivity {
     }
 
     public void setOfferData(String senderId, String text, Boolean accepted, int exchangeID, final Map<String, Integer> valoration){
+        if (exchangeID != 0) {
+            offerHasExchangeID = true;
+            offerExchangeID = exchangeID;
+            downloadExchangeAdvertFromServer();
+            bAdvOffer.setVisibility(View.VISIBLE);
+            bAdvOffer.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View arg0) {
+                    createAdvExchangeDialog(exchangeAdv).show();
+                }
+            });
+
+            tvContentOffer.setVisibility(View.GONE);
+        }
+        else {
+            tvContentOffer.setVisibility(View.VISIBLE);
+            tvContentOffer.setText(text);
+            bAdvOffer.setVisibility(View.GONE);
+        }
+
         if (!accepted) {
             canSendOffers = "Yes";
             layoutOffer.setVisibility(View.VISIBLE);
-            tvContentOffer.setText(text);
             if (senderId.equals(myId)) {
                 bCancelOffer.setVisibility(View.GONE);
                 bAcceptOffer.setVisibility(View.GONE);
@@ -319,6 +345,7 @@ public class SingleChatActivity extends AppCompatActivity {
                 bCancelOffer.setVisibility(View.VISIBLE);
                 bAcceptOffer.setVisibility(View.VISIBLE);
                 tvPendingOffer.setVisibility(View.GONE);
+                tvContentOffer.setVisibility(View.VISIBLE);
                 tvContentOffer.setText(R.string.rate_offer);
                 rateAvailable = true;
                 rateAdvId = valoration.get(Helpers.getActualUser(this).getAlias());
@@ -340,11 +367,6 @@ public class SingleChatActivity extends AppCompatActivity {
                 });
             }
             else hideOffer();
-        }
-
-        if (exchangeID != -1) {
-            offerHasExchangeID = true;
-            offerExchangeID = exchangeID;
         }
     }
 
@@ -393,8 +415,13 @@ public class SingleChatActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        if (isMyAdv) getMenuInflater().inflate(R.menu.menu_option_my_single_chat, menu);
+        if (isMyAdv) {
+            if(isMyAdvGift) getMenuInflater().inflate(R.menu.menu_option_my_single_chat_giveaway, menu);
+            else getMenuInflater().inflate(R.menu.menu_option_my_single_chat, menu);
+        }
         else getMenuInflater().inflate(R.menu.menu_option_single_chat, menu);
+
+        myMenu = menu;
         return true;
     }
 
@@ -427,6 +454,10 @@ public class SingleChatActivity extends AppCompatActivity {
             alertDialog.show();
 
             return true;
+        }
+
+        if (id == R.id.action_give_gift) {
+            if (isMyAdvGift) createGiveGiftDialog().show();
         }
 
         return super.onOptionsItemSelected(item);
@@ -548,8 +579,7 @@ public class SingleChatActivity extends AppCompatActivity {
                             }
                             else {
                                 tvErrorOffer.setVisibility(View.INVISIBLE);
-                                createOffer(offerList.getSelectedItem().toString(), "");
-                                d.dismiss();
+                                createOffer(offerList.getSelectedItem().toString(), "", d);
                             }
                         }
                         else if (s.isEmpty() || s.equals("")){
@@ -558,8 +588,7 @@ public class SingleChatActivity extends AppCompatActivity {
                         }
                         else {
                             tvErrorOffer.setVisibility(View.INVISIBLE);
-                            createOffer(offerList.getSelectedItem().toString(), s);
-                            d.dismiss();
+                            createOffer(offerList.getSelectedItem().toString(), s, d);
                         }
                     }
                 });
@@ -569,7 +598,7 @@ public class SingleChatActivity extends AppCompatActivity {
         return d;
     }
 
-    private void createOffer(String typeOffer, String content){
+    private void createOffer(String typeOffer, String content, AlertDialog d){
         String senderId = myId;
         Map<String, Object> values = new HashMap<>();
 
@@ -578,21 +607,15 @@ public class SingleChatActivity extends AppCompatActivity {
                 content = content+"€";
                 break;
             case "Offer my advert":
-                values.put("exchangeID", advertisementsIds.get(positionMyAdv));
                 content = advertisementsTitles.get(positionMyAdv);
                 break;
             case "Other offers":
                 break;
         }
 
-
-        values.put("senderId", senderId);
-        values.put("text", content);
-        values.put("accepted", false);
-
-        offersRef.setValue(values);
-
-        addMessageOffer(0,content);
+        String exchangeID = "";
+        if (positionMyAdv != -1 ) exchangeID = advertisementsIds.get(positionMyAdv).toString();
+        sendOfferToServer(values, exchangeID, content, d);
     }
 
     private void denyOffer(){
@@ -606,12 +629,11 @@ public class SingleChatActivity extends AppCompatActivity {
 
     private void acceptOffer(){
         Map<String, Object> values = new HashMap<>();
-        values.put("accepted", true);
 
         //Build the valoration
         Map<String, Integer> valoration = new HashMap<>();
         valoration.put(""+userName,Integer.parseInt(idProduct));
-        //if (offerHasExchangeID) valoration.put(""+Helpers.getActualUser(this).getAlias(), offerExchangeID);
+        if (offerHasExchangeID) valoration.put(""+Helpers.getActualUser(this).getAlias(), offerExchangeID);
         values.put("valoration",valoration);
 
         offersRef.updateChildren(values);
@@ -633,7 +655,8 @@ public class SingleChatActivity extends AppCompatActivity {
         values.put("senderId", "FirebaseAutoMessage");
         if (status == 0) values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_made_offer)+" "+content);
         else if (status == 1) values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_accepted_offer));
-        else values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_denied_offer));
+        else if (status == 2) values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_denied_offer));
+        else values.put("text", getString(R.string.message_information_offer)+alias+" "+getString(R.string.message_give_gift));
         values.put("read", false);
 
         messagesRef.push().setValue(values);
@@ -654,7 +677,7 @@ public class SingleChatActivity extends AppCompatActivity {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
                                 if (deny1) denyOffer();
-                                else closeAdvert();
+                                else acceptOfferOnServer();
                             }
                         })
                 .setNegativeButton(negative,
@@ -695,6 +718,7 @@ public class SingleChatActivity extends AppCompatActivity {
     }
 
     public AlertDialog createValorationDialog(Map<String, Integer> valoration) {
+        final int idProductToRate = valoration.get(Helpers.getActualUser(this).getAlias());
         valoration.remove(Helpers.getActualUser(this).getAlias());
         final Map<String, Object> value = new HashMap<>();
         value.put("valoration",valoration);
@@ -733,7 +757,7 @@ public class SingleChatActivity extends AppCompatActivity {
 
                     @Override
                     public void onClick(View view) {
-                        sendRateToServer(value, d);
+                        sendRateToServer(value, idProductToRate, d);
                     }
                 });
             }
@@ -781,6 +805,44 @@ public class SingleChatActivity extends AppCompatActivity {
         return builder.create();
     }
 
+    public AlertDialog createAdvExchangeDialog(Advertisement adv) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(adv.getTitle())
+                .setMessage(adv.getDescription())
+                .setPositiveButton("Ok",
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                            }
+                        });
+
+        return builder.create();
+    }
+
+    public AlertDialog createGiveGiftDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setTitle(R.string.dialog_title_give_gift)
+                .setMessage(R.string.dialog_message_give_gift)
+                .setPositiveButton(R.string.dialog_confirm_give_gift,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                closeAdvert();
+                            }
+                        })
+                .setNegativeButton(R.string.dialog_cancel_give_gift,
+                        new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //onNegativeButtonClick();
+                            }
+                        });
+
+        return builder.create();
+    }
+
     private void onPossitiveButtonClick(){
         //Remove from Firebase putting the value to false
         Map<String, Object> value = new HashMap<>();
@@ -803,15 +865,11 @@ public class SingleChatActivity extends AppCompatActivity {
         finish();
     }
 
-    private void closeAdvert() {
+    private void acceptOfferOnServer() {
         JSONObject jsonObject = new JSONObject();
-        try {
-            jsonObject.put("sold", true);
-        } catch (JSONException e) {
-        }
 
         final Context context = this.getApplicationContext();
-        new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/"+idProduct, this){
+        new TagMatchPutAsyncTask(Constants.IP_SERVER + "/offer/"+offerId+"/accept", this){
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 try {
@@ -819,6 +877,8 @@ public class SingleChatActivity extends AppCompatActivity {
                     if(jsonObject.has("error")) {
                         String error = jsonObject.get("error").toString();
                         Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                        Map<String, Object> value = new HashMap<>();
+                        if (jsonObject.getInt("statusCode") == 401) offersRef.setValue(value);
                     }
                     else {
                         acceptOffer();
@@ -847,6 +907,17 @@ public class SingleChatActivity extends AppCompatActivity {
                                 for (int n = 0; n < jsonArray.length(); n++) {
                                     JSONObject object = jsonArray.getJSONObject(n);
                                     Advertisement newAdvert = Helpers.convertJSONToAdvertisement(object);
+                                    if (newAdvert.getTypeDescription().equals(Constants.typeServerGIFT)){
+                                        Log.i("DebugAdvIsGift","el chat es dun anunci que es un regal");
+                                        if (object.has("id") && object.getString("id").equals(idProduct)){
+                                            Log.i("DebugAdvIsGift","el regal es meu");
+                                            if (object.has("sold") && !object.getBoolean("sold")) {
+                                                Log.i("DebugAdvIsGift","el regal no esta venut");
+                                                isMyAdvGift = true;
+                                                getMenuInflater().inflate(R.menu.menu_option_my_single_chat_giveaway, myMenu);
+                                            }
+                                        }
+                                    }
                                     advertisementsTitles.add(newAdvert.getTitle());
                                     advertisementsIds.add(newAdvert.getID());
                                 }
@@ -863,7 +934,29 @@ public class SingleChatActivity extends AppCompatActivity {
         }
     }
 
-    private void sendRateToServer(final Map<String, Object> value, final AlertDialog d){
+    private void downloadExchangeAdvertFromServer() {
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+            Log.i(Constants.DebugTAG,"Vaig a fer el get a: "+ Constants.IP_SERVER+"/ads/"+offerExchangeID);
+            new TagMatchGetAsyncTask(Constants.IP_SERVER+"/ads/"+offerExchangeID,this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    Log.i(Constants.DebugTAG,"onPostExecute");
+                    Log.i(Constants.DebugTAG,"JSON: "+jsonObject.toString());
+                    exchangeAdv = Helpers.convertJSONToAdvertisement(jsonObject);
+                    //String error = jsonObject.get("error").toString();
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            Log.i(Constants.DebugTAG,"HA PETAT JAVA");
+            e.printStackTrace();
+        }
+    }
+
+    private void sendRateToServer(final Map<String, Object> value, final int idProductToRate, final AlertDialog d){
         Log.i("DebugRate",String.valueOf(starts));
         JSONObject jsonObject = new JSONObject();
         try {
@@ -871,7 +964,7 @@ public class SingleChatActivity extends AppCompatActivity {
         } catch (JSONException e) {
         }
         final Context context = this;
-        new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads/"+idProduct+"/rate", this, true){
+        new TagMatchPostAsyncTask(Constants.IP_SERVER + "/ads/"+idProductToRate+"/rate", this, true){
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 try {
@@ -883,6 +976,98 @@ public class SingleChatActivity extends AppCompatActivity {
                     else {
                         FirebaseUtils.getChatsRef().child(idChat).child("offer").updateChildren(value);
                         d.dismiss();
+                    }
+                } catch (JSONException ignored){
+
+                }
+            }
+        }.execute(jsonObject);
+    }
+
+    private void sendOfferToServer(final Map<String, Object> value, String exchangeID, final String content, final AlertDialog d){
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("destinedUser", userName);
+            jsonObject.put("offerAdvertisement", idProduct);
+            if (!exchangeID.isEmpty()) jsonObject.put("offeredExchangeAdvertisement", exchangeID);
+            else jsonObject.put("offeredText", content);
+        } catch (JSONException e) {
+        }
+        final Context context = this;
+        new TagMatchPostAsyncTask(Constants.IP_SERVER + "/offer", this, true){
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    Log.i("DebugOffer","JSON2: \n"+jsonObject);
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        value.put("offerID",jsonObject.getInt("offerId"));
+                        offersRef.setValue(value);
+                        addMessageOffer(0,content);
+                        d.dismiss();
+                    }
+                } catch (JSONException ignored){
+
+                }
+            }
+        }.execute(jsonObject);
+    }
+
+    private void getOfferFromServer(int offerId, final Map<String, Integer> valoration){
+        JSONObject jObject = new JSONObject();
+        User actualUser = Helpers.getActualUser(this);
+        String url = Constants.IP_SERVER+"/offer/"+offerId;
+        this.offerId = offerId;
+        try {
+            jObject.put("username", actualUser.getAlias());
+            jObject.put("password", actualUser.getPassword());
+            new TagMatchGetAsyncTask(url,this) {
+                @Override
+                protected void onPostExecute(JSONObject jsonObject) {
+                    try {
+                        if(jsonObject.has("error")) {
+                            String error = jsonObject.get("error").toString();
+                            Helpers.showError(error,getApplicationContext());
+                        }
+                        else if (jsonObject.has("offerId")){
+                            Offer offer = Helpers.convertJSONToOffer(jsonObject);
+                            setOfferData(offer.getUserThatOffers(),offer.getOfferedText(),
+                                    offer.isAccepted(), offer.getOfferedExchangeAdvertisement(), valoration);
+                        }
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.execute(jObject);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void closeAdvert() {
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("sold", true);
+        } catch (JSONException e) {
+        }
+
+        final Context context = this.getApplicationContext();
+        new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/"+idProduct, this){
+            @Override
+            protected void onPostExecute(JSONObject jsonObject) {
+                try {
+                    Log.i(Constants.DebugTAG,"JSON1: \n"+jsonObject);
+                    if(jsonObject.has("error")) {
+                        String error = jsonObject.get("error").toString();
+                        Toast.makeText(context, error, Toast.LENGTH_SHORT).show();
+                    }
+                    else {
+                        Log.i("Debug-CloseAdv","Closed adv" +idProduct);
+                        isMyAdvGift = false;
+                        addMessageOffer(3,"");
                     }
                 } catch (JSONException ignored){
 

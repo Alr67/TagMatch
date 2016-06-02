@@ -29,7 +29,7 @@ import software33.tagmatch.Utils.Helpers;
 
 public abstract class FirebaseUtils {
 
-    private static Firebase myFirebaseRef = new Firebase("https://torrid-torch-42.firebaseio.com/");
+    private static Firebase myFirebaseRef = new Firebase("https://tagmatch.firebaseio.com/");
     private static Firebase chatsRef = myFirebaseRef.child("chats");
     private static Firebase usersRef = myFirebaseRef.child("users");
 
@@ -122,19 +122,19 @@ public abstract class FirebaseUtils {
     }
 
     public static class ChatOffer {
-        String senderId;
-        String text;
+        int offerID;
+        String ownerId;
         Boolean accepted;
         int exchangeID = -1;
         Map<String, Integer> valoration = new HashMap<>();
         public ChatOffer() {
             // empty default constructor, necessary for Firebase to be able to deserialize blog posts
         }
-        public String getSenderId() {
-            return senderId;
+        public String getOwnerId() {
+            return ownerId;
         }
-        public String getText() {
-            return text;
+        public int getOfferId() {
+            return offerID;
         }
         public Boolean getAccepted() { return accepted; }
         public int getExchangeID() {
