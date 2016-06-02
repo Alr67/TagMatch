@@ -1,5 +1,6 @@
 package software33.tagmatch.Login_Register;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
@@ -45,6 +46,7 @@ public class Login extends AppCompatActivity {
     @Bind(R.id.input_email) EditText username;
     @Bind(R.id.input_password) EditText passw;
 
+    private ProgressDialog mDialog;
     private static final String SH_PREF_NAME = "TagMatch_pref";
 
 
@@ -102,6 +104,13 @@ public class Login extends AppCompatActivity {
 
                 new TagMatchGetAsyncTask(direcc, getApplicationContext()) {
                     @Override
+                    protected void onPreExecute() {
+                        super.onPreExecute();
+                        mDialog = new ProgressDialog(Login.this);
+                        mDialog.setMessage("Please wait...");
+                        mDialog.show();
+                    }
+                    @Override
                     protected void onPostExecute(JSONObject jsonObject) {
                         try {
                             if(jsonObject.has("status") && jsonObject.getInt("status") != 200) Toast.makeText(getApplicationContext(),R.string.error_login,Toast.LENGTH_LONG).show();
@@ -109,6 +118,7 @@ public class Login extends AppCompatActivity {
                                 if (jsonObject.has("valid") && jsonObject.getBoolean("valid")) {
                                     continueLogin();
                                 } else {
+                                    mDialog.dismiss();
                                     Toast.makeText(getApplicationContext(), getString(R.string.error_login), Toast.LENGTH_LONG).show();
                                 }
                             }
@@ -157,6 +167,7 @@ public class Login extends AppCompatActivity {
     }
 
     private void endLogin() {
+        mDialog.dismiss();
         Intent success = new Intent(this, Home.class);
         startActivity(success);
         finish();
