@@ -50,7 +50,7 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
             con.setReadTimeout(350000);
             con.setDoInput(true);
             con.setRequestMethod("POST");
-            Helpers.connectUser(con);
+            Helpers.connectUser(con,context);
             Log.i(Constants.DebugTAG,"Envio Content-Type->image/"+imgExtension);
             con.setRequestProperty("Content-Type", "image/" + imgExtension);
 

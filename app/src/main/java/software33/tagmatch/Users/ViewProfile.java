@@ -262,9 +262,11 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + username + "/photo", this) {
                 @Override
                 protected void onPostExecute(String url) {
-                    Picasso.with(ViewProfile.this).load(url).error(R.drawable.image0).into(ivUserImage);
                     if (url == null){
                         Picasso.with(ViewProfile.this).load(R.drawable.image0).into(ivUserImage);
+                    }
+                    else {
+                        Picasso.with(ViewProfile.this).load(url).error(R.drawable.image0).into(ivUserImage);
                     }
                 }
             }.execute(jsonObject);
