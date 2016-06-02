@@ -51,8 +51,8 @@ public class TagMatchDeleteAsyncTask extends AsyncTask<JSONObject, Void, JSONObj
             basicAuth = "Basic " + new String(Base64.encode(userPass.getBytes(), Base64.NO_WRAP));
             if (url.getHost().contains("heroku")) {
                 HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
+                con.setConnectTimeout(35000);
+                con.setReadTimeout(35000);
                 con.setRequestMethod("DELETE");
                 con.setDoInput(true);
 

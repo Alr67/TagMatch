@@ -1,7 +1,6 @@
 package software33.tagmatch.ServerConnection;
 
 import android.content.Context;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.util.Base64;
 import android.util.Log;
@@ -24,12 +23,12 @@ import java.util.Map;
 import software33.tagmatch.R;
 import software33.tagmatch.Utils.Helpers;
 
-public abstract class TagMatchPutAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
+public abstract class TagMatchPutQRAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
 
     private URL url;
     private Context context;
 
-    public TagMatchPutAsyncTask(String url, Context context) {
+    public TagMatchPutQRAsyncTask(String url, Context context) {
         try {
             this.url = new URL(url);
             this.context = context;
@@ -41,7 +40,6 @@ public abstract class TagMatchPutAsyncTask extends AsyncTask<JSONObject, Void, J
     protected JSONObject doInBackground(JSONObject... params) {
         try {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            connectUser(con);
             con.setConnectTimeout(35000);
             con.setReadTimeout(35000);
             con.setDoInput(true);
@@ -88,16 +86,6 @@ public abstract class TagMatchPutAsyncTask extends AsyncTask<JSONObject, Void, J
         }
     }
 
-    private void connectUser(HttpURLConnection c) {
-        ArrayList<String> personalData = new ArrayList<String>();
-        personalData = new Helpers().getPersonalData(context);
-        final String user = personalData.get(0);
-        final String password = personalData.get(1);
-
-        String userPass = user + ":" + password;
-        c.setRequestProperty("Authorization", "Basic " +
-                new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT)));
-    }
 
     public String iStreamToString(InputStream is1) {
         BufferedReader rd = new BufferedReader(new InputStreamReader(is1), 4096);

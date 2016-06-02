@@ -46,8 +46,8 @@ public abstract class TagMatchPostImgAsyncTask extends AsyncTask<Byte[], Void, J
     protected JSONObject doInBackground(Byte[]... params) {
         try {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            con.setConnectTimeout(5000);
-            con.setReadTimeout(50000);
+            con.setConnectTimeout(35000);
+            con.setReadTimeout(350000);
             con.setDoInput(true);
             con.setRequestMethod("POST");
             connectUser(con);

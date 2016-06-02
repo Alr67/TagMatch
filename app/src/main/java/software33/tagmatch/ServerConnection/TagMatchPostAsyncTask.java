@@ -43,8 +43,8 @@ public abstract class TagMatchPostAsyncTask extends AsyncTask<JSONObject, Void, 
         try {
             if (url.getHost().contains("heroku")) {
                 HttpsURLConnection con = (HttpsURLConnection) url.openConnection();
-                con.setConnectTimeout(5000);
-                con.setReadTimeout(5000);
+                con.setConnectTimeout(35000);
+                con.setReadTimeout(35000);
                 con.setDoInput(true);
                 con.setRequestMethod("POST");
 

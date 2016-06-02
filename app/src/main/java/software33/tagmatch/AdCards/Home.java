@@ -1,8 +1,7 @@
 package software33.tagmatch.AdCards;
 
-import android.content.Context;
+import android.app.ProgressDialog;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.ActivityInfo;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -46,6 +45,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     private RecyclerView.LayoutManager lManager;
     private List<Advertisement> advertisements;
     private ArrayList<AdvertContent> items;
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -132,6 +132,13 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             jObject.put("password", actualUser.getPassword());
             new TagMatchGetAsyncTask(url,this) {
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(Home.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
+                @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     if(jsonObject.has("arrayResponse")) {
                         try {
@@ -147,6 +154,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
                                 items.add( new AdvertContent(newAdvert.getTitle(),imageId, newAdvert.getTypeDescription(), newAdvert.getPrice(), newAdvert.getOwner().getAlias(), newAdvert.getID()));
                             }
                             adapter.notifyDataSetChanged();
+                            mDialog.dismiss();
 
                         } catch (JSONException e) {
                             e.printStackTrace();

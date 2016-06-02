@@ -1,5 +1,6 @@
 package software33.tagmatch.Login_Register;
 
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -30,6 +31,8 @@ import software33.tagmatch.ServerConnection.TagMatchPostAsyncTask;
 import software33.tagmatch.Utils.Constants;
 
 public class RegistrationActivity extends AppCompatActivity {
+
+    private ProgressDialog mDialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -75,6 +78,7 @@ public class RegistrationActivity extends AppCompatActivity {
         //Try to create user in firebase
         Map<String, Object> img = new HashMap<>();
         img.put("img","");
+        Log.i("USER: ",user);
         createUser(email, pass, user, img , this);
 
     }
@@ -95,6 +99,13 @@ public class RegistrationActivity extends AppCompatActivity {
 
             new TagMatchPostAsyncTask(Constants.IP_SERVER + "/users", this, false) {
                 @Override
+                protected void onPreExecute() {
+                    super.onPreExecute();
+                    mDialog = new ProgressDialog(RegistrationActivity.this);
+                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.show();
+                }
+                @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
                         String error = jsonObject.get("error").toString();
@@ -102,6 +113,7 @@ public class RegistrationActivity extends AppCompatActivity {
                         removeUser(context);
 
                     } catch (JSONException ignored) {
+                        mDialog.dismiss();
                         continueRegistration2(email, username, password);
                     }
                 }
@@ -116,6 +128,7 @@ public class RegistrationActivity extends AppCompatActivity {
         act.putExtra("username", username);
         act.putExtra("password", password);
         startActivity(act);
+        finish();
     }
 
     private boolean validatePassword() {
