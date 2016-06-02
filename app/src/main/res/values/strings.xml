@@ -111,8 +111,6 @@
     <string name="succ_edit">Ad successfully updated</string>
     <string name="succ_upload">Ad successfully uploaded</string>
     <string name="please_add_photo">Plase, add at least 1 photo</string>
-    <string name="changing_pass">Changing your password...</string>
-    <string name="changing_title">Change your password</string>
     <string name="settings_title">Settings</string>
 
     <!-- Navigation Drawer -->
@@ -230,16 +228,24 @@
 
     <!-- Settings -->
     <string name="password_change">Change Password</string>
+    <string name="settings_wrong_default_advs_number">Number of adverts cannot be less than 1</string>
+    <string name="settings_default_num_advs">Default number of adverts to show</string>
 
     <!-- Password Change -->
     <string name="title_activity_password_change">PasswordChange</string>
     <string name="change_password_hint_old_password">Old Password</string>
     <string name="change_password_hint_new_password">New Password</string>
+    <string name="change_password_hint_repite_new_password">Repite Password</string>
+    <string name="change_password_error_password_empty">Fields cannot be empty</string>
     <string name="change_password_hint_repeat_new_password">Repeat Password</string>
-    <string name="password_change_error_password_empty">Fields cannot be empty</string>
     <string name="change_password_error_password_missmatch">Passwords do not match</string>
     <string name="change_password_error_incorrect_password">Incorrect Password</string>
     <string name="change_password_ok">Password Chaged!</string>
+    <string name="change_password_btn">Change Password</string>
+    <string name="changing_pass">Changing your password...</string>
+    <string name="changing_title">Change your password</string>
+
+
     <string name="title_activity_gossip">gossip</string>
     <string name="title_activity_password_recover">PasswordRecover</string>
     <string name="title_activity_recover_second_step">RecoverSecondStep</string>

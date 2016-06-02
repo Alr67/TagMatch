@@ -833,7 +833,7 @@ public class SingleChatActivity extends AppCompatActivity {
     private void downloadMyAdvertsFromServer() {
         JSONObject jObject = new JSONObject();
         User actualUser = Helpers.getActualUser(this);
-        String url = Constants.IP_SERVER+"/users/"+actualUser.getAlias()+"/ads?limit="+Constants.SERVER_limitAdverts;
+        String url = Constants.IP_SERVER+"/users/"+actualUser.getAlias()+"/ads?limit="+Helpers.getDefaultAdvertisementNumber(this);
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());

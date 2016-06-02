@@ -261,9 +261,20 @@ public class Helpers {
 
         ((TextView) nav_header.findViewById(R.id.user_name_header)).setText(Helpers.getActualUser(context).getAlias());
     }
+
+    public static void setDefaultAdvertisementNumber(Context context, int value){
+        SharedPreferences prefs = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE);
+        prefs.edit().putInt("default_advertisement_show", value).commit();
+    }
+
+    public static int  getDefaultAdvertisementNumber(Context context){
+        SharedPreferences prefs = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE);
+        return prefs.getInt("default_advertisement_show", -1);
+    }
     public static boolean isEmpty(EditText myeditText) {
         return myeditText.getText().toString().trim().length() == 0;
     }
+
 
     public static String iStreamToString(InputStream is1) {
         BufferedReader rd = new BufferedReader(new InputStreamReader(is1), 4096);

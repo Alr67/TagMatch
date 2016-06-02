@@ -1,7 +1,6 @@
 package software33.tagmatch.Settings;
 
 import android.content.Intent;
-import android.graphics.Typeface;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
@@ -11,13 +10,17 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
+import android.view.WindowManager;
+import android.widget.EditText;
 
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.R;
+import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
 
 public class Settings extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
+
+    private EditText numberOfAdvs;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,6 +38,12 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view_settings);
         navigationView.setNavigationItemSelectedListener(this);
+
+        //para que no se abra el teclado al entrar en la activity
+        this.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
+        numberOfAdvs = (EditText) findViewById(R.id.settings_default_advertisement_number);
+        numberOfAdvs.setText(Integer.toString(Helpers.getDefaultAdvertisementNumber(this)));
     }
 
     public void goToPasswordChange(View view){
@@ -43,15 +52,28 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
         finish();
     }
 
+    private boolean saveNewDefaultAdvertLimit() {
+        if (!numberOfAdvs.getText().toString().equals("")) {
+            if (Integer.parseInt(numberOfAdvs.getText().toString()) <= 0) {
+                Helpers.showError(getString(R.string.settings_wrong_default_advs_number), this);
+                return false;
+            } else
+                Helpers.setDefaultAdvertisementNumber(this, Integer.parseInt(numberOfAdvs.getText().toString()));
+        }
+        return true;
+    }
+
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            Intent intent = new Intent(this, Home.class);
-            startActivity(intent);
-            finish();
+        if (saveNewDefaultAdvertLimit()) {
+            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_settings);
+            if (drawer.isDrawerOpen(GravityCompat.START)) {
+                drawer.closeDrawer(GravityCompat.START);
+            } else {
+                Intent intent = new Intent(this, Home.class);
+                startActivity(intent);
+                finish();
+            }
         }
     }
 
