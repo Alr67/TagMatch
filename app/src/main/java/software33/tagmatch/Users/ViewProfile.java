@@ -1,16 +1,12 @@
 package software33.tagmatch.Users;
-import android.Manifest;
 import android.app.ProgressDialog;
-
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;s
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -24,14 +20,7 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RatingBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
-import com.facebook.CallbackManager;
-import com.facebook.FacebookCallback;
-import com.facebook.FacebookException;
-import com.facebook.FacebookSdk;
-import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.firebase.client.Firebase;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
@@ -51,6 +40,7 @@ import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
+import software33.tagmatch.Utils.CircleTransform;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
@@ -68,25 +58,16 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     private boolean otherUser;
     private RatingBar ratingBar;
     private TextView ratingTV;
-    private LoginButton loginButton;
-    CallbackManager callbackManager;
     private ProgressDialog mDialog;
+    private ImageView fbImage;
+    private ImageView twitterImage;
+    private ImageView mailImage;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        String[] permissions = {Manifest.permission.INTERNET};
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.INTERNET) != PackageManager.PERMISSION_GRANTED) {
-                requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
-            }
-        }
-        FacebookSdk.sdkInitialize(getApplicationContext());
-
         setContentView(R.layout.nav_view_profile);
-        loginButton = (LoginButton) findViewById(R.id.login_button);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view_profile);
         setSupportActionBar(toolbar);
@@ -113,6 +94,10 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         tvLocation = (TextView) findViewById(R.id.tvLocation);
         ivUserImage = (ImageView) findViewById(R.id.ivUserImage);
 
+        fbImage = (ImageView) findViewById(R.id.loggedWithFb);
+        twitterImage = (ImageView) findViewById(R.id.loggedWithTwitter);
+        mailImage = (ImageView) findViewById(R.id.loggedWithMail);
+
         interests_hash = (ListView) findViewById(R.id.profile_interests);
         Firebase.setAndroidContext(this);
 
@@ -131,24 +116,6 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             otherUser=false;
             initCurrentUser();
         }
-        callbackManager = CallbackManager.Factory.create();
-        loginButton.registerCallback( callbackManager ,new FacebookCallback<LoginResult>() {
-            @Override
-            public void onSuccess(LoginResult loginResult) {
-                Toast.makeText(getApplicationContext(), "SUCCESS", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onCancel() {
-                Toast.makeText(getApplicationContext(), "Cancel", Toast.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onError(FacebookException exception) {
-                Toast.makeText(getApplicationContext(), "Error", Toast.LENGTH_SHORT).show();
-            }
-        });
-
     }
 
     private void initCurrentUser() {
@@ -210,6 +177,23 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                                     listdata.add(interestsArray.get(i).toString());
                                 }
                             }
+
+                            Boolean loggedWithFb = jsonObject.getBoolean("facebookVerified");
+                            if(loggedWithFb){
+                                Picasso.with(ViewProfile.this).load(R.drawable.com_facebook_button_icon_blue).centerCrop().resize(fbImage.getMaxWidth(), fbImage.getMaxHeight()).transform(new CircleTransform()).into(fbImage);
+                            }
+                            else fbImage.setVisibility(View.GONE);
+                            Boolean loggedWithTwitter = jsonObject.getBoolean("twitterVerified");
+                            if(loggedWithTwitter){
+                                Picasso.with(ViewProfile.this).load(R.drawable.tw__ic_tweet_verified).centerCrop().resize(twitterImage.getMaxWidth(), twitterImage.getMaxHeight()).transform(new CircleTransform()).into(twitterImage);
+                            }
+                            else twitterImage.setVisibility(View.GONE);
+                            Boolean loggedWithMail = jsonObject.getBoolean("emailVerified");
+                            if(loggedWithMail){
+                                Picasso.with(ViewProfile.this).load(R.drawable.gmail).centerCrop().resize(mailImage.getMaxWidth(), mailImage.getMaxHeight()).transform(new CircleTransform()).into(mailImage);
+                            }
+                            else mailImage.setVisibility(View.GONE);
+
                             interests_hash.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, listdata));
                             double ratingAux = jsonObject.getDouble("rating");
                             ratingBar.setRating((float) ratingAux);
@@ -293,6 +277,22 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                             double ratingAux = jsonObject.getDouble("rating");
                             ratingBar.setRating((float) ratingAux);
                             ratingTV.setText(jsonObject.getString("rating") + "/5.0");
+
+                            Boolean loggedWithFb = jsonObject.getBoolean("facebookVerified");
+                            if(loggedWithFb){
+                                Picasso.with(ViewProfile.this).load(R.drawable.com_facebook_button_icon_blue).centerCrop().resize(fbImage.getMaxWidth(), fbImage.getMaxHeight()).transform(new CircleTransform()).into(fbImage);
+                            }
+                            else fbImage.setVisibility(View.GONE);
+                            Boolean loggedWithTwitter = jsonObject.getBoolean("twitterVerified");
+                            if(loggedWithTwitter){
+                                Picasso.with(ViewProfile.this).load(R.drawable.tw__ic_tweet_verified).centerCrop().resize(twitterImage.getMaxWidth(), twitterImage.getMaxHeight()).transform(new CircleTransform()).into(twitterImage);
+                            }
+                            else twitterImage.setVisibility(View.GONE);
+                            Boolean loggedWithMail = jsonObject.getBoolean("emailVerified");
+                            if(loggedWithMail){
+                                Picasso.with(ViewProfile.this).load(R.drawable.gmail).centerCrop().resize(mailImage.getMaxWidth(), mailImage.getMaxHeight()).transform(new CircleTransform()).into(mailImage);
+                            }
+                            else mailImage.setVisibility(View.GONE);
                         }
                     } catch (JSONException ignored) {
                         Log.i("DEBUG","error al get user");
@@ -360,12 +360,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        callbackManager.onActivityResult(requestCode, resultCode, data);
 
-    }
 
 
 }
