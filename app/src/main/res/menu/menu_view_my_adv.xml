@@ -8,7 +8,7 @@
         app:showAsAction="ifRoom" />
     <item android:id="@+id/tagmatch_exchange"
         android:title="@string/action_tagmatch"
-        android:icon="@mipmap/dtm"
+        android:icon="@mipmap/etm"
         android:orderInCategory="100"
         app:showAsAction="ifRoom" />
 </menu>
