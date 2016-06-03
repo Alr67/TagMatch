@@ -8,6 +8,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
@@ -54,6 +55,7 @@ import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.SingleChatActivity;
+import software33.tagmatch.Domain.AdvChange;
 import software33.tagmatch.Domain.Advertisement;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
@@ -218,12 +220,18 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             alertDialog.show();
         }
         else if (id == R.id.tagmatch_exchange) {
-            Intent intent = new Intent(getApplicationContext(), Home.class);
-            intent.putExtra("previousActivity", "ex_tagmatch");
-            String url = Constants.IP_SERVER + "/ads/" + adv.getID() + "/tagmatch";
-            intent.putExtra("url", url);
-            startActivity(intent);
-            //finish();
+            Log.i("TIPO",adv.getTypeDescription());
+            if(adv.getTypeDescription() == Constants.typeServerEXCHANGE) {
+                Intent intent = new Intent(getApplicationContext(), Home.class);
+                intent.putExtra("previousActivity", "ex_tagmatch");
+                String url = Constants.IP_SERVER + "/ads/" + adv.getID() + "/tagmatch";
+                intent.putExtra("url", url);
+                startActivity(intent);
+                //finish();s
+            }
+            else{
+                Toast.makeText(getApplicationContext(),"Only available with Exchange Ads, sorry",Toast.LENGTH_SHORT).show();
+            }
         }
         else if (id == R.id.action_fav) {
             new TagMatchPutAsyncTask(Constants.IP_SERVER + "/users/"+ adv.getID().toString() + "/fav", getApplicationContext()){

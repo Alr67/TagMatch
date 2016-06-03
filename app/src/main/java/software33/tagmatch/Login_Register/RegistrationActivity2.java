@@ -350,6 +350,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
 
     private void showError(String msg) {
         Toast.makeText(getApplicationContext(), msg, Toast.LENGTH_LONG).show();
+        mDialog.dismiss();
     }
 }
 
