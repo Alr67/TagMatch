@@ -116,7 +116,7 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
 
             @Override
             public void failure(TwitterException exception) {
-                Toast.makeText(getApplicationContext(), "Error on Facebook", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getApplicationContext(), "Error on Twitter", Toast.LENGTH_SHORT).show();
             }
         });
         SharedPreferences prefs =  this.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE);
