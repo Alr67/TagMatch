@@ -159,10 +159,10 @@ public class SingleChatActivity extends AppCompatActivity {
         actionBar.setCustomView(R.layout.actionbar_single_chat);
 
         TextView mytext = (TextView) findViewById(R.id.singleChatUserName);
-        mytext.setText(userName);
+        mytext.setText(userName.substring(0, Math.min(userName.length(),16)));
 
         mytext = (TextView) findViewById(R.id.singleChatTitleProduct);
-        mytext.setText(titleProduct);
+        mytext.setText(titleProduct.substring(0, Math.min(titleProduct.length(),16)));
 
         ImageView image = (ImageView) findViewById(R.id.singleChatImage);
 
