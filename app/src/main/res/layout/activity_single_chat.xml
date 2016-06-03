@@ -36,21 +36,20 @@
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="right">
+                android:gravity="center_vertical|right|center_horizontal"
+                android:layout_gravity="center|right">
 
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/deny_offer"
-                    android:id="@+id/bCancelOffert"
-                    android:layout_gravity="center|right" />
+                    android:id="@+id/bCancelOffert" />
 
                 <Button
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="@string/accept"
-                    android:id="@+id/bAcceptOffer"
-                    android:layout_gravity="center|right" />
+                    android:id="@+id/bAcceptOffer" />
 
                 <TextView
                     android:layout_width="wrap_content"
