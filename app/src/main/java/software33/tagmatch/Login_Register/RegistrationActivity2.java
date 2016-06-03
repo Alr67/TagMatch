@@ -246,7 +246,7 @@ public class RegistrationActivity2 extends AppCompatActivity implements
                 protected void onPreExecute() {
                     super.onPreExecute();
                     mDialog = new ProgressDialog(RegistrationActivity2.this);
-                    mDialog.setMessage(getString(R.string.loading));
+                    mDialog.setMessage(getString(R.string.creating_user));
                     mDialog.show();
                 }
                 @Override
