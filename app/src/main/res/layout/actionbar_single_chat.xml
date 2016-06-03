@@ -22,17 +22,22 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:id="@+id/singleChatTitleProduct"
             android:layout_gravity="left|center"
             android:textColor="#ffffff"
-            android:id="@+id/singleChatUserName"
-            android:textSize="18dp" />
+            android:textSize="18dp"
+            android:textStyle="bold" />
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:id="@+id/singleChatTitleProduct"
-            android:layout_gravity="left|center" />
+            android:layout_gravity="left|center"
+            android:textColor="#ffffff"
+            android:id="@+id/singleChatUserName"
+            android:textSize="10dp"
+            android:textIsSelectable="false"
+            android:textStyle="italic" />
+
     </LinearLayout>
 
 </LinearLayout>

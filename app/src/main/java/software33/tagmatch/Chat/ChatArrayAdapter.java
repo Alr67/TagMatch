@@ -57,7 +57,10 @@ public class ChatArrayAdapter extends ArrayAdapter<ChatMessage> {
             if (chatMessageObj.getRead())readImage.setVisibility(View.VISIBLE);
             else readImage.setVisibility(View.GONE);
         }else{
-            row = inflater.inflate(R.layout.left_chat, parent, false);
+            if (chatMessageObj.getUserName().equals("FirebaseAutoMessage")){
+                row = inflater.inflate(R.layout.firebase_chat, parent, false);
+            }
+            else row = inflater.inflate(R.layout.left_chat, parent, false);
         }
         chatText = (TextView) row.findViewById(R.id.msgr);
         chatText.setText(chatMessageObj.message);

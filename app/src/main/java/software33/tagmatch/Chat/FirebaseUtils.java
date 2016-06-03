@@ -247,7 +247,7 @@ public abstract class FirebaseUtils {
                                     }
                                     String userName = "";
                                     for (Object o : c.getUsers().values()) {
-                                        if (!o.toString().equals(Helpers.getActualUser(context).getAlias())){
+                                        if (!o.toString().equals(myId)){
                                             userName = o.toString();
                                         }
                                     }

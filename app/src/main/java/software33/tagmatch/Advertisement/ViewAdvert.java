@@ -500,7 +500,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private void getChats(){
+    private void getChats() {
         if (FirebaseUtils.getMyId(this) != null) {
             FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
                 @Override
