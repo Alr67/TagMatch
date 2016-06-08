@@ -248,7 +248,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
 
-            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias().replaceAll(" ", "%20"), this) {
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -306,7 +306,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
 
-            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias() + "/photo", this) {
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias().replaceAll(" ", "%20") + "/photo", this) {
                 @Override
                 protected void onPostExecute(String url) {
                     Picasso.with(EditProfile.this).load(url).error(R.drawable.image0).into(iv);

@@ -324,16 +324,12 @@ public class RegistrationActivity2 extends AppCompatActivity implements
         if (pos != null) {
             map.clear();
             userMarker = new LatLng(pos.getLatitude(), pos.getLongitude());
-            map.moveCamera(CameraUpdateFactory.newLatLngZoom(userMarker, 14.f));
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(userMarker, 15));
             map.addMarker(new MarkerOptions().position(userMarker));
         } else {
             map.clear();
             userMarker = new LatLng(41.385064, 2.173403);
-            CameraUpdate center =
-                    CameraUpdateFactory.newLatLng(userMarker);
-            CameraUpdate zoom = CameraUpdateFactory.zoomTo(14);
-            map.moveCamera(center);
-            map.animateCamera(zoom);
+            map.animateCamera(CameraUpdateFactory.newLatLngZoom(userMarker, 15));
             map.addMarker(new MarkerOptions().position(userMarker));
         }
     }

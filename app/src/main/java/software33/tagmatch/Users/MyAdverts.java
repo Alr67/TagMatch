@@ -148,7 +148,7 @@ public class MyAdverts extends AppCompatActivity implements View.OnClickListener
         if(otherUser)
             url = Constants.IP_SERVER+"/users/"+username+"/ads?limit="+Helpers.getDefaultAdvertisementNumber(this);
         else
-            url = Constants.IP_SERVER+"/users/"+actualUser.getAlias()+"/ads?limit="+Helpers.getDefaultAdvertisementNumber(this);
+            url = Constants.IP_SERVER+"/users/"+actualUser.getAlias().replaceAll(" ", "%20")+"/ads?limit="+Helpers.getDefaultAdvertisementNumber(this);
         try {
             jObject.put("username", actualUser.getAlias());
             jObject.put("password", actualUser.getPassword());
