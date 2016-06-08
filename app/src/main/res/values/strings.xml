@@ -230,6 +230,7 @@
     <string name="password_change">Change Password</string>
     <string name="settings_wrong_default_advs_number">Number of adverts cannot be less than 1</string>
     <string name="settings_default_num_advs">Default number of adverts to show</string>
+    <string name="settings_default_num_advs_ok">Default number of adverts changed</string>
 
     <!-- Password Change -->
     <string name="title_activity_password_change">PasswordChange</string>

@@ -38,6 +38,14 @@
                 android:id="@+id/settings_default_advertisement_number"
                 android:layout_weight="0.30" />
 
+            <Button
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="33dp"
+                android:layout_height="34dp"
+                android:background="@android:drawable/ic_menu_save"
+                android:onClick="saveNewDefaultAdvertLimit"
+                android:id="@+id/button" />
+
         </LinearLayout>
 
         <android.support.v7.widget.AppCompatButton

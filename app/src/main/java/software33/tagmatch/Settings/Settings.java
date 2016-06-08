@@ -52,28 +52,26 @@ public class Settings extends AppCompatActivity implements NavigationView.OnNavi
         finish();
     }
 
-    private boolean saveNewDefaultAdvertLimit() {
+    public void saveNewDefaultAdvertLimit(View view) {
         if (!numberOfAdvs.getText().toString().equals("")) {
             if (Integer.parseInt(numberOfAdvs.getText().toString()) <= 0) {
                 Helpers.showError(getString(R.string.settings_wrong_default_advs_number), this);
-                return false;
-            } else
+            } else {
                 Helpers.setDefaultAdvertisementNumber(this, Integer.parseInt(numberOfAdvs.getText().toString()));
+                Helpers.showError(getString(R.string.settings_default_num_advs_ok), this);
+            }
         }
-        return true;
     }
 
     @Override
     public void onBackPressed() {
-        if (saveNewDefaultAdvertLimit()) {
-            DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_settings);
-            if (drawer.isDrawerOpen(GravityCompat.START)) {
-                drawer.closeDrawer(GravityCompat.START);
-            } else {
-                Intent intent = new Intent(this, Home.class);
-                startActivity(intent);
-                finish();
-            }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout_settings);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            Intent intent = new Intent(this, Home.class);
+            startActivity(intent);
+            finish();
         }
     }
 
