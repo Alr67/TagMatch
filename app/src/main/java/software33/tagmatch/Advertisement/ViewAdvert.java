@@ -81,6 +81,8 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private String imageChat;
     private String myName;
     private String idProduct;
+    private String urlImage = "";
+
     private ProgressDialog mDialog;
     private Menu my_menu;
     private boolean myAdv;
@@ -444,7 +446,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                     else if (jsonObject.has("username")){
                         try {
                             Log.i("Debug-GetUser", jsonObject.toString());
-                            userId = jsonObject.get("firebaseID").toString();
+                            userId = adv.getUser().getAlias();
                             location.setText(jsonObject.get("city").toString());
                             LatLng latLng = new LatLng(jsonObject.getDouble("latitude"), jsonObject.getDouble("longitude"));
                             CameraUpdate center = CameraUpdateFactory.newLatLng(latLng);
@@ -463,10 +465,12 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         new TagMatchGetImageAsyncTask(url, this) {
             @Override
             protected void onPostExecute(String url) {
-                if (url == null){
+                if (url == null) {
                     Picasso.with(ViewAdvert.this).load(R.drawable.image0).into(userImage);
+                } else {
+                    Picasso.with(ViewAdvert.this).load(url).error(R.drawable.image0).into(userImage);
+                    urlImage = url;
                 }
-                else Picasso.with(ViewAdvert.this).load(url).error(R.drawable.image0).into(userImage);
                 getChats();
                 if(myAdv)prepareEdit();
             }
@@ -488,37 +492,40 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         });
     }
 
-    private void getChats(){
-        FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                if (!dataSnapshot.hasChildren()) {
-                    if (!adv.getOwner().getAlias().equals(myName)) {
-                        fab.setClickable(true);
-                        fab.setImageDrawable(getDrawable(R.drawable.chat_add));
-                        fab.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View view) {
-                                Intent chat = buttonStartXat(view);
-                                startActivity(chat);
-                                finish();
-                            }
-                        });
-                    }
-                }
-                else {
-                    long numChats = dataSnapshot.getChildrenCount();
-                    for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()){
+    private void getChats() {
+        if (FirebaseUtils.getMyId(this) != null) {
+            FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(this)).child("chats").addValueEventListener(new ValueEventListener() {
+                @Override
+                public void onDataChange(DataSnapshot dataSnapshot) {
+                    if (!dataSnapshot.hasChildren()) {
+                        if (!adv.getOwner().getAlias().equals(myName)) {
+                            fab.setClickable(true);
+                            fab.setImageDrawable(getDrawable(R.drawable.chat_add));
+                            fab.setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View view) {
+                                    Intent chat = buttonStartXat(view);
+                                    startActivity(chat);
+                                    finish();
+                                }
+                            });
+                        }
+                    } else {
+                        long numChats = dataSnapshot.getChildrenCount();
+                        for (DataSnapshot dataSnapshot1 : dataSnapshot.getChildren()) {
 
-                        getChat(dataSnapshot1.getKey(), numChats);
-                        --numChats;
+                            getChat(dataSnapshot1.getKey(), numChats);
+                            --numChats;
+                        }
                     }
                 }
-            }
-            @Override
-            public void onCancelled(FirebaseError firebaseError) {}
-        });
-        mDialog.dismiss();
+
+                @Override
+                public void onCancelled(FirebaseError firebaseError) {
+                }
+            });
+            mDialog.dismiss();
+        }
     }
 
     public void prepareImages() {
@@ -555,30 +562,18 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         Intent intent = new Intent(this, SingleChatActivity.class);
         Bundle b = new Bundle();
         b.putString("UserName", username.getText().toString());
-        b.putString("TitleProduct", getTitle().toString());
+        b.putString("TitleProduct", title.getText().toString());
 
         if (idChat.equals("Not exists")) {
             b.putString("IdChat", createChat());
         }
         else b.putString("IdChat", idChat);
         b.putString("IdUser", userId);
+        b.putString("IdProduct", idProduct);
 
         b.putBoolean("FromAdvert",true);
 
-        //Get user Image
-        Drawable drawable = userImage.getDrawable();
-
-        BitmapDrawable bitmapDrawable = ((BitmapDrawable) drawable);
-        Bitmap bitmap = bitmapDrawable.getBitmap();
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
-        byte[] imageInByte = stream.toByteArray();
-
-        String encodedImage = Base64.encodeToString(imageInByte, Base64.DEFAULT);
-
-        imageChat = encodedImage;
-
-        FirebaseUtils.setChatImage(imageChat,this);
+        FirebaseUtils.setChatImage(urlImage,this);
         intent.putExtras(b);
 
         return intent;
@@ -594,7 +589,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         users.put(id1, Helpers.getActualUser(this).getAlias());
         users.put(id2, username.getText().toString());
 
-        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(idProduct, getTitle().toString(), id2, users);
+        FirebaseUtils.ChatInfo chatInfo = new FirebaseUtils.ChatInfo(idProduct, title.getText().toString(), id2, users);
         id.child("info").setValue(chatInfo);
 
         //Set the chats to each user

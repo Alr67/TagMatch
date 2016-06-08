@@ -54,17 +54,14 @@ public abstract class TagMatchPutQRAsyncTask extends AsyncTask<JSONObject, Void,
             con.getOutputStream().close();
             con.connect();
 
-            /*>=400 errorStream
-            else inputStream*/
-
             JSONObject aux;
 
             Log.i("put status code", Integer.toString(con.getResponseCode()));
 
             if (con.getResponseCode() >= 400)
-                aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                aux = new JSONObject(Helpers.iStreamToString(con.getErrorStream()));
             else
-                aux = new JSONObject(iStreamToString(con.getInputStream()));
+                aux = new JSONObject(Helpers.iStreamToString(con.getInputStream()));
 
             con.disconnect();
 
@@ -84,25 +81,6 @@ public abstract class TagMatchPutQRAsyncTask extends AsyncTask<JSONObject, Void,
             }
             return new JSONObject(map);
         }
-    }
-
-
-    public String iStreamToString(InputStream is1) {
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is1), 4096);
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try {
-            while ((line = rd.readLine()) != null) {
-                sb.append(line);
-            }
-            rd.close();
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        String contentOfMyInputStream = sb.toString();
-        return contentOfMyInputStream;
     }
 
 }

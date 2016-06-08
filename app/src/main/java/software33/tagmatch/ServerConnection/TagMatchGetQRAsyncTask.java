@@ -25,6 +25,7 @@ import javax.net.ssl.HttpsURLConnection;
 
 import software33.tagmatch.R;
 import software33.tagmatch.Utils.Constants;
+import software33.tagmatch.Utils.Helpers;
 
 public class TagMatchGetQRAsyncTask extends AsyncTask<JSONObject, Void, JSONObject> {
     private URL url;
@@ -51,9 +52,9 @@ public class TagMatchGetQRAsyncTask extends AsyncTask<JSONObject, Void, JSONObje
 
                 JSONObject aux;
 
-                String response = iStreamToString(con.getInputStream());
+                String response = Helpers.iStreamToString(con.getInputStream());
                 if (con.getResponseCode() >= 400){
-                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                    aux = new JSONObject(Helpers.iStreamToString(con.getErrorStream()));
                 }
                 else if(con.getResponseCode() == 302) {
                     aux = new JSONObject();
@@ -89,7 +90,7 @@ public class TagMatchGetQRAsyncTask extends AsyncTask<JSONObject, Void, JSONObje
 
                 if (con.getResponseCode() >= 400){
                     Log.i(Constants.DebugTAG,"response code: "+con.getResponseCode());
-                    aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                    aux = new JSONObject(Helpers.iStreamToString(con.getErrorStream()));
                 }
                 else if(con.getResponseCode() == 302) {
                     aux = new JSONObject();
@@ -97,7 +98,7 @@ public class TagMatchGetQRAsyncTask extends AsyncTask<JSONObject, Void, JSONObje
                     aux.put("302",con.getURL().toString());
                 }
                 else {
-                    String response = iStreamToString(con.getInputStream());
+                    String response = Helpers.iStreamToString(con.getInputStream());
                     if(response.startsWith("[{")){
                         aux = new JSONObject();
                         Log.i(Constants.DebugTAG,"Array JSON REBUT");
@@ -132,30 +133,5 @@ public class TagMatchGetQRAsyncTask extends AsyncTask<JSONObject, Void, JSONObje
             }
             return new JSONObject(map);
         }
-    }
-
-    public String iStreamToString(InputStream is1) {
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is1), 4096);
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try {
-            while ((line = rd.readLine()) != null) {
-                sb.append(line);
-            }
-            rd.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        String contentOfMyInputStream = sb.toString();
-        return contentOfMyInputStream;
-    }
-
-    public String readIt(InputStream stream, int len) throws IOException, UnsupportedEncodingException {
-        Reader reader = null;
-        reader = new InputStreamReader(stream, "UTF-8");
-        char[] buffer = new char[len];
-        reader.read(buffer);
-        return new String(buffer);
     }
 }

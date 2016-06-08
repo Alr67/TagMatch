@@ -13,30 +13,42 @@
         android:paddingRight="24dp">
 
         <LinearLayout
-            android:orientation="horizontal"
+            android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:weightSum="1">
+            android:layout_height="match_parent"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp">
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/settings_default_num_advs"
-                android:id="@+id/textView" />
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:text="Number of ads to be shown"
+                android:id="@+id/textView15" />
 
-            <Space
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_weight="0.26" />
-
-            <EditText
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:inputType="number"
-                android:gravity="center_horizontal"
-                android:id="@+id/settings_default_advertisement_number"
-                android:layout_weight="0.30" />
+                android:layout_gravity="center_horizontal"
+                android:weightSum="1">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/settings_default_num_advs"
+                    android:id="@+id/textView"
+                    android:paddingRight="35dp" />
+
+                <EditText
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:inputType="number"
+                    android:gravity="center_horizontal"
+                    android:id="@+id/settings_default_advertisement_number"
+                    android:layout_weight="0.30" />
+
+            </LinearLayout>
 
             <Button
                 style="?android:attr/buttonStyleSmall"
@@ -47,6 +59,13 @@
                 android:id="@+id/button" />
 
         </LinearLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Change your password"
+            android:id="@+id/textView16" />
 
         <android.support.v7.widget.AppCompatButton
             android:id="@+id/btn_password_change"
@@ -59,6 +78,36 @@
             android:onClick="goToPasswordChange"
             android:background="@color/sky"
             android:textColor="@color/app_header_color" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Verify your account"
+            android:id="@+id/textView17" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.facebook.login.widget.LoginButton
+                android:id="@+id/Fblogin_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="30dp"
+                android:layout_marginBottom="30dp"
+                android:text="Fb" />
+
+            <com.twitter.sdk.android.core.identity.TwitterLoginButton
+                android:id="@+id/twitter_login_button"
+                android:layout_width="176dp"
+                android:layout_height="wrap_content"
+                android:layout_centerInParent="true"
+                android:layout_gravity="center_horizontal" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

@@ -41,7 +41,7 @@ public abstract class TagMatchPutAsyncTask extends AsyncTask<JSONObject, Void, J
     protected JSONObject doInBackground(JSONObject... params) {
         try {
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
-            connectUser(con);
+            Helpers.connectUser(con, context);
             con.setConnectTimeout(35000);
             con.setReadTimeout(35000);
             con.setDoInput(true);
@@ -56,17 +56,14 @@ public abstract class TagMatchPutAsyncTask extends AsyncTask<JSONObject, Void, J
             con.getOutputStream().close();
             con.connect();
 
-            /*>=400 errorStream
-            else inputStream*/
-
             JSONObject aux;
 
             Log.i("put status code", Integer.toString(con.getResponseCode()));
 
             if (con.getResponseCode() >= 400)
-                aux = new JSONObject(iStreamToString(con.getErrorStream()));
+                aux = new JSONObject(Helpers.iStreamToString(con.getErrorStream()));
             else
-                aux = new JSONObject(iStreamToString(con.getInputStream()));
+                aux = new JSONObject(Helpers.iStreamToString(con.getInputStream()));
 
             con.disconnect();
 
@@ -86,35 +83,6 @@ public abstract class TagMatchPutAsyncTask extends AsyncTask<JSONObject, Void, J
             }
             return new JSONObject(map);
         }
-    }
-
-    private void connectUser(HttpURLConnection c) {
-        ArrayList<String> personalData = new ArrayList<String>();
-        personalData = new Helpers().getPersonalData(context);
-        final String user = personalData.get(0);
-        final String password = personalData.get(1);
-
-        String userPass = user + ":" + password;
-        c.setRequestProperty("Authorization", "Basic " +
-                new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT)));
-    }
-
-    public String iStreamToString(InputStream is1) {
-        BufferedReader rd = new BufferedReader(new InputStreamReader(is1), 4096);
-        String line;
-        StringBuilder sb = new StringBuilder();
-        try {
-            while ((line = rd.readLine()) != null) {
-                sb.append(line);
-            }
-            rd.close();
-
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
-        String contentOfMyInputStream = sb.toString();
-        return contentOfMyInputStream;
     }
 
 }

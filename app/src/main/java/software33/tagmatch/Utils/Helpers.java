@@ -6,20 +6,13 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Path;
-import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.util.Base64;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.view.WindowManager;
-
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
-
-import android.widget.EditText;
-
 import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
@@ -28,6 +21,11 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 
 import software33.tagmatch.Chat.FirebaseUtils;
@@ -35,6 +33,7 @@ import software33.tagmatch.Domain.AdvChange;
 import software33.tagmatch.Domain.AdvGift;
 import software33.tagmatch.Domain.AdvSell;
 import software33.tagmatch.Domain.Advertisement;
+import software33.tagmatch.Domain.Offer;
 import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
@@ -103,6 +102,7 @@ public class Helpers {
         SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SH_PREF_NAME, Context.MODE_PRIVATE).edit();
         editor.remove("name");
         editor.remove("password");
+        editor.remove("twitterUser");
         FirebaseUtils.removeMyId(context);
         editor.commit();
     }
@@ -174,6 +174,32 @@ public class Helpers {
             e.printStackTrace();
         }
         return advert;
+    }
+
+    public static Offer convertJSONToOffer(JSONObject jsonObject) {
+        Offer offer = new Offer();
+        int offerId = 0;
+        String userThatOffers = "";
+        String destinedUser = "";
+        int offerAdvertisement = 0;
+        int offeredExchangeAdvertisement = 0;
+        String offeredText = "";
+        boolean accepted = false;
+
+        try {
+            if(jsonObject.has("offerId")) offerId = jsonObject.getInt("offerId");
+            if(jsonObject.has("userThatOffers")) userThatOffers = jsonObject.getString("userThatOffers");
+            if(jsonObject.has("destinedUser")) destinedUser = jsonObject.getString("destinedUser");
+            if(jsonObject.has("offerAdvertisement")) offerAdvertisement = jsonObject.getInt("offerAdvertisement");
+            if(jsonObject.has("offeredExchangeAdvertisement") && !jsonObject.isNull("offeredExchangeAdvertisement")) offeredExchangeAdvertisement = jsonObject.getInt("offeredExchangeAdvertisement");
+            if(jsonObject.has("offeredText") && !jsonObject.isNull("offeredText")) offeredText = jsonObject.getString("offeredText");
+            if(jsonObject.has("accepted")) accepted = jsonObject.getBoolean("accepted");
+            offer = new Offer(offerId,userThatOffers,destinedUser,offerAdvertisement,offeredExchangeAdvertisement,offeredText,accepted);
+            return offer;
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return offer;
     }
 
 
@@ -254,7 +280,7 @@ public class Helpers {
             }
         });
 
-        ((TextView) nav_header.findViewById(R.id.user_name_header)).setText(Helpers.getActualUser(context).getAlias());
+        ((TextView) nav_header.findViewById(R.id.user_name_header)).setText(context.getResources().getString(R.string.logged_as) + Helpers.getActualUser(context).getAlias());
     }
 
     public static void setDefaultAdvertisementNumber(Context context, int value){
@@ -269,4 +295,30 @@ public class Helpers {
     public static boolean isEmpty(EditText myeditText) {
         return myeditText.getText().toString().trim().length() == 0;
     }
+
+
+    public static String iStreamToString(InputStream is1) {
+        BufferedReader rd = new BufferedReader(new InputStreamReader(is1), 4096);
+        String line;
+        StringBuilder sb = new StringBuilder();
+        try {
+            while ((line = rd.readLine()) != null) {
+                sb.append(line);
+            }
+            rd.close();
+        } catch (IOException e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        String contentOfMyInputStream = sb.toString();
+        return contentOfMyInputStream;
+    }
+
+    public static void connectUser(HttpURLConnection c, Context context) {
+        User actualUser = Helpers.getActualUser(context);
+        String userPass = actualUser.getAlias() + ":" + actualUser.getPassword();
+        c.setRequestProperty("Authorization", "Basic " +
+                new String(Base64.encode(userPass.getBytes(), Base64.DEFAULT)));
+    }
+
 }

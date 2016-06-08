@@ -1,5 +1,4 @@
 package software33.tagmatch.Users;
-
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Build;
@@ -41,9 +40,11 @@ import software33.tagmatch.Domain.User;
 import software33.tagmatch.R;
 import software33.tagmatch.ServerConnection.TagMatchGetAsyncTask;
 import software33.tagmatch.ServerConnection.TagMatchGetImageAsyncTask;
+import software33.tagmatch.Utils.CircleTransform;
 import software33.tagmatch.Utils.Constants;
 import software33.tagmatch.Utils.Helpers;
 import software33.tagmatch.Utils.NavigationController;
+
 
 public class ViewProfile extends AppCompatActivity implements NavigationView.OnNavigationItemSelectedListener {
 
@@ -58,11 +59,16 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
     private RatingBar ratingBar;
     private TextView ratingTV;
     private ProgressDialog mDialog;
+    private ImageView fbImage;
+    private ImageView twitterImage;
+    private ImageView mailImage;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.nav_view_profile);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar_view_profile);
         setSupportActionBar(toolbar);
 
@@ -88,8 +94,11 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         tvLocation = (TextView) findViewById(R.id.tvLocation);
         ivUserImage = (ImageView) findViewById(R.id.ivUserImage);
 
-        interests_hash = (ListView) findViewById(R.id.profile_interests);
+        fbImage = (ImageView) findViewById(R.id.loggedWithFb);
+        twitterImage = (ImageView) findViewById(R.id.loggedWithTwitter);
+        mailImage = (ImageView) findViewById(R.id.loggedWithMail);
 
+        interests_hash = (ListView) findViewById(R.id.profile_interests);
         Firebase.setAndroidContext(this);
 
         try {
@@ -107,7 +116,6 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             otherUser=false;
             initCurrentUser();
         }
-
     }
 
     private void initCurrentUser() {
@@ -169,6 +177,23 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                                     listdata.add(interestsArray.get(i).toString());
                                 }
                             }
+
+                            Boolean loggedWithFb = jsonObject.getBoolean("facebookVerified");
+                            if(loggedWithFb){
+                                Picasso.with(ViewProfile.this).load(R.drawable.com_facebook_button_icon_blue).centerCrop().resize(fbImage.getMaxWidth(), fbImage.getMaxHeight()).transform(new CircleTransform()).into(fbImage);
+                            }
+                            else fbImage.setVisibility(View.GONE);
+                            Boolean loggedWithTwitter = jsonObject.getBoolean("twitterVerified");
+                            if(loggedWithTwitter){
+                                Picasso.with(ViewProfile.this).load(R.drawable.tw__ic_tweet_verified).centerCrop().resize(twitterImage.getMaxWidth(), twitterImage.getMaxHeight()).transform(new CircleTransform()).into(twitterImage);
+                            }
+                            else twitterImage.setVisibility(View.GONE);
+                            Boolean loggedWithMail = jsonObject.getBoolean("emailVerified");
+                            if(loggedWithMail){
+                                Picasso.with(ViewProfile.this).load(R.drawable.gmail).centerCrop().resize(mailImage.getMaxWidth(), mailImage.getMaxHeight()).transform(new CircleTransform()).into(mailImage);
+                            }
+                            else mailImage.setVisibility(View.GONE);
+
                             interests_hash.setAdapter(new ArrayAdapter<String>(getApplicationContext(), R.layout.dropdown, listdata));
                             double ratingAux = jsonObject.getDouble("rating");
                             ratingBar.setRating((float) ratingAux);
@@ -252,6 +277,22 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                             double ratingAux = jsonObject.getDouble("rating");
                             ratingBar.setRating((float) ratingAux);
                             ratingTV.setText(jsonObject.getString("rating") + "/5.0");
+
+                            Boolean loggedWithFb = jsonObject.getBoolean("facebookVerified");
+                            if(loggedWithFb){
+                                Picasso.with(ViewProfile.this).load(R.drawable.com_facebook_button_icon_blue).centerCrop().resize(fbImage.getMaxWidth(), fbImage.getMaxHeight()).transform(new CircleTransform()).into(fbImage);
+                            }
+                            else fbImage.setVisibility(View.GONE);
+                            Boolean loggedWithTwitter = jsonObject.getBoolean("twitterVerified");
+                            if(loggedWithTwitter){
+                                Picasso.with(ViewProfile.this).load(R.drawable.tw__ic_tweet_verified).centerCrop().resize(twitterImage.getMaxWidth(), twitterImage.getMaxHeight()).transform(new CircleTransform()).into(twitterImage);
+                            }
+                            else twitterImage.setVisibility(View.GONE);
+                            Boolean loggedWithMail = jsonObject.getBoolean("emailVerified");
+                            if(loggedWithMail){
+                                Picasso.with(ViewProfile.this).load(R.drawable.gmail).centerCrop().resize(mailImage.getMaxWidth(), mailImage.getMaxHeight()).transform(new CircleTransform()).into(mailImage);
+                            }
+                            else mailImage.setVisibility(View.GONE);
                         }
                     } catch (JSONException ignored) {
                         Log.i("DEBUG","error al get user");
@@ -262,9 +303,11 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + username + "/photo", this) {
                 @Override
                 protected void onPostExecute(String url) {
-                    Picasso.with(ViewProfile.this).load(url).error(R.drawable.image0).into(ivUserImage);
                     if (url == null){
                         Picasso.with(ViewProfile.this).load(R.drawable.image0).into(ivUserImage);
+                    }
+                    else {
+                        Picasso.with(ViewProfile.this).load(url).error(R.drawable.image0).into(ivUserImage);
                     }
                 }
             }.execute(jsonObject);
@@ -293,6 +336,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         }
     }
 
+
     @Override
     public boolean onNavigationItemSelected(MenuItem item) {
         return  NavigationController.onItemSelected(item.getItemId(),this);
@@ -317,4 +361,8 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+
+
 }

@@ -35,6 +35,9 @@
         <meta-data
             android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
+        <meta-data
+            android:name="com.facebook.sdk.ApplicationId"
+            android:value="@string/facebook_app_id"/>
 
         <activity
             android:name=".AdCards.Home"
@@ -127,6 +130,9 @@
             android:name=".Users.RecoverSecondStep"
             android:label="@string/title_activity_recover_second_step"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="76047eec93cd1095a8abf70c10689498c39942d5" />
     </application>
 
 </manifest>
