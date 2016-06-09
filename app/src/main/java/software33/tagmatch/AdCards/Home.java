@@ -169,7 +169,7 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
     }
 
     private void startChatListeners(){
-        FirebaseUtils.startListeners(FirebaseUtils.getMyId(this), this);
+        FirebaseUtils.startListeners(this);
         //FirebaseUtils.startService(this);
     }
 
