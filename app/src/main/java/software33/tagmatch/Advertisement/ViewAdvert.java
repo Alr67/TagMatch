@@ -435,7 +435,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
         }
         String url = Constants.IP_SERVER+"/users/"+ adv.getUser().getAlias().replaceAll(" ", "%20")+"/photo";
 
-        new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + adv.getUser().getAlias(), this) {
+        new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + adv.getUser().getAlias().replaceAll(" ", "%20"), this) {
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 try {
