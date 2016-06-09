@@ -529,6 +529,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                                 if (jsonObject.has("error")) {
                                     String error = jsonObject.get("error").toString();
                                     Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
+                                } else {
+                                    newImageUpdated();
                                 }
                             } catch (JSONException ignored) {
                                 ignored.printStackTrace();
@@ -539,8 +541,14 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                     e.printStackTrace();
                 }
             }
-            advertUpdated();
         } else {
+            advertUpdated();
+        }
+    }
+
+    private void newImageUpdated(){
+        ++numPhotos;
+        if(numPhotos == images.size()) {
             advertUpdated();
         }
     }
