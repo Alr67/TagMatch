@@ -28,14 +28,16 @@ public class NotificationController {
     private HashMap<Pair<String, String>, Object[]> messagesForEveryChat = new HashMap<>();
 
     public void cleanEntry(Context context, String titleProduct, String author){
-        messagesForEveryChat.remove(new Pair<>(titleProduct, author));
-        if (messagesForEveryChat.isEmpty()){
-            Log.i("DebugMessagesNoti","no more messages in the notification");
-            NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        if (!messagesForEveryChat.isEmpty()){
+            messagesForEveryChat.remove(new Pair<>(titleProduct, author));
+            if (messagesForEveryChat.isEmpty()) {
+                Log.i("DebugMessagesNoti", "no more messages in the notification");
+                NotificationManager mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
    /* notificationID allows you to update the notification later on. */
-            int notificationID = idNotification;
-            mNotificationManager.cancel(notificationID);
+                int notificationID = idNotification;
+                mNotificationManager.cancel(notificationID);
+            }
         }
     }
 
