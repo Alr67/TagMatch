@@ -9,6 +9,7 @@ import android.widget.Toast;
 
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Advertisement.DiscoveryTagmatch;
+import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.MainChatActivity;
 import software33.tagmatch.Login_Register.Login;
 import software33.tagmatch.R;
@@ -45,6 +46,7 @@ public final class NavigationController {
             parent.finish();
         }  else if (id == R.id.nav_logout) {
             Helpers.logout(parent.getApplicationContext());
+            FirebaseUtils.stopListeners();
             Intent intent3 = new Intent(parent.getApplicationContext(), Login.class);
             parent.startActivity(intent3);
             parent.finish();
