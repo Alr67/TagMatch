@@ -433,7 +433,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
             e.printStackTrace();
         }
-        String url = Constants.IP_SERVER+"/users/"+ adv.getUser().getAlias()+"/photo";
+        String url = Constants.IP_SERVER+"/users/"+ adv.getUser().getAlias().replaceAll(" ", "%20")+"/photo";
 
         new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + adv.getUser().getAlias(), this) {
             @Override
