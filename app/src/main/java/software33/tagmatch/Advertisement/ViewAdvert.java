@@ -618,7 +618,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private void setButtonXat(String idProduct, String idChat, long numChats) {
 
         //Restriccions de obrir xat:
-        if (idProduct.equals(this.idProduct)){
+        if (idProduct.equals(this.idProduct) && !myAdv){
             this.idChat = idChat;
             fab.setClickable(true);
             fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
@@ -644,6 +644,9 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                         finish();
                     }
                 });
+            }
+            else {
+                prepareEdit();
             }
         }
     }
