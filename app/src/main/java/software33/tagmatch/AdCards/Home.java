@@ -105,7 +105,8 @@ public class Home extends AppCompatActivity implements NavigationView.OnNavigati
             @Override  //recView.getChildPosition(v)
             public void onClick(View v) {
                 Integer id = items.get(v.getTag().hashCode()).getAd_id();
-                Intent viewRecepta = new Intent(getApplicationContext(), ViewAdvert.class).putExtra(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT, id);
+                Intent viewRecepta = new Intent(getApplicationContext(), ViewAdvert.class);
+                viewRecepta.putExtra(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT, id);
                 viewRecepta.putExtra(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT,items.get(v.getTag().hashCode()).getOwner());
                 startActivity(viewRecepta);
                 finish();

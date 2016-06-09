@@ -84,7 +84,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private final String DebugTag = "DEBUG ADVERT";
     private Advertisement adv;
     private boolean edit = false;
-    private Intent intent;
     private Integer okImages;
     private AutoCompleteTextView sugg_hashtags, sugg_hashtags_ex;
     private ArrayList<String> suggestions, ex_hash, off_hash;
@@ -92,6 +91,7 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     private String pathfoto;
     private Spinner categorySpinner, typeSpinner;
     private ProgressDialog mDialog;
+    private int numPhotos;
 
 
     @Override
@@ -129,7 +129,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             jObject2.put("username", actualUser.getAlias());
             jObject2.put("password", actualUser.getPassword());
         } catch (JSONException e) {
-            Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
             e.printStackTrace();
         }
         new TagMatchGetTrendingAsyncTask(Constants.IP_SERVER + "/categories", getApplicationContext()) {
@@ -359,22 +358,19 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         mViewPager.setAdapter(mCustomPagerAdapterNewAdvert);
 
 
-         intent = getIntent();
-
-        if(intent.hasExtra("edit") && intent.getBooleanExtra("edit",false)) { //Si es edit
+        if(getIntent().hasExtra("edit")) { //Si es edit
             createButton.setText(R.string.text_edit_button);
             edit = true;
-            getAdvertisement(intent.getIntExtra("idAnunci",0));
+            getAdvertisement(getIntent().getIntExtra("idAnunci",0));
         }
         else setTitle(R.string.new_ad_general_title);
 
     }
 
-
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.newImage:
-               onNewImageClicked();
+                onNewImageClicked();
                 break;
             case R.id.btn_newAdvert:
                 onAdvertCreateClicked();
@@ -408,7 +404,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             tags = off_hash.toArray(tags);
             Advertisement adv = new Advertisement();
             Log.v(DebugTag,"Tipus seleccionat: " + typeSpinner.getSelectedItem());
-            //TODO sujeto a cambios cuando implementemos los usuarios
             User owner = Helpers.getActualUser(this);
 
             if(typeSpinner.getSelectedItem().equals(Constants.typeGift)) {
@@ -441,14 +436,13 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
 
     private void updateAdvertToServer(Advertisement adv) {
         final Context context = this.getApplicationContext();
-        //Toast.makeText(this,R.string.upload_ad_to_server,Toast.LENGTH_LONG).show();
         if(images.size() == 0) {
             Toast.makeText(getApplicationContext(),R.string.please_add_photo,Toast.LENGTH_LONG).show();
         }
         else {
             if (edit) {
                 //System.out.println("VAMOSSS: " +Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci",0));
-                new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/" + intent.getIntExtra("idAnunci", 0), getApplicationContext()) {
+                new TagMatchPutAsyncTask(Constants.IP_SERVER + "/ads/" + getIntent().getIntExtra("idAnunci", 0), getApplicationContext()) {
                     @Override
                     protected void onPreExecute() {
                         super.onPreExecute();
@@ -460,9 +454,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                     @Override
                     protected void onPostExecute(JSONObject jsonObject) {
                         try {
-                            if (jsonObject.has("status"))
-                                Log.i(Constants.DebugTAG, "status: " + jsonObject.getInt("status"));
-                            Log.i(Constants.DebugTAG, "JSON: \n" + jsonObject);
                             if (jsonObject.has("error")) {
                                 String error = jsonObject.get("error").toString();
                             } else {
@@ -472,7 +463,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                                 }
                             }
                         } catch (JSONException ignored) {
-
                         }
                     }
                 }.execute(adv.toJSON2());
@@ -517,11 +507,12 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
             Log.i(Constants.DebugTAG, "Aquest anunci no te imatges");
             advertUpdated();
         }
-        else {
-            Log.i(Constants.DebugTAG,"Aquest anunci te " + images.size() + " fotos, anem a pujarles al server");
+        else if(numPhotos < images.size()) {
+            Log.i(Constants.DebugTAG, "Aquest anunci te " + images.size() + " fotos, anem a pujarles al server");
 
             String url = Constants.IP_SERVER + "/ads/" + advId + "/photos";
-            for (Bitmap bm : images) {
+            for (int i = numPhotos; i < images.size(); i++) {
+                Bitmap bm = images.get(i);
                 ByteArrayOutputStream stream = new ByteArrayOutputStream();
                 bm.compress(Bitmap.CompressFormat.PNG, 100, stream);
                 byte[] byteArray = stream.toByteArray();
@@ -529,6 +520,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                 JSONObject jObject = new JSONObject();
                 try {
                     jObject.put("profilePhotoId", byteArray);
+                    if (imgExtension == null)
+                        imgExtension = "jpeg";
                     new TagMatchPostImgAsyncTask(url, this, byteArray, imgExtension) {
                         @Override
                         protected void onPostExecute(JSONObject jsonObject) {
@@ -536,8 +529,6 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                                 if (jsonObject.has("error")) {
                                     String error = jsonObject.get("error").toString();
                                     Toast.makeText(getApplicationContext(), error, Toast.LENGTH_SHORT).show();
-                                } else {
-                                    newImageUpdated();
                                 }
                             } catch (JSONException ignored) {
                                 ignored.printStackTrace();
@@ -548,12 +539,8 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
                     e.printStackTrace();
                 }
             }
-        }
-    }
-
-    private void newImageUpdated(){
-        ++okImages;
-        if(okImages == images.size()) {
+            advertUpdated();
+        } else {
             advertUpdated();
         }
     }
@@ -695,8 +682,9 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
     @Override
     public void onBackPressed() {
         if(edit) {
-            Intent viewRecepta = new Intent(getApplicationContext(), ViewAdvert.class).putExtra(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT, adv.getID());
-            viewRecepta.putExtra(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT,adv.getOwner().toString());
+            Intent viewRecepta = new Intent(getApplicationContext(), ViewAdvert.class);
+            viewRecepta.putExtra(Constants.TAG_BUNDLE_IDVIEWADVERTISEMENT, adv.getID());
+            viewRecepta.putExtra(Constants.TAG_BUNDLE_USERVIEWADVERTISEMENT, adv.getOwner().getAlias());
             startActivity(viewRecepta);
             finish();
         }
@@ -779,7 +767,10 @@ public class NewAdvertisement extends AppCompatActivity implements View.OnClickL
         }
         String url = Constants.IP_SERVER+"/ads/"+ adv.getID().toString()+"/photo/";
         Log.i(Constants.DebugTAG,"Aquest anunci te "+adv.getImagesIDs().length+" fotos");
+
+        numPhotos = 0;
         for (String photoId :adv.getImagesIDs()) {
+            numPhotos++;
             Log.i(Constants.DebugTAG, "Vaig a demanar la foto amb id: " + photoId);
 
             new TagMatchGetBitmapAsyncTask(url+photoId.toString(),getApplicationContext()) {
