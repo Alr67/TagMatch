@@ -12,6 +12,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -59,8 +60,12 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -89,6 +94,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
     private ArrayList<String> listdata, suggestions;
     private AutoCompleteTextView sugg_hashtags;
     private String myId;
+    private String pathfoto;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -101,7 +107,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
         String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION};
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
                 requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
             }
         }
@@ -248,7 +254,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
 
-            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias().replaceAll(" ", "%20"), this) {
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -306,7 +312,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
 
-            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias() + "/photo", this) {
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias().replaceAll(" ", "%20") + "/photo", this) {
                 @Override
                 protected void onPostExecute(String url) {
                     Picasso.with(EditProfile.this).load(url).error(R.drawable.image0).into(iv);
@@ -400,48 +406,111 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
     }
 
     public void addPhoto(View view) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                Intent intent = new Intent(Intent.ACTION_PICK);
-                intent.setType("image/*");
-                startActivityForResult(intent, Constants.codeImagePicker);
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+            android.app.AlertDialog.Builder builder =
+                    new android.app.AlertDialog.Builder(this, R.style.AppCompatAlertDialogStyle);
+            builder.setTitle(getResources().getString(R.string.imagePickTitle));
+            builder.setMessage(getResources().getString(R.string.imagePickText));
+            builder.setNeutralButton(getResources().getString(R.string.imagePickGallery), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Intent intent = new Intent(Intent.ACTION_PICK);
+                    intent.setType("image/*");
+                    startActivityForResult(intent, Constants.codeImagePicker);
+                }
+            });
+            builder.setPositiveButton(getResources().getString(R.string.imagePickCamera), new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialog, int which) {
+                    Log.v("Register Error","Vaig al cameraPicker");
+                    Intent takePicture = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                    File photoFile = null;
+                    try {
+                        photoFile = createImageFile();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    if (photoFile != null) {
+                        takePicture.putExtra(MediaStore.EXTRA_OUTPUT, Uri.fromFile(photoFile));
+                        startActivityForResult(takePicture, Constants.codeCameraPicker);
+                    }
+                    else Log.e("Register Error", "Error en crear la foto");
+                }
+            });
+            builder.show();
+        } else {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                String[] permissions = {Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION, Manifest.permission.CAMERA};
+                requestPermissions(permissions, Constants.REQUEST_ID_MULTIPLE_PERMISSIONS);
             }
         }
+    }
+
+    private File createImageFile() throws IOException {
+        Log.v("Register Error", "Anem a crear el fitxer de la foto");
+        //Create an unique name for the new picture
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        //We save it at the default picture folder
+        File storageDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+        File image = File.createTempFile( imageFileName, ".jpg",storageDir);
+        pathfoto = image.getAbsolutePath();
+        imgExtension = "jpg";
+        return image;
     }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == Constants.codeImagePicker && resultCode == RESULT_OK && null != data) {
-            Uri selectedImage = data.getData();
-            String[] filePathColumn = {MediaStore.Images.Media.DATA};
+        switch(requestCode) {
+            case Constants.codeImagePicker:
+                if(resultCode == RESULT_OK){
+                    Uri selectedImage = data.getData();
+                    String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
-            Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
-            cursor.moveToFirst();
+                    Cursor cursor = getContentResolver().query(selectedImage, filePathColumn, null, null, null);
+                    cursor.moveToFirst();
 
-            int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
-            String picturePath = cursor.getString(columnIndex);
-            Log.i("img path", picturePath);
-            cursor.close();
+                    int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                    String picturePath = cursor.getString(columnIndex);
+                    Log.i("img path", picturePath);
+                    cursor.close();
 
-            String selectedPic = picturePath;
+                    String selectedPic = picturePath;
 
-            String[] parts = selectedPic.split("\\.");
-            imgExtension = parts[parts.length - 1];
+                    String[] parts = selectedPic.split("\\.");
+                    imgExtension = parts[parts.length - 1];
 
-            if (imgExtension.equals("jpg"))
-                imgExtension = "jpeg";
+                    if (imgExtension.equals("jpg"))
+                        imgExtension = "jpeg";
 
-            Log.i("extension", imgExtension);
+                    Log.i("extension", imgExtension);
 
-            BitmapWorkerTask task = new BitmapWorkerTask(iv);
-            Integer hp, wp;
-            hp = iv.getHeight();
-            wp = iv.getWidth();
-            task.execute(selectedPic, hp.toString(), wp.toString());
+                    BitmapWorkerTask task = new BitmapWorkerTask(iv);
+                    Integer hp, wp;
+                    hp = iv.getHeight();
+                    wp = iv.getWidth();
+                    task.execute(selectedPic, hp.toString(), wp.toString());
 
-            iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
-            imgMod = true;
+                    iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                }
+                break;
+            case Constants.codeCameraPicker:
+                if(resultCode == RESULT_OK) {
+                    BitmapWorkerTask task = new BitmapWorkerTask(iv);
+                    Integer hp, wp;
+                    hp = iv.getHeight();
+                    wp = iv.getWidth();
+                    task.execute(pathfoto, hp.toString(), wp.toString());
+
+                    iv.setScaleType(ImageView.ScaleType.CENTER_CROP);
+                }
+                break;
+            default:
+                Log.e(Constants.DebugTAG, "Error, He entrat al default del onActivityResult");
+                break;
         }
     }
 
@@ -454,7 +523,7 @@ public class EditProfile extends AppCompatActivity implements GoogleApiClient.Co
 
     @Override
     public void onConnected(@Nullable Bundle bundle) {
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED || ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
 
         }
     }

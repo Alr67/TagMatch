@@ -270,7 +270,7 @@ public class Filter extends AppCompatActivity implements View.OnClickListener {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
-            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias().replaceAll(" ", "%20"), this) {
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {

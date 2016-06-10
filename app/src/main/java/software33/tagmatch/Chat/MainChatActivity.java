@@ -441,7 +441,7 @@ public class MainChatActivity extends AppCompatActivity implements NavigationVie
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
 
-            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + userName + "/photo", this) {
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + userName.replaceAll(" ", "%20") + "/photo", this) {
                 @Override
                 protected void onPostExecute(String url) {
                     setListData(idUser, idProduct, titleProduct, owner, userName, idChat, url, messages, newOffer);

@@ -224,12 +224,19 @@ public abstract class FirebaseUtils {
         context.startService(intent);
     }
 
-    public static void startListeners(final String myId, final Context context){
+    public static void stopListeners(){
+        startedListeners = false;
+        FirebaseUtils.getMyFirebaseRef().removeEventListener(listener1);
+        FirebaseUtils.getMyFirebaseRef().removeEventListener(listener2);
+        FirebaseUtils.getMyFirebaseRef().removeEventListener(listener3);
+    }
+
+    public static void startListeners(final Context context){
         if (!startedListeners) {
             Log.i("DebugListeners","Starting listeners");
             startedListeners = true;
             final NotificationController notificationController = new NotificationController();
-            listener1 = FirebaseUtils.getUsersRef().child(myId).child("chats").addValueEventListener(new ValueEventListener() {
+            listener1 = FirebaseUtils.getUsersRef().child(FirebaseUtils.getMyId(context)).child("chats").addValueEventListener(new ValueEventListener() {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     if (dataSnapshot.hasChildren()) {
@@ -241,22 +248,26 @@ public abstract class FirebaseUtils {
                                     ArrayList<String> arrayListMessages = new ArrayList<>((int)snapshot.child("chats").getChildrenCount());
                                     for (DataSnapshot dataSnapshot1 : snapshot.child("messages").getChildren()) {
                                         FirebaseUtils.ChatText ct = dataSnapshot1.getValue(FirebaseUtils.ChatText.class);
-                                        if (!ct.getRead() && !ct.getSenderId().equals(myId)) {
+                                        if (!ct.getRead() && !ct.getSenderId().equals(FirebaseUtils.getMyId(context))) {
                                             arrayListMessages.add(ct.getText());
+                                            Log.i("DebugNewMessage","sender id: "+ ct.getSenderId()+ " and myId: " +FirebaseUtils.getMyId(context));
                                         }
                                     }
                                     String userName = "";
                                     for (Object o : c.getUsers().values()) {
-                                        if (!o.toString().equals(myId)){
+                                        if (!o.toString().equals(FirebaseUtils.getMyId(context))){
                                             userName = o.toString();
                                         }
                                     }
                                     if (arrayListMessages.size() > 0) notificationController.displayNotification(context,c.getTitleProduct(),userName,arrayListMessages);
-                                    else notificationController.cleanEntry(c.getTitleProduct(),userName);
+                                    else if (arrayListMessages.isEmpty()) {
+                                        notificationController.cleanEntry(context,c.getTitleProduct(),userName);
+                                        Log.i("DebugNotification","Clean Entry, titleP: "+c.getTitleProduct()+" user: "+ userName);
+                                    }
 
                                     String idUser = "";
                                     for (String s : c.getUsers().keySet()) {
-                                        if (!s.equals(myId)) {
+                                        if (!s.equals(FirebaseUtils.getMyId(context))) {
                                             idUser = s;
                                         }
                                     }

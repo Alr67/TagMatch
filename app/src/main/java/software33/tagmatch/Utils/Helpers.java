@@ -256,7 +256,7 @@ public class Helpers {
             JSONObject jsonObject = new JSONObject();
             jsonObject.put("username", Helpers.getActualUser(context).getAlias());
             jsonObject.put("password", Helpers.getActualUser(context).getPassword());
-            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(context).getAlias() + "/photo", context) {
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(context).getAlias().replaceAll(" ", "%20") + "/photo", context) {
                 @Override
                 protected void onPostExecute(String url) {
                     ImageView contenedor = (ImageView) nav_header.findViewById(R.id.image_nav);

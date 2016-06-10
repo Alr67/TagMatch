@@ -19,13 +19,6 @@
             android:paddingTop="10dp"
             android:paddingBottom="10dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:text="Number of ads to be shown"
-                android:id="@+id/textView15" />
-
             <LinearLayout
                 android:orientation="horizontal"
                 android:layout_width="match_parent"
@@ -34,11 +27,12 @@
                 android:weightSum="1">
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="152dp"
                     android:layout_height="wrap_content"
                     android:text="@string/settings_default_num_advs"
                     android:id="@+id/textView"
-                    android:paddingRight="35dp" />
+                    android:paddingRight="35dp"
+                    android:layout_weight="0.32" />
 
                 <EditText
                     android:layout_width="wrap_content"
@@ -46,7 +40,15 @@
                     android:inputType="number"
                     android:gravity="center_horizontal"
                     android:id="@+id/settings_default_advertisement_number"
-                    android:layout_weight="0.30" />
+                    android:layout_weight="0.58" />
+
+                <Button
+                    style="?android:attr/buttonStyleSmall"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@android:drawable/ic_menu_save"
+                    android:onClick="saveNewDefaultAdvertLimit"
+                    android:id="@+id/button" />
 
             </LinearLayout>
 

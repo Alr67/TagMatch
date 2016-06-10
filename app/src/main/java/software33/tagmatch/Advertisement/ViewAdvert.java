@@ -4,20 +4,15 @@ import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.design.widget.FloatingActionButton;
-import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.util.Base64;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -45,13 +40,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.ByteArrayOutputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
-import software33.tagmatch.AdCards.AdvertContent;
 import software33.tagmatch.AdCards.Home;
 import software33.tagmatch.Chat.FirebaseUtils;
 import software33.tagmatch.Chat.SingleChatActivity;
@@ -441,9 +432,9 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
             Log.i(Constants.DebugTAG,"HA PETAT JAVA amb Json");
             e.printStackTrace();
         }
-        String url = Constants.IP_SERVER+"/users/"+ adv.getUser().getAlias()+"/photo";
+        String url = Constants.IP_SERVER+"/users/"+ adv.getUser().getAlias().replaceAll(" ", "%20")+"/photo";
 
-        new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + adv.getUser().getAlias(), this) {
+        new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + adv.getUser().getAlias().replaceAll(" ", "%20"), this) {
             @Override
             protected void onPostExecute(JSONObject jsonObject) {
                 try {
@@ -626,7 +617,7 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
     private void setButtonXat(String idProduct, String idChat, long numChats) {
 
         //Restriccions de obrir xat:
-        if (idProduct.equals(this.idProduct)){
+        if (idProduct.equals(this.idProduct) && !myAdv){
             this.idChat = idChat;
             fab.setClickable(true);
             fab.setImageDrawable(getDrawable(R.drawable.ic_menu_send));
@@ -652,6 +643,9 @@ public class ViewAdvert extends AppCompatActivity implements View.OnClickListene
                         finish();
                     }
                 });
+            }
+            else {
+                prepareEdit();
             }
         }
     }

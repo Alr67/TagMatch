@@ -432,10 +432,6 @@ public class SingleChatActivity extends AppCompatActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_send_image) {
-            return true;
-        }
         if (id == R.id.action_send_offer) {
             if (canSendOffers != null){
                 if (canSendOffers.equals("Yes")) {
@@ -444,9 +440,6 @@ public class SingleChatActivity extends AppCompatActivity {
                     createErrorDialog().show();
                 }
             }
-            return true;
-        }
-        if (id == R.id.action_block_user) {
             return true;
         }
         if (id == R.id.action_delete_chat) {

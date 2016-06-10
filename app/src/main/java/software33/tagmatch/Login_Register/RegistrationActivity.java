@@ -111,11 +111,10 @@ public class RegistrationActivity extends AppCompatActivity {
                         String error = jsonObject.get("error").toString();
                         showError(error);
                         removeUser(context);
-
                     } catch (JSONException ignored) {
-                        mDialog.dismiss();
                         continueRegistration2(email, username, password);
                     }
+                    mDialog.dismiss();
                 }
             }.execute(jObject);
         } catch (JSONException e) {

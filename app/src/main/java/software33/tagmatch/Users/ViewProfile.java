@@ -144,7 +144,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
 
-            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias(), this) {
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias().replaceAll(" ", "%20"), this) {
                 @Override
                 protected void onPreExecute() {
                     super.onPreExecute();
@@ -207,7 +207,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                 }
             }.execute(jsonObject);
 
-            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias() + "/photo", this) {
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + Helpers.getActualUser(this).getAlias().replaceAll(" ", "%20") + "/photo", this) {
                 @Override
                 protected void onPostExecute(String url) {
                     if (url == null){
@@ -248,7 +248,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
             jsonObject.put("username", Helpers.getActualUser(this).getAlias());
             jsonObject.put("password", Helpers.getActualUser(this).getPassword());
 
-            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + username, this) {
+            new TagMatchGetAsyncTask(Constants.IP_SERVER + "/users/" + username.replaceAll(" ", "%20"), this) {
                 @Override
                 protected void onPostExecute(JSONObject jsonObject) {
                     try {
@@ -300,7 +300,7 @@ public class ViewProfile extends AppCompatActivity implements NavigationView.OnN
                 }
             }.execute(jsonObject);
 
-            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + username + "/photo", this) {
+            new TagMatchGetImageAsyncTask(Constants.IP_SERVER + "/users/" + username.replaceAll(" ", "%20") + "/photo", this) {
                 @Override
                 protected void onPostExecute(String url) {
                     if (url == null){
